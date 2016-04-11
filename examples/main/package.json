@@ -1,0 +1,7 @@
+{
+  "name": "react-scrolling-main-example",
+  "version": "0.0.0",
+  "dependencies": {
+    "react-dom": "^15.0.1"
+  }
+}
