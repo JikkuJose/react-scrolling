@@ -58,13 +58,18 @@
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
+	var sizeProps = {
+		container: 400,
+		content: 1000
+	};
+
 	ReactDOM.render(React.createElement(
-		_reactScrolling.ReactScrolling,
-		null,
+		_reactScrolling.Scroller,
+		{ id: 'scroller-p', orientation: _reactScrolling.Orientation.Vertiacal, size: sizeProps },
 		React.createElement(
-			'div',
-			null,
-			'Hello, React Scrolling!'
+			'p',
+			{ style: { width: '100px' } },
+			'(Horizontal) Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur nec risus vel sapien mattis aliquam vel ullamcorper enim. Nulla fermentum euismod elit quis vulputate. Donec efficitur est justo, et sollicitudin dolor tincidunt non. Maecenas eget mattis nisi, nec vestibulum dui. Suspendisse potenti. Quisque malesuada tortor sit amet metus tempus, nec ullamcorper arcu dignissim. Phasellus dignissim leo vitae tellus molestie maximus. Integer eget orci nec ipsum faucibus rhoncus. Aliquam consectetur tempor pellentesque. Proin sit amet enim sem. Phasellus consequat consequat nisi sit amet vehicula. Duis placerat justo felis, vel tristique erat interdum eget. Maecenas scelerisque dolor mauris.'
 		)
 	), document.getElementById('ReactScrolling'));
 
@@ -20032,26 +20037,17 @@
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.ReactScrolling = undefined;
+	exports.Pagination = exports.Orientation = exports.Scroller = undefined;
 
-	var _ReactScrolling = __webpack_require__(167);
+	var _Scroller = __webpack_require__(167);
 
-	exports.ReactScrolling = _ReactScrolling.ReactScrolling;
+	var _Orientation = __webpack_require__(188);
 
-/***/ },
-/* 167 */
-/***/ function(module, exports, __webpack_require__) {
+	var Orientation = _interopRequireWildcard(_Orientation);
 
-	'use strict';
+	var _Pagination = __webpack_require__(189);
 
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	exports.ReactScrolling = undefined;
-
-	var _react = __webpack_require__(1);
-
-	var React = _interopRequireWildcard(_react);
+	var Pagination = _interopRequireWildcard(_Pagination);
 
 	function _interopRequireWildcard(obj) {
 		if (obj && obj.__esModule) {
@@ -20065,16 +20061,2834 @@
 		}
 	}
 
-	var ReactScrolling = exports.ReactScrolling = function ReactScrolling(props) {
-		return React.createElement('div', null, props.children);
+	exports.Scroller = _Scroller.Scroller;
+	exports.Orientation = Orientation;
+	exports.Pagination = Pagination;
+
+/***/ },
+/* 167 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.Scroller = undefined;
+
+	var _createClass = function () {
+		function defineProperties(target, props) {
+			for (var i = 0; i < props.length; i++) {
+				var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+			}
+		}return function (Constructor, protoProps, staticProps) {
+			if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+		};
+	}();
+
+	var _desc, _value, _class;
+
+	var _react = __webpack_require__(1);
+
+	var React = _interopRequireWildcard(_react);
+
+	var _autobindDecorator = __webpack_require__(168);
+
+	var _autobindDecorator2 = _interopRequireDefault(_autobindDecorator);
+
+	var _reactGesture = __webpack_require__(169);
+
+	var _reactGesture2 = _interopRequireDefault(_reactGesture);
+
+	var _coordinatesFromEvent = __webpack_require__(172);
+
+	var _reactMotion = __webpack_require__(173);
+
+	var _config = __webpack_require__(187);
+
+	var Config = _interopRequireWildcard(_config);
+
+	var _Orientation = __webpack_require__(188);
+
+	var Orientation = _interopRequireWildcard(_Orientation);
+
+	var _Pagination = __webpack_require__(189);
+
+	var Pagination = _interopRequireWildcard(_Pagination);
+
+	var _Springs = __webpack_require__(190);
+
+	var Springs = _interopRequireWildcard(_Springs);
+
+	var _ScrollerOnPoint = __webpack_require__(191);
+
+	var _PositionCorrectors = __webpack_require__(193);
+
+	var _ArrayPropValue = __webpack_require__(194);
+
+	var _OrientationHelpers = __webpack_require__(192);
+
+	function _interopRequireDefault(obj) {
+		return obj && obj.__esModule ? obj : { default: obj };
+	}
+
+	function _interopRequireWildcard(obj) {
+		if (obj && obj.__esModule) {
+			return obj;
+		} else {
+			var newObj = {};if (obj != null) {
+				for (var key in obj) {
+					if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+				}
+			}newObj.default = obj;return newObj;
+		}
+	}
+
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
+
+	function _possibleConstructorReturn(self, call) {
+		if (!self) {
+			throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+		}return call && ((typeof call === "undefined" ? "undefined" : _typeof(call)) === "object" || typeof call === "function") ? call : self;
+	}
+
+	function _inherits(subClass, superClass) {
+		if (typeof superClass !== "function" && superClass !== null) {
+			throw new TypeError("Super expression must either be null or a function, not " + (typeof superClass === "undefined" ? "undefined" : _typeof(superClass)));
+		}subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+	}
+
+	function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
+		var desc = {};
+		Object['ke' + 'ys'](descriptor).forEach(function (key) {
+			desc[key] = descriptor[key];
+		});
+		desc.enumerable = !!desc.enumerable;
+		desc.configurable = !!desc.configurable;
+
+		if ('value' in desc || desc.initializer) {
+			desc.writable = true;
+		}
+
+		desc = decorators.slice().reverse().reduce(function (desc, decorator) {
+			return decorator(target, property, desc) || desc;
+		}, desc);
+
+		if (context && desc.initializer !== void 0) {
+			desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
+			desc.initializer = undefined;
+		}
+
+		if (desc.initializer === void 0) {
+			Object['define' + 'Property'](target, property, desc);
+			desc = null;
+		}
+
+		return desc;
+	}
+
+	var Scroller = exports.Scroller = (_class = function (_React$Component) {
+		_inherits(Scroller, _React$Component);
+
+		function Scroller(props) {
+			_classCallCheck(this, Scroller);
+
+			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Scroller).call(this, props));
+
+			_this.state = {};
+			var defaultSingleState = {
+				position: 0,
+				spring: Springs.Normal
+			};
+			if (typeof props.id === 'string') {
+				_this.state[props.id] = defaultSingleState;
+			} else {
+				var _iteratorNormalCompletion = true;
+				var _didIteratorError = false;
+				var _iteratorError = undefined;
+
+				try {
+					for (var _iterator = props.id[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+						var id = _step.value;
+
+						_this.state[id] = Object.assign({}, defaultSingleState);
+					}
+				} catch (err) {
+					_didIteratorError = true;
+					_iteratorError = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion && _iterator.return) {
+							_iterator.return();
+						}
+					} finally {
+						if (_didIteratorError) {
+							throw _iteratorError;
+						}
+					}
+				}
+			}
+			_this.lock = null;
+			_this.correctOutOfTheBox(props);
+			return _this;
+		}
+
+		_createClass(Scroller, [{
+			key: 'componentWillReceiveProps',
+			value: function componentWillReceiveProps(props) {
+				if (!this.lock) {
+					this.correctPagination(props, Springs.Hard);
+					this.correctOutOfTheBox(props);
+				}
+			}
+
+			// <publicMethods>
+
+		}, {
+			key: 'moveScroller',
+			value: function moveScroller(newPosition) {
+				var id = arguments.length <= 1 || arguments[1] === undefined ? this.props.id : arguments[1];
+				var springValue = arguments.length <= 2 || arguments[2] === undefined ? Springs.Normal : arguments[2];
+
+				if (id in this.state) {
+					var newPartialState = {};
+					newPartialState[id] = {
+						position: newPosition,
+						spring: springValue
+					};
+					this.setState(newPartialState);
+				}
+			}
+		}, {
+			key: 'moveScrollWithinBox',
+			value: function moveScrollWithinBox(delta, scrollerId) {
+				if (scrollerId in this.state) {
+					var oldPosition = this.state[scrollerId].position;
+					var newPosition = oldPosition + delta;
+					var finalPosition = (0, _PositionCorrectors.outOfTheBoxCorrection)(newPosition, scrollerId, this.props);
+					if (finalPosition !== oldPosition) {
+						this.moveScroller(finalPosition, scrollerId);
+					}
+					return finalPosition !== oldPosition;
+				}
+				return false;
+			}
+		}, {
+			key: 'moveScrollerToPage',
+			value: function moveScrollerToPage(page, scrollerId, margin) {
+				if (scrollerId in this.state) {
+					var position = (0, _PositionCorrectors.pagePositionForScroller)(page, scrollerId, this.props, margin);
+					this.moveScroller(position, scrollerId);
+				}
+			}
+		}, {
+			key: 'currentPage',
+			value: function currentPage(scrollerId) {
+				if (scrollerId in this.state) {
+					return (0, _PositionCorrectors.pageNumberForPosition)(this.state[scrollerId].position, scrollerId, this.props);
+				}
+				return undefined;
+			}
+		}, {
+			key: 'isScrolling',
+			value: function isScrolling() {
+				return this.lock !== null;
+			}
+		}, {
+			key: 'releaseScroller',
+			value: function releaseScroller() {
+				this.handleEventEnd({
+					gesture: {
+						velocityX: 0,
+						velocityY: 0
+					}
+				});
+			}
+		}, {
+			key: 'scrollerPosition',
+			value: function scrollerPosition() {
+				var scrollerId = arguments.length <= 0 || arguments[0] === undefined ? this.props.id : arguments[0];
+
+				return this.state[scrollerId].position;
+			}
+		}, {
+			key: 'allPositions',
+			value: function allPositions() {
+				var res = {};
+				for (var scrollerId in this.state) {
+					if (this.state.hasOwnProperty(scrollerId)) {
+						res[scrollerId] = this.state[scrollerId].position;
+					}
+				}
+				return res;
+			}
+		}, {
+			key: 'correctOutOfTheBox',
+			value: function correctOutOfTheBox() {
+				var props = arguments.length <= 0 || arguments[0] === undefined ? this.props : arguments[0];
+
+				for (var scrollerId in this.state) {
+					if (this.state.hasOwnProperty(scrollerId)) {
+						var oldPosition = this.state[scrollerId].position;
+						var newPosition = (0, _PositionCorrectors.outOfTheBoxCorrection)(oldPosition, scrollerId, props);
+						if (newPosition !== oldPosition) {
+							this.moveScroller(newPosition, scrollerId);
+						}
+					}
+				}
+			}
+		}, {
+			key: 'correctPagination',
+			value: function correctPagination() {
+				var props = arguments.length <= 0 || arguments[0] === undefined ? this.props : arguments[0];
+				var springValue = arguments.length <= 1 || arguments[1] === undefined ? Springs.Normal : arguments[1];
+
+				for (var scrollerId in this.state) {
+					if (this.state.hasOwnProperty(scrollerId)) {
+						if ((0, _ArrayPropValue.getPropValueForScroller)(scrollerId, props.id, props.pagination) !== Pagination.None) {
+							var oldPosition = this.state[scrollerId].position;
+							var newPosition = (0, _PositionCorrectors.paginationCorrection)(oldPosition, scrollerId, props);
+							if (newPosition !== oldPosition && oldPosition !== 0) {
+								this.moveScroller(newPosition, scrollerId, springValue);
+							}
+						}
+					}
+				}
+			}
+		}, {
+			key: 'correctPosition',
+			value: function correctPosition() {
+				this.correctPagination();
+				this.correctOutOfTheBox();
+			}
+
+			// </publicMethods>
+
+		}, {
+			key: 'handleEventBegin',
+			value: function handleEventBegin(e) {
+				if (!this.lock) {
+					var coordinates = (0, _coordinatesFromEvent.eventCoordinates)(e, this.props.scale);
+					var coordinateValue = coordinates[_OrientationHelpers.orientationProp[this.props.orientation]];
+
+					var scroller = (0, _ScrollerOnPoint.scrollerOnPoint)(coordinates, this.props);
+					if (scroller) {
+						this.lock = {
+							scroller: scroller,
+							coordinateValue: coordinateValue
+						};
+						if ((0, _ArrayPropValue.getPropValueForScroller)(scroller, this.props.id, this.props.pagination) === Pagination.Single) {
+							this.lock.page = this.currentPage(scroller);
+						}
+						if (this.lastRenderedStyle[scroller] !== this.state[scroller].position) {
+							this.moveScroller(this.lastRenderedStyle[scroller], scroller, Springs.Hard);
+							this.lock.swiped = true;
+						}
+					}
+				}
+			}
+		}, {
+			key: 'handleEventEnd',
+			value: function handleEventEnd(e) {
+				if (this.lock && this.lock.swiped) {
+					var velocityProp = 'velocity' + _OrientationHelpers.orientationProp[this.props.orientation].toUpperCase();
+					var signedVelocity = e.gesture[velocityProp];
+					if (Math.abs(signedVelocity) < Config.FLICK_THRESHOLD) {
+						signedVelocity = 0;
+					} else {
+						var deltaProp = 'delta' + _OrientationHelpers.orientationProp[this.props.orientation].toUpperCase();
+						signedVelocity *= Math.sign(e.gesture[deltaProp]);
+					}
+
+					var springValue = Springs.Move;
+					var newPosition = this.state[this.lock.scroller].position;
+					if ((0, _ArrayPropValue.getPropValueForScroller)(this.lock.scroller, this.props.id, this.props.pagination) === Pagination.Single) {
+						newPosition = (0, _PositionCorrectors.paginationCorrection)(newPosition, this.lock.scroller, this.props, Math.sign(signedVelocity), this.lock.page);
+					} else {
+						newPosition = (0, _PositionCorrectors.velocityPositionCorrection)(newPosition, this.lock.scroller, signedVelocity);
+						if ((0, _ArrayPropValue.getPropValueForScroller)(this.lock.scroller, this.props.id, this.props.pagination) === Pagination.Multiple) {
+							newPosition = (0, _PositionCorrectors.paginationCorrection)(newPosition, this.lock.scroller, this.props);
+							springValue = Springs.Bounce;
+						}
+					}
+
+					var finalPosition = (0, _PositionCorrectors.outOfTheBoxCorrection)(newPosition, this.lock.scroller, this.props);
+					if (newPosition !== finalPosition) {
+						springValue = Springs.Bounce;
+					}
+					this.moveScroller(finalPosition, this.lock.scroller, springValue);
+				}
+				this.lock = null;
+			}
+		}, {
+			key: 'handleSwipe',
+			value: function handleSwipe(e) {
+				var direction = e.gesture.type.replace('swipe', '');
+				if (_OrientationHelpers.orientationDirection[this.props.orientation].indexOf(direction) >= 0) {
+					if (this.lock) {
+						var coordinates = (0, _coordinatesFromEvent.eventCoordinates)(e, this.props.scale);
+						var coordinateValue = coordinates[_OrientationHelpers.orientationProp[this.props.orientation]];
+						var delta = coordinateValue - this.lock.coordinateValue;
+
+						var oldPosition = this.state[this.lock.scroller].position;
+						var newPosition = oldPosition + delta;
+						if ((0, _PositionCorrectors.outOfTheBoxCorrection)(newPosition, this.lock.scroller, this.props) !== newPosition) {
+							newPosition = oldPosition + delta * Config.OUT_OF_THE_BOX_ACCELERATION;
+						}
+
+						this.lock.coordinateValue = coordinateValue;
+						this.lock.swiped = true;
+						this.moveScroller(newPosition, this.lock.scroller);
+					}
+				}
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+				var _this2 = this;
+
+				var springStyle = {};
+				for (var scrollerId in this.state) {
+					if (this.state.hasOwnProperty(scrollerId)) {
+						springStyle[scrollerId] = (0, _reactMotion.spring)(this.state[scrollerId].position, this.state[scrollerId].spring);
+					}
+				}
+				return React.createElement(_reactMotion.Motion, { style: springStyle }, function (style) {
+					_this2.lastRenderedStyle = style;
+					var children = null;
+					if (typeof _this2.props.id === 'string') {
+						if (typeof _this2.props.children === 'function') {
+							children = _this2.props.children(style[_this2.props.id]);
+						} else {
+							var translate = { x: 0, y: 0 };
+							translate[_OrientationHelpers.orientationProp[_this2.props.orientation]] = style[_this2.props.id];
+							children = React.createElement('div', { style: {
+									overflow: 'hidden',
+									width: '100%',
+									height: '100%'
+								}
+							}, React.createElement('div', { style: {
+									transform: 'translate3d(' + translate.x + 'px, ' + translate.y + 'px, 0px)'
+								}
+							}, _this2.props.children));
+						}
+					} else {
+						children = _this2.props.children(style);
+					}
+					if (children instanceof Array) {
+						children = React.createElement('div', null, children);
+					}
+					return React.createElement(_reactGesture2.default, {
+						onTouchStart: _this2.handleEventBegin,
+						onMouseDown: _this2.handleEventBegin,
+						onTouchEnd: _this2.handleEventEnd,
+						onMouseUp: _this2.handleEventEnd,
+						onSwipeLeft: _this2.handleSwipe,
+						onSwipeRight: _this2.handleSwipe,
+						onSwipeUp: _this2.handleSwipe,
+						onSwipeDown: _this2.handleSwipe
+					}, children);
+				});
+			}
+		}]);
+
+		return Scroller;
+	}(React.Component), (_applyDecoratedDescriptor(_class.prototype, 'handleEventBegin', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'handleEventBegin'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'handleEventEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'handleEventEnd'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'handleSwipe', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'handleSwipe'), _class.prototype)), _class);
+
+	Scroller.valueOrArray = function (ReactType) {
+		return React.PropTypes.oneOfType([ReactType, React.PropTypes.arrayOf(ReactType)]);
 	};
 
-	ReactScrolling.defaultProps = {
-		children: undefined
+	Scroller.enumType = function (Enum) {
+		return React.PropTypes.oneOf(Object.keys(Enum).map(function (key) {
+			return Enum[key];
+		}));
 	};
 
-	ReactScrolling.propTypes = {
-		children: React.PropTypes.any
+	Scroller.propTypes = {
+		id: Scroller.valueOrArray(React.PropTypes.string).isRequired,
+		orientation: Scroller.enumType(Orientation),
+		pagination: Scroller.valueOrArray(Scroller.enumType(Pagination)),
+		center: Scroller.valueOrArray(React.PropTypes.bool),
+		size: React.PropTypes.shape({
+			container: Scroller.valueOrArray(React.PropTypes.number),
+			content: Scroller.valueOrArray(React.PropTypes.number)
+		}).isRequired,
+		page: React.PropTypes.shape({
+			size: Scroller.valueOrArray(React.PropTypes.number),
+			margin: Scroller.valueOrArray(React.PropTypes.number)
+		}),
+		multiple: React.PropTypes.shape({
+			before: React.PropTypes.number,
+			between: React.PropTypes.number,
+			size: React.PropTypes.number
+		}),
+		scale: React.PropTypes.number,
+		children: React.PropTypes.oneOfType([React.PropTypes.func, React.PropTypes.node])
+	};
+	Scroller.defaultProps = {
+		scale: 1,
+		orientation: Orientation.Vertiacal,
+		pagination: Pagination.None,
+		center: false
+	};
+
+	/*
+	const propsExample = {
+		id: ['scr-a', 'scr-b'],
+		orientation: Orientation.Horizontal, // single value only
+		pagination: [Pagination.Multiple, Pagination.None],
+		center: [true, false],
+		size: {
+			container: 1366,
+			content: [900, 2000]
+		},
+		page: {
+			size: 300,
+			margin: 30
+		},
+		multiple: {
+			before: 30,
+			between: 200,
+			size: 400
+		}
+	};
+	*/
+
+/***/ },
+/* 168 */
+/***/ function(module, exports) {
+
+	/**
+	 * @copyright 2015, Andrey Popp <8mayday@gmail.com>
+	 *
+	 * The decorator may be used on classes or methods
+	 * ```
+	 * @autobind
+	 * class FullBound {}
+	 *
+	 * class PartBound {
+	 *   @autobind
+	 *   method () {}
+	 * }
+	 * ```
+	 */
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports['default'] = autobind;
+
+	function autobind() {
+	  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	    args[_key] = arguments[_key];
+	  }
+
+	  if (args.length === 1) {
+	    return boundClass.apply(undefined, args);
+	  } else {
+	    return boundMethod.apply(undefined, args);
+	  }
+	}
+
+	/**
+	 * Use boundMethod to bind all methods on the target.prototype
+	 */
+	function boundClass(target) {
+	  // (Using reflect to get all keys including symbols)
+	  var keys = undefined;
+	  // Use Reflect if exists
+	  if (typeof Reflect !== 'undefined' && typeof Reflect.ownKeys === 'function') {
+	    keys = Reflect.ownKeys(target.prototype);
+	  } else {
+	    keys = Object.getOwnPropertyNames(target.prototype);
+	    // use symbols if support is provided
+	    if (typeof Object.getOwnPropertySymbols === 'function') {
+	      keys = keys.concat(Object.getOwnPropertySymbols(target.prototype));
+	    }
+	  }
+
+	  keys.forEach(function (key) {
+	    // Ignore special case target method
+	    if (key === 'constructor') {
+	      return;
+	    }
+
+	    var descriptor = Object.getOwnPropertyDescriptor(target.prototype, key);
+
+	    // Only methods need binding
+	    if (typeof descriptor.value === 'function') {
+	      Object.defineProperty(target.prototype, key, boundMethod(target, key, descriptor));
+	    }
+	  });
+	  return target;
+	}
+
+	/**
+	 * Return a descriptor removing the value and returning a getter
+	 * The getter will return a .bind version of the function
+	 * and memoize the result against a symbol on the instance
+	 */
+	function boundMethod(target, key, descriptor) {
+	  var fn = descriptor.value;
+
+	  if (typeof fn !== 'function') {
+	    throw new Error('@autobind decorator can only be applied to methods not: ' + typeof fn);
+	  }
+
+	  return {
+	    configurable: true,
+	    get: function get() {
+	      if (this === target.prototype || this.hasOwnProperty(key)) {
+	        return fn;
+	      }
+
+	      var boundFn = fn.bind(this);
+	      Object.defineProperty(this, key, {
+	        value: boundFn,
+	        configurable: true,
+	        writable: true
+	      });
+	      return boundFn;
+	    }
+	  };
+	}
+	module.exports = exports['default'];
+
+
+/***/ },
+/* 169 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _ReactGesture = __webpack_require__(170);
+
+	exports.default = _ReactGesture.ReactGesture;
+
+/***/ },
+/* 170 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.ReactGesture = undefined;
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _desc, _value, _class;
+
+	var _react = __webpack_require__(1);
+
+	var React = _interopRequireWildcard(_react);
+
+	var _autobindDecorator = __webpack_require__(168);
+
+	var _autobindDecorator2 = _interopRequireDefault(_autobindDecorator);
+
+	var _getureCalculations = __webpack_require__(171);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
+		var desc = {};
+		Object['ke' + 'ys'](descriptor).forEach(function (key) {
+			desc[key] = descriptor[key];
+		});
+		desc.enumerable = !!desc.enumerable;
+		desc.configurable = !!desc.configurable;
+
+		if ('value' in desc || desc.initializer) {
+			desc.writable = true;
+		}
+
+		desc = decorators.slice().reverse().reduce(function (desc, decorator) {
+			return decorator(target, property, desc) || desc;
+		}, desc);
+
+		if (context && desc.initializer !== void 0) {
+			desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
+			desc.initializer = undefined;
+		}
+
+		if (desc.initializer === void 0) {
+			Object['define' + 'Property'](target, property, desc);
+			desc = null;
+		}
+
+		return desc;
+	}
+
+	var LINE_HEIGHT = 20;
+
+	var ReactGesture = exports.ReactGesture = (_class = function (_React$Component) {
+		_inherits(ReactGesture, _React$Component);
+
+		function ReactGesture(props) {
+			_classCallCheck(this, ReactGesture);
+
+			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ReactGesture).call(this, props));
+
+			_this.pseudoState = {
+				x: null,
+				y: null,
+				swiping: false,
+				pinch: false,
+				start: 0,
+				holdTimer: null,
+				wheelTimer: null,
+				fingers: []
+			};
+
+			window.addEventListener('mousemove', _this._handleMouseMove);
+			window.addEventListener('mouseup', _this._handleMouseUp);
+			window.addEventListener('touchmove', _this._handleTouchMove);
+			window.addEventListener('touchend', _this._handleTouchEnd);
+			window.addEventListener('wheel', _this._handleWheel);
+			return _this;
+		}
+
+		_createClass(ReactGesture, [{
+			key: '_resetState',
+			value: function _resetState() {
+				clearTimeout(this.pseudoState.holdTimer);
+				this.pseudoState = {
+					x: null,
+					y: null,
+					swiping: false,
+					pinch: false,
+					start: Number.POSITIVE_INFINITY,
+					holdTimer: null,
+					wheelTimer: null,
+					fingers: []
+				};
+			}
+		}, {
+			key: '_emitEvent',
+			value: function _emitEvent(name, e) {
+				if (this.props[name]) {
+					this.props[name](e);
+				}
+			}
+		}, {
+			key: '_getGestureDetails',
+			value: function _getGestureDetails(e) {
+				var _ref = e.changedTouches ? e.changedTouches[0] : e;
+
+				var clientX = _ref.clientX;
+				var clientY = _ref.clientY;
+
+				var deltaX = this.pseudoState.x - clientX;
+				var deltaY = this.pseudoState.y - clientY;
+				var absX = Math.abs(deltaX);
+				var absY = Math.abs(deltaY);
+				var duration = Date.now() - this.pseudoState.start;
+				var velocity = Math.sqrt(absX * absX + absY * absY) / duration;
+				var velocityX = absX / duration;
+				var velocityY = absY / duration;
+				var done = e.type === 'touchend';
+
+				e.gesture = {
+					deltaX: deltaX,
+					deltaY: deltaY,
+					absX: absX,
+					absY: absY,
+					velocity: velocity,
+					velocityX: velocityX,
+					velocityY: velocityY,
+					duration: duration,
+					done: done
+				};
+
+				return e;
+			}
+		}, {
+			key: '_handleTouchStart',
+			value: function _handleTouchStart(e) {
+				this._emitEvent('onTouchStart', e);
+
+				var holdTimer = this.pseudoState.holdTimer;
+				if (holdTimer === null) {
+					holdTimer = setTimeout(this._handleHoldGesture.bind(this), this.props.holdTime, e);
+				}
+
+				this.pseudoState = {
+					start: Date.now(),
+					x: e.touches[0].clientX,
+					y: e.touches[0].clientY,
+					swiping: false,
+					pinch: false,
+					holdTimer: holdTimer,
+					fingers: (0, _getureCalculations.touchListMap)(e.touches, _getureCalculations.getXY)
+				};
+
+				e.preventDefault();
+			}
+		}, {
+			key: '_handleTouchMove',
+			value: function _handleTouchMove(e) {
+				e.preventDefault();
+				var gestureDetails = this._getGestureDetails(e);
+
+				this._emitEvent('onTouchMove', gestureDetails);
+
+				if (this.pseudoState.x !== null) {
+					if (e.touches.length === 2) {
+						if (this.pseudoState.fingers.length === 2) {
+							this._handlePinch(e);
+						}
+
+						this.pseudoState.fingers = (0, _getureCalculations.touchListMap)(e.touches, _getureCalculations.getXY);
+
+						return;
+					}
+
+					if (this.pseudoState.swiping || gestureDetails.gesture.absX > this.props.swipeThreshold || gestureDetails.gesture.absY > this.props.swipeThreshold) {
+						this._handleSwipeGesture(gestureDetails);
+						return;
+					}
+				}
+			}
+		}, {
+			key: '_handlePinch',
+			value: function _handlePinch(e) {
+				this.pseudoState.pinch = true;
+				var prevDist = (0, _getureCalculations.distance)(this.pseudoState.fingers);
+				var currDist = (0, _getureCalculations.distance)(e.touches, 'clientX', 'clientY');
+				var scale = currDist / prevDist;
+				var origin = {
+					x: (this.pseudoState.fingers[0].x + this.pseudoState.fingers[1].x) / 2,
+					y: (this.pseudoState.fingers[0].y + this.pseudoState.fingers[1].y) / 2
+				};
+
+				e.pinch = {
+					scale: scale,
+					origin: origin
+				};
+
+				this._emitEvent('onPinchToZoom', e);
+			}
+		}, {
+			key: '_handleTouchCancel',
+			value: function _handleTouchCancel(e) {
+				this._emitEvent('onTouchCancel', e);
+				this._resetState();
+			}
+		}, {
+			key: '_handleTouchEnd',
+			value: function _handleTouchEnd(e) {
+				var ge = this._getGestureDetails(e);
+
+				this._emitEvent('onTouchEnd', ge);
+
+				if (this.pseudoState.swiping) {
+					this._handleSwipeGesture(ge);
+					this._resetState();
+					return;
+				}
+				if (!this.pseudoState.pinch && ge.gesture.duration > 0) {
+					this._handleTapGesture(ge);
+				}
+				this._resetState();
+			}
+		}, {
+			key: '_handleTapGesture',
+			value: function _handleTapGesture(ge) {
+				ge.gesture.type = 'tap';
+				// no more fingers on the screen => no position
+				ge.clientX = this.pseudoState.x;
+				ge.clientY = this.pseudoState.y;
+				this._emitEvent('onTap', ge);
+			}
+		}, {
+			key: '_handleMouseDown',
+			value: function _handleMouseDown(e) {
+				this._emitEvent('onMouseDown', e);
+
+				var holdTimer = setTimeout(this._handleHoldGesture.bind(this), this.props.holdTime, e);
+
+				this.pseudoState = {
+					start: Date.now(),
+					x: e.clientX,
+					y: e.clientY,
+					swiping: false,
+					pinch: false,
+					holdTimer: holdTimer
+				};
+			}
+		}, {
+			key: '_handleMouseMove',
+			value: function _handleMouseMove(e) {
+				var gestureDetails = this._getGestureDetails(e);
+
+				this._emitEvent('onMouseMove', gestureDetails);
+
+				if (this.pseudoState.x !== null && this.pseudoState.y !== null && (this.pseudoState.swiping || gestureDetails.gesture.absX > this.props.swipeThreshold || gestureDetails.gesture.absY > this.props.swipeThreshold)) {
+					this._handleSwipeGesture(gestureDetails);
+					return;
+				}
+			}
+		}, {
+			key: '_handleMouseUp',
+			value: function _handleMouseUp(e) {
+				var gestureDetails = this._getGestureDetails(e);
+
+				this._emitEvent('onMouseUp', gestureDetails);
+
+				if (this.pseudoState.swiping) {
+					this._handleSwipeGesture(gestureDetails);
+					this._resetState();
+					return;
+				}
+
+				if (gestureDetails.gesture.duration > 0) {
+					this._handleClickGesture(gestureDetails);
+				}
+
+				this._resetState();
+			}
+		}, {
+			key: '_handleClickGesture',
+			value: function _handleClickGesture(gestureDetails) {
+				gestureDetails.gesture.type = 'click';
+				this._emitEvent('onClick', gestureDetails);
+			}
+		}, {
+			key: '_handleSwipeGesture',
+			value: function _handleSwipeGesture(gestureDetails) {
+				var _gestureDetails$gestu = gestureDetails.gesture;
+				var deltaX = _gestureDetails$gestu.deltaX;
+				var absX = _gestureDetails$gestu.absX;
+				var deltaY = _gestureDetails$gestu.deltaY;
+				var absY = _gestureDetails$gestu.absY;
+
+				var direction = (0, _getureCalculations.getDirection)(deltaX, absX, deltaY, absY);
+
+				if (!this.pseudoState.swiping) {
+					this.pseudoState.swiping = true;
+					this.pseudoState.swipingDirection = absX > absY ? 'x' : 'y';
+				}
+
+				if (this.pseudoState.swipingDirection === 'x' && absX > absY || this.pseudoState.swipingDirection === 'y' && absY > absX) {
+					gestureDetails.gesture.isFlick = gestureDetails.gesture.velocity > this.props.flickThreshold;
+					gestureDetails.gesture.type = 'swipe' + direction.toLowerCase();
+					this._emitEvent('onSwipe' + direction, gestureDetails);
+					gestureDetails.preventDefault();
+				}
+			}
+		}, {
+			key: '_handleHoldGesture',
+			value: function _handleHoldGesture(e) {
+				if (!this.pseudoState.swiping && (!this.pseudoState.fingers || this.pseudoState.fingers.length === 1)) {
+					this._emitEvent('onHold', e);
+				}
+			}
+		}, {
+			key: '_handleWheel',
+			value: function _handleWheel(e) {
+				var gestureDetails = this._getGestureDetails(e);
+				gestureDetails.gesture.scrollDelta = e.deltaY * (e.deltaMode ? LINE_HEIGHT : 1);
+				this._emitEvent('onScroll', gestureDetails);
+				if (this.pseudoState.wheelTimer) {
+					clearTimeout(this.pseudoState.wheelTimer);
+				}
+				this.pseudoState.wheelTimer = setTimeout(this._handleScrollEnd.bind(this, gestureDetails), this.props.scrollEndTimeout);
+			}
+		}, {
+			key: '_handleScrollEnd',
+			value: function _handleScrollEnd(e) {
+				this._emitEvent('onScrollEnd', e);
+				clearTimeout(this.pseudoState.wheelTimer);
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+				var children = this.props.children;
+				var element = React.Children.only(children);
+
+				return React.cloneElement(element, {
+					onTouchStart: this._handleTouchStart,
+					onTouchCancel: this._handleTouchCancel,
+					onMouseDown: this._handleMouseDown
+				});
+			}
+		}]);
+
+		return ReactGesture;
+	}(React.Component), (_applyDecoratedDescriptor(_class.prototype, '_handleTouchStart', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleTouchStart'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleTouchMove', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleTouchMove'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleTouchCancel', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleTouchCancel'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleTouchEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleTouchEnd'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleMouseDown', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleMouseDown'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleMouseMove', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleMouseMove'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleMouseUp', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleMouseUp'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleWheel', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleWheel'), _class.prototype)), _class);
+
+
+	ReactGesture.propTypes = {
+		onSwipeUp: React.PropTypes.func,
+		onSwipeDown: React.PropTypes.func,
+		onSwipeLeft: React.PropTypes.func,
+		onSwipeRight: React.PropTypes.func,
+		onTap: React.PropTypes.func,
+		onClick: React.PropTypes.func,
+		onHold: React.PropTypes.func,
+		onPinchToZoom: React.PropTypes.func,
+		onTouchStart: React.PropTypes.func,
+		onTouchMove: React.PropTypes.func,
+		onTouchCancel: React.PropTypes.func,
+		onTouchEnd: React.PropTypes.func,
+		onMouseDown: React.PropTypes.func,
+		onMouseMove: React.PropTypes.func,
+		onMouseUp: React.PropTypes.func,
+		onScroll: React.PropTypes.func,
+		onScrollEnd: React.PropTypes.func,
+		flickThreshold: React.PropTypes.number,
+		swipeThreshold: React.PropTypes.number,
+		holdTime: React.PropTypes.number,
+		scrollEndTimeout: React.PropTypes.number,
+		children: React.PropTypes.element
+	};
+
+	ReactGesture.defaultProps = {
+		flickThreshold: 0.6,
+		swipeThreshold: 10,
+		holdTime: 400,
+		scrollEndTimeout: 200
+	};
+
+/***/ },
+/* 171 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.touchListMap = touchListMap;
+	exports.distance = distance;
+	exports.getDirection = getDirection;
+	exports.getXY = getXY;
+	function touchListMap(list, callback) {
+		// TouchList.map is not defined
+		// return list.map(listItem => callback(listItem));
+		var result = [];
+
+		for (var i = 0, listLength = list.length; i < listLength; ++i) {
+			result.push(callback(list[i]));
+		}
+
+		return result;
+	}
+
+	function distance(points) {
+		var x = arguments.length <= 1 || arguments[1] === undefined ? 'x' : arguments[1];
+		var y = arguments.length <= 2 || arguments[2] === undefined ? 'y' : arguments[2];
+
+		var dX = points[1][x] - points[0][x];
+		var dY = points[1][y] - points[0][y];
+
+		return Math.sqrt(dX * dX + dY * dY);
+	}
+
+	function getDirectionX(deltaX) {
+		return deltaX < 0 ? 'Right' : 'Left';
+	}
+
+	function getDirectionY(deltaY) {
+		return deltaY < 0 ? 'Down' : 'Up';
+	}
+
+	function getDirection(deltaX, absX, deltaY, absY) {
+		return absX > absY ? getDirectionX(deltaX) : getDirectionY(deltaY);
+	}
+
+	function getXY(touch) {
+		return {
+			x: touch.clientX,
+			y: touch.clientY
+		};
+	}
+
+/***/ },
+/* 172 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var eventCoordinates = exports.eventCoordinates = function eventCoordinates(e, scale) {
+	    var shift = window.innerWidth / 2 * (1 - scale);
+
+	    if (e.touches && e.touches.length > 0) {
+	        return {
+	            x: (e.touches[0].clientX - shift) / scale,
+	            y: e.touches[0].clientY / scale
+	        };
+	    }
+
+	    return {
+	        x: (e.clientX - shift) / scale,
+	        y: e.clientY / scale
+	    };
+	};
+
+/***/ },
+/* 173 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+
+	function _interopRequire(obj) { return obj && obj.__esModule ? obj['default'] : obj; }
+
+	var _Motion = __webpack_require__(174);
+
+	exports.Motion = _interopRequire(_Motion);
+
+	var _StaggeredMotion = __webpack_require__(181);
+
+	exports.StaggeredMotion = _interopRequire(_StaggeredMotion);
+
+	var _TransitionMotion = __webpack_require__(182);
+
+	exports.TransitionMotion = _interopRequire(_TransitionMotion);
+
+	var _spring = __webpack_require__(184);
+
+	exports.spring = _interopRequire(_spring);
+
+	var _presets = __webpack_require__(185);
+
+	exports.presets = _interopRequire(_presets);
+
+	// deprecated, dummy warning function
+
+	var _reorderKeys = __webpack_require__(186);
+
+	exports.reorderKeys = _interopRequire(_reorderKeys);
+
+/***/ },
+/* 174 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _mapToZero = __webpack_require__(175);
+
+	var _mapToZero2 = _interopRequireDefault(_mapToZero);
+
+	var _stripStyle = __webpack_require__(176);
+
+	var _stripStyle2 = _interopRequireDefault(_stripStyle);
+
+	var _stepper3 = __webpack_require__(177);
+
+	var _stepper4 = _interopRequireDefault(_stepper3);
+
+	var _performanceNow = __webpack_require__(178);
+
+	var _performanceNow2 = _interopRequireDefault(_performanceNow);
+
+	var _raf = __webpack_require__(179);
+
+	var _raf2 = _interopRequireDefault(_raf);
+
+	var _shouldStopAnimation = __webpack_require__(180);
+
+	var _shouldStopAnimation2 = _interopRequireDefault(_shouldStopAnimation);
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var msPerFrame = 1000 / 60;
+
+	var Motion = _react2['default'].createClass({
+	  displayName: 'Motion',
+
+	  propTypes: {
+	    // TOOD: warn against putting a config in here
+	    defaultStyle: _react.PropTypes.objectOf(_react.PropTypes.number),
+	    style: _react.PropTypes.objectOf(_react.PropTypes.oneOfType([_react.PropTypes.number, _react.PropTypes.object])).isRequired,
+	    children: _react.PropTypes.func.isRequired,
+	    onRest: _react.PropTypes.func
+	  },
+
+	  getInitialState: function getInitialState() {
+	    var _props = this.props;
+	    var defaultStyle = _props.defaultStyle;
+	    var style = _props.style;
+
+	    var currentStyle = defaultStyle || _stripStyle2['default'](style);
+	    var currentVelocity = _mapToZero2['default'](currentStyle);
+	    return {
+	      currentStyle: currentStyle,
+	      currentVelocity: currentVelocity,
+	      lastIdealStyle: currentStyle,
+	      lastIdealVelocity: currentVelocity
+	    };
+	  },
+
+	  wasAnimating: false,
+	  animationID: null,
+	  prevTime: 0,
+	  accumulatedTime: 0,
+	  // it's possible that currentStyle's value is stale: if props is immediately
+	  // changed from 0 to 400 to spring(0) again, the async currentStyle is still
+	  // at 0 (didn't have time to tick and interpolate even once). If we naively
+	  // compare currentStyle with destVal it'll be 0 === 0 (no animation, stop).
+	  // In reality currentStyle should be 400
+	  unreadPropStyle: null,
+	  // after checking for unreadPropStyle != null, we manually go set the
+	  // non-interpolating values (those that are a number, without a spring
+	  // config)
+	  clearUnreadPropStyle: function clearUnreadPropStyle(destStyle) {
+	    var dirty = false;
+	    var _state = this.state;
+	    var currentStyle = _state.currentStyle;
+	    var currentVelocity = _state.currentVelocity;
+	    var lastIdealStyle = _state.lastIdealStyle;
+	    var lastIdealVelocity = _state.lastIdealVelocity;
+
+	    for (var key in destStyle) {
+	      if (!destStyle.hasOwnProperty(key)) {
+	        continue;
+	      }
+
+	      var styleValue = destStyle[key];
+	      if (typeof styleValue === 'number') {
+	        if (!dirty) {
+	          dirty = true;
+	          currentStyle = _extends({}, currentStyle);
+	          currentVelocity = _extends({}, currentVelocity);
+	          lastIdealStyle = _extends({}, lastIdealStyle);
+	          lastIdealVelocity = _extends({}, lastIdealVelocity);
+	        }
+
+	        currentStyle[key] = styleValue;
+	        currentVelocity[key] = 0;
+	        lastIdealStyle[key] = styleValue;
+	        lastIdealVelocity[key] = 0;
+	      }
+	    }
+
+	    if (dirty) {
+	      this.setState({ currentStyle: currentStyle, currentVelocity: currentVelocity, lastIdealStyle: lastIdealStyle, lastIdealVelocity: lastIdealVelocity });
+	    }
+	  },
+
+	  startAnimationIfNecessary: function startAnimationIfNecessary() {
+	    var _this = this;
+
+	    // TODO: when config is {a: 10} and dest is {a: 10} do we raf once and
+	    // call cb? No, otherwise accidental parent rerender causes cb trigger
+	    this.animationID = _raf2['default'](function () {
+	      // check if we need to animate in the first place
+	      var propsStyle = _this.props.style;
+	      if (_shouldStopAnimation2['default'](_this.state.currentStyle, propsStyle, _this.state.currentVelocity)) {
+	        if (_this.wasAnimating && _this.props.onRest) {
+	          _this.props.onRest();
+	        }
+
+	        // no need to cancel animationID here; shouldn't have any in flight
+	        _this.animationID = null;
+	        _this.wasAnimating = false;
+	        _this.accumulatedTime = 0;
+	        return;
+	      }
+
+	      _this.wasAnimating = true;
+
+	      var currentTime = _performanceNow2['default']();
+	      var timeDelta = currentTime - _this.prevTime;
+	      _this.prevTime = currentTime;
+	      _this.accumulatedTime = _this.accumulatedTime + timeDelta;
+	      // more than 10 frames? prolly switched browser tab. Restart
+	      if (_this.accumulatedTime > msPerFrame * 10) {
+	        _this.accumulatedTime = 0;
+	      }
+
+	      if (_this.accumulatedTime === 0) {
+	        // no need to cancel animationID here; shouldn't have any in flight
+	        _this.animationID = null;
+	        _this.startAnimationIfNecessary();
+	        return;
+	      }
+
+	      var currentFrameCompletion = (_this.accumulatedTime - Math.floor(_this.accumulatedTime / msPerFrame) * msPerFrame) / msPerFrame;
+	      var framesToCatchUp = Math.floor(_this.accumulatedTime / msPerFrame);
+
+	      var newLastIdealStyle = {};
+	      var newLastIdealVelocity = {};
+	      var newCurrentStyle = {};
+	      var newCurrentVelocity = {};
+
+	      for (var key in propsStyle) {
+	        if (!propsStyle.hasOwnProperty(key)) {
+	          continue;
+	        }
+
+	        var styleValue = propsStyle[key];
+	        if (typeof styleValue === 'number') {
+	          newCurrentStyle[key] = styleValue;
+	          newCurrentVelocity[key] = 0;
+	          newLastIdealStyle[key] = styleValue;
+	          newLastIdealVelocity[key] = 0;
+	        } else {
+	          var newLastIdealStyleValue = _this.state.lastIdealStyle[key];
+	          var newLastIdealVelocityValue = _this.state.lastIdealVelocity[key];
+	          for (var i = 0; i < framesToCatchUp; i++) {
+	            var _stepper = _stepper4['default'](msPerFrame / 1000, newLastIdealStyleValue, newLastIdealVelocityValue, styleValue.val, styleValue.stiffness, styleValue.damping, styleValue.precision);
+
+	            newLastIdealStyleValue = _stepper[0];
+	            newLastIdealVelocityValue = _stepper[1];
+	          }
+
+	          var _stepper2 = _stepper4['default'](msPerFrame / 1000, newLastIdealStyleValue, newLastIdealVelocityValue, styleValue.val, styleValue.stiffness, styleValue.damping, styleValue.precision);
+
+	          var nextIdealX = _stepper2[0];
+	          var nextIdealV = _stepper2[1];
+
+	          newCurrentStyle[key] = newLastIdealStyleValue + (nextIdealX - newLastIdealStyleValue) * currentFrameCompletion;
+	          newCurrentVelocity[key] = newLastIdealVelocityValue + (nextIdealV - newLastIdealVelocityValue) * currentFrameCompletion;
+	          newLastIdealStyle[key] = newLastIdealStyleValue;
+	          newLastIdealVelocity[key] = newLastIdealVelocityValue;
+	        }
+	      }
+
+	      _this.animationID = null;
+	      // the amount we're looped over above
+	      _this.accumulatedTime -= framesToCatchUp * msPerFrame;
+
+	      _this.setState({
+	        currentStyle: newCurrentStyle,
+	        currentVelocity: newCurrentVelocity,
+	        lastIdealStyle: newLastIdealStyle,
+	        lastIdealVelocity: newLastIdealVelocity
+	      });
+
+	      _this.unreadPropStyle = null;
+
+	      _this.startAnimationIfNecessary();
+	    });
+	  },
+
+	  componentDidMount: function componentDidMount() {
+	    this.prevTime = _performanceNow2['default']();
+	    this.startAnimationIfNecessary();
+	  },
+
+	  componentWillReceiveProps: function componentWillReceiveProps(props) {
+	    if (this.unreadPropStyle != null) {
+	      // previous props haven't had the chance to be set yet; set them here
+	      this.clearUnreadPropStyle(this.unreadPropStyle);
+	    }
+
+	    this.unreadPropStyle = props.style;
+	    if (this.animationID == null) {
+	      this.prevTime = _performanceNow2['default']();
+	      this.startAnimationIfNecessary();
+	    }
+	  },
+
+	  componentWillUnmount: function componentWillUnmount() {
+	    if (this.animationID != null) {
+	      _raf2['default'].cancel(this.animationID);
+	      this.animationID = null;
+	    }
+	  },
+
+	  render: function render() {
+	    var renderedChildren = this.props.children(this.state.currentStyle);
+	    return renderedChildren && _react2['default'].Children.only(renderedChildren);
+	  }
+	});
+
+	exports['default'] = Motion;
+	module.exports = exports['default'];
+
+/***/ },
+/* 175 */
+/***/ function(module, exports) {
+
+	
+
+	// currently used to initiate the velocity style object to 0
+	'use strict';
+
+	exports.__esModule = true;
+	exports['default'] = mapToZero;
+
+	function mapToZero(obj) {
+	  var ret = {};
+	  for (var key in obj) {
+	    if (obj.hasOwnProperty(key)) {
+	      ret[key] = 0;
+	    }
+	  }
+	  return ret;
+	}
+
+	module.exports = exports['default'];
+
+/***/ },
+/* 176 */
+/***/ function(module, exports) {
+
+	
+	// turn {x: {val: 1, stiffness: 1, damping: 2}, y: 2} generated by
+	// `{x: spring(1, {stiffness: 1, damping: 2}), y: 2}` into {x: 1, y: 2}
+
+	'use strict';
+
+	exports.__esModule = true;
+	exports['default'] = stripStyle;
+
+	function stripStyle(style) {
+	  var ret = {};
+	  for (var key in style) {
+	    if (!style.hasOwnProperty(key)) {
+	      continue;
+	    }
+	    ret[key] = typeof style[key] === 'number' ? style[key] : style[key].val;
+	  }
+	  return ret;
+	}
+
+	module.exports = exports['default'];
+
+/***/ },
+/* 177 */
+/***/ function(module, exports) {
+
+	
+
+	// stepper is used a lot. Saves allocation to return the same array wrapper.
+	// This is fine and danger-free against mutations because the callsite
+	// immediately destructures it and gets the numbers inside without passing the
+	"use strict";
+
+	exports.__esModule = true;
+	exports["default"] = stepper;
+
+	var reusedTuple = [];
+
+	function stepper(secondPerFrame, x, v, destX, k, b, precision) {
+	  // Spring stiffness, in kg / s^2
+
+	  // for animations, destX is really spring length (spring at rest). initial
+	  // position is considered as the stretched/compressed position of a spring
+	  var Fspring = -k * (x - destX);
+
+	  // Damping, in kg / s
+	  var Fdamper = -b * v;
+
+	  // usually we put mass here, but for animation purposes, specifying mass is a
+	  // bit redundant. you could simply adjust k and b accordingly
+	  // let a = (Fspring + Fdamper) / mass;
+	  var a = Fspring + Fdamper;
+
+	  var newV = v + a * secondPerFrame;
+	  var newX = x + newV * secondPerFrame;
+
+	  if (Math.abs(newV) < precision && Math.abs(newX - destX) < precision) {
+	    reusedTuple[0] = destX;
+	    reusedTuple[1] = 0;
+	    return reusedTuple;
+	  }
+
+	  reusedTuple[0] = newX;
+	  reusedTuple[1] = newV;
+	  return reusedTuple;
+	}
+
+	module.exports = exports["default"];
+	// array reference around.
+
+/***/ },
+/* 178 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {// Generated by CoffeeScript 1.7.1
+	(function() {
+	  var getNanoSeconds, hrtime, loadTime;
+
+	  if ((typeof performance !== "undefined" && performance !== null) && performance.now) {
+	    module.exports = function() {
+	      return performance.now();
+	    };
+	  } else if ((typeof process !== "undefined" && process !== null) && process.hrtime) {
+	    module.exports = function() {
+	      return (getNanoSeconds() - loadTime) / 1e6;
+	    };
+	    hrtime = process.hrtime;
+	    getNanoSeconds = function() {
+	      var hr;
+	      hr = hrtime();
+	      return hr[0] * 1e9 + hr[1];
+	    };
+	    loadTime = getNanoSeconds();
+	  } else if (Date.now) {
+	    module.exports = function() {
+	      return Date.now() - loadTime;
+	    };
+	    loadTime = Date.now();
+	  } else {
+	    module.exports = function() {
+	      return new Date().getTime() - loadTime;
+	    };
+	    loadTime = new Date().getTime();
+	  }
+
+	}).call(this);
+
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ },
+/* 179 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {var now = __webpack_require__(178)
+	  , root = typeof window === 'undefined' ? global : window
+	  , vendors = ['moz', 'webkit']
+	  , suffix = 'AnimationFrame'
+	  , raf = root['request' + suffix]
+	  , caf = root['cancel' + suffix] || root['cancelRequest' + suffix]
+
+	for(var i = 0; !raf && i < vendors.length; i++) {
+	  raf = root[vendors[i] + 'Request' + suffix]
+	  caf = root[vendors[i] + 'Cancel' + suffix]
+	      || root[vendors[i] + 'CancelRequest' + suffix]
+	}
+
+	// Some versions of FF have rAF but not cAF
+	if(!raf || !caf) {
+	  var last = 0
+	    , id = 0
+	    , queue = []
+	    , frameDuration = 1000 / 60
+
+	  raf = function(callback) {
+	    if(queue.length === 0) {
+	      var _now = now()
+	        , next = Math.max(0, frameDuration - (_now - last))
+	      last = next + _now
+	      setTimeout(function() {
+	        var cp = queue.slice(0)
+	        // Clear queue here to prevent
+	        // callbacks from appending listeners
+	        // to the current frame's queue
+	        queue.length = 0
+	        for(var i = 0; i < cp.length; i++) {
+	          if(!cp[i].cancelled) {
+	            try{
+	              cp[i].callback(last)
+	            } catch(e) {
+	              setTimeout(function() { throw e }, 0)
+	            }
+	          }
+	        }
+	      }, Math.round(next))
+	    }
+	    queue.push({
+	      handle: ++id,
+	      callback: callback,
+	      cancelled: false
+	    })
+	    return id
+	  }
+
+	  caf = function(handle) {
+	    for(var i = 0; i < queue.length; i++) {
+	      if(queue[i].handle === handle) {
+	        queue[i].cancelled = true
+	      }
+	    }
+	  }
+	}
+
+	module.exports = function(fn) {
+	  // Wrap in a new function to prevent
+	  // `cancel` potentially being assigned
+	  // to the native rAF function
+	  return raf.call(root, fn)
+	}
+	module.exports.cancel = function() {
+	  caf.apply(root, arguments)
+	}
+	module.exports.polyfill = function() {
+	  root.requestAnimationFrame = raf
+	  root.cancelAnimationFrame = caf
+	}
+
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 180 */
+/***/ function(module, exports) {
+
+	
+
+	// usage assumption: currentStyle values have already been rendered but it says
+	// nothing of whether currentStyle is stale (see unreadPropStyle)
+	'use strict';
+
+	exports.__esModule = true;
+	exports['default'] = shouldStopAnimation;
+
+	function shouldStopAnimation(currentStyle, style, currentVelocity) {
+	  for (var key in style) {
+	    if (!style.hasOwnProperty(key)) {
+	      continue;
+	    }
+
+	    if (currentVelocity[key] !== 0) {
+	      return false;
+	    }
+
+	    var styleValue = typeof style[key] === 'number' ? style[key] : style[key].val;
+	    // stepper will have already taken care of rounding precision errors, so
+	    // won't have such thing as 0.9999 !=== 1
+	    if (currentStyle[key] !== styleValue) {
+	      return false;
+	    }
+	  }
+
+	  return true;
+	}
+
+	module.exports = exports['default'];
+
+/***/ },
+/* 181 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _mapToZero = __webpack_require__(175);
+
+	var _mapToZero2 = _interopRequireDefault(_mapToZero);
+
+	var _stripStyle = __webpack_require__(176);
+
+	var _stripStyle2 = _interopRequireDefault(_stripStyle);
+
+	var _stepper3 = __webpack_require__(177);
+
+	var _stepper4 = _interopRequireDefault(_stepper3);
+
+	var _performanceNow = __webpack_require__(178);
+
+	var _performanceNow2 = _interopRequireDefault(_performanceNow);
+
+	var _raf = __webpack_require__(179);
+
+	var _raf2 = _interopRequireDefault(_raf);
+
+	var _shouldStopAnimation = __webpack_require__(180);
+
+	var _shouldStopAnimation2 = _interopRequireDefault(_shouldStopAnimation);
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var msPerFrame = 1000 / 60;
+
+	function shouldStopAnimationAll(currentStyles, styles, currentVelocities) {
+	  for (var i = 0; i < currentStyles.length; i++) {
+	    if (!_shouldStopAnimation2['default'](currentStyles[i], styles[i], currentVelocities[i])) {
+	      return false;
+	    }
+	  }
+	  return true;
+	}
+
+	var StaggeredMotion = _react2['default'].createClass({
+	  displayName: 'StaggeredMotion',
+
+	  propTypes: {
+	    // TOOD: warn against putting a config in here
+	    defaultStyles: _react.PropTypes.arrayOf(_react.PropTypes.objectOf(_react.PropTypes.number)),
+	    styles: _react.PropTypes.func.isRequired,
+	    children: _react.PropTypes.func.isRequired
+	  },
+
+	  getInitialState: function getInitialState() {
+	    var _props = this.props;
+	    var defaultStyles = _props.defaultStyles;
+	    var styles = _props.styles;
+
+	    var currentStyles = defaultStyles || styles().map(_stripStyle2['default']);
+	    var currentVelocities = currentStyles.map(function (currentStyle) {
+	      return _mapToZero2['default'](currentStyle);
+	    });
+	    return {
+	      currentStyles: currentStyles,
+	      currentVelocities: currentVelocities,
+	      lastIdealStyles: currentStyles,
+	      lastIdealVelocities: currentVelocities
+	    };
+	  },
+
+	  animationID: null,
+	  prevTime: 0,
+	  accumulatedTime: 0,
+	  // it's possible that currentStyle's value is stale: if props is immediately
+	  // changed from 0 to 400 to spring(0) again, the async currentStyle is still
+	  // at 0 (didn't have time to tick and interpolate even once). If we naively
+	  // compare currentStyle with destVal it'll be 0 === 0 (no animation, stop).
+	  // In reality currentStyle should be 400
+	  unreadPropStyles: null,
+	  // after checking for unreadPropStyles != null, we manually go set the
+	  // non-interpolating values (those that are a number, without a spring
+	  // config)
+	  clearUnreadPropStyle: function clearUnreadPropStyle(unreadPropStyles) {
+	    var _state = this.state;
+	    var currentStyles = _state.currentStyles;
+	    var currentVelocities = _state.currentVelocities;
+	    var lastIdealStyles = _state.lastIdealStyles;
+	    var lastIdealVelocities = _state.lastIdealVelocities;
+
+	    var someDirty = false;
+	    for (var i = 0; i < unreadPropStyles.length; i++) {
+	      var unreadPropStyle = unreadPropStyles[i];
+	      var dirty = false;
+
+	      for (var key in unreadPropStyle) {
+	        if (!unreadPropStyle.hasOwnProperty(key)) {
+	          continue;
+	        }
+
+	        var styleValue = unreadPropStyle[key];
+	        if (typeof styleValue === 'number') {
+	          if (!dirty) {
+	            dirty = true;
+	            someDirty = true;
+	            currentStyles[i] = _extends({}, currentStyles[i]);
+	            currentVelocities[i] = _extends({}, currentVelocities[i]);
+	            lastIdealStyles[i] = _extends({}, lastIdealStyles[i]);
+	            lastIdealVelocities[i] = _extends({}, lastIdealVelocities[i]);
+	          }
+	          currentStyles[i][key] = styleValue;
+	          currentVelocities[i][key] = 0;
+	          lastIdealStyles[i][key] = styleValue;
+	          lastIdealVelocities[i][key] = 0;
+	        }
+	      }
+	    }
+
+	    if (someDirty) {
+	      this.setState({ currentStyles: currentStyles, currentVelocities: currentVelocities, lastIdealStyles: lastIdealStyles, lastIdealVelocities: lastIdealVelocities });
+	    }
+	  },
+
+	  startAnimationIfNecessary: function startAnimationIfNecessary() {
+	    var _this = this;
+
+	    // TODO: when config is {a: 10} and dest is {a: 10} do we raf once and
+	    // call cb? No, otherwise accidental parent rerender causes cb trigger
+	    this.animationID = _raf2['default'](function () {
+	      var destStyles = _this.props.styles(_this.state.lastIdealStyles);
+
+	      // check if we need to animate in the first place
+	      if (shouldStopAnimationAll(_this.state.currentStyles, destStyles, _this.state.currentVelocities)) {
+	        // no need to cancel animationID here; shouldn't have any in flight
+	        _this.animationID = null;
+	        _this.accumulatedTime = 0;
+	        return;
+	      }
+
+	      var currentTime = _performanceNow2['default']();
+	      var timeDelta = currentTime - _this.prevTime;
+	      _this.prevTime = currentTime;
+	      _this.accumulatedTime = _this.accumulatedTime + timeDelta;
+	      // more than 10 frames? prolly switched browser tab. Restart
+	      if (_this.accumulatedTime > msPerFrame * 10) {
+	        _this.accumulatedTime = 0;
+	      }
+
+	      if (_this.accumulatedTime === 0) {
+	        // no need to cancel animationID here; shouldn't have any in flight
+	        _this.animationID = null;
+	        _this.startAnimationIfNecessary();
+	        return;
+	      }
+
+	      var currentFrameCompletion = (_this.accumulatedTime - Math.floor(_this.accumulatedTime / msPerFrame) * msPerFrame) / msPerFrame;
+	      var framesToCatchUp = Math.floor(_this.accumulatedTime / msPerFrame);
+
+	      var newLastIdealStyles = [];
+	      var newLastIdealVelocities = [];
+	      var newCurrentStyles = [];
+	      var newCurrentVelocities = [];
+
+	      for (var i = 0; i < destStyles.length; i++) {
+	        var destStyle = destStyles[i];
+	        var newCurrentStyle = {};
+	        var newCurrentVelocity = {};
+	        var newLastIdealStyle = {};
+	        var newLastIdealVelocity = {};
+
+	        for (var key in destStyle) {
+	          if (!destStyle.hasOwnProperty(key)) {
+	            continue;
+	          }
+
+	          var styleValue = destStyle[key];
+	          if (typeof styleValue === 'number') {
+	            newCurrentStyle[key] = styleValue;
+	            newCurrentVelocity[key] = 0;
+	            newLastIdealStyle[key] = styleValue;
+	            newLastIdealVelocity[key] = 0;
+	          } else {
+	            var newLastIdealStyleValue = _this.state.lastIdealStyles[i][key];
+	            var newLastIdealVelocityValue = _this.state.lastIdealVelocities[i][key];
+	            for (var j = 0; j < framesToCatchUp; j++) {
+	              var _stepper = _stepper4['default'](msPerFrame / 1000, newLastIdealStyleValue, newLastIdealVelocityValue, styleValue.val, styleValue.stiffness, styleValue.damping, styleValue.precision);
+
+	              newLastIdealStyleValue = _stepper[0];
+	              newLastIdealVelocityValue = _stepper[1];
+	            }
+
+	            var _stepper2 = _stepper4['default'](msPerFrame / 1000, newLastIdealStyleValue, newLastIdealVelocityValue, styleValue.val, styleValue.stiffness, styleValue.damping, styleValue.precision);
+
+	            var nextIdealX = _stepper2[0];
+	            var nextIdealV = _stepper2[1];
+
+	            newCurrentStyle[key] = newLastIdealStyleValue + (nextIdealX - newLastIdealStyleValue) * currentFrameCompletion;
+	            newCurrentVelocity[key] = newLastIdealVelocityValue + (nextIdealV - newLastIdealVelocityValue) * currentFrameCompletion;
+	            newLastIdealStyle[key] = newLastIdealStyleValue;
+	            newLastIdealVelocity[key] = newLastIdealVelocityValue;
+	          }
+	        }
+
+	        newCurrentStyles[i] = newCurrentStyle;
+	        newCurrentVelocities[i] = newCurrentVelocity;
+	        newLastIdealStyles[i] = newLastIdealStyle;
+	        newLastIdealVelocities[i] = newLastIdealVelocity;
+	      }
+
+	      _this.animationID = null;
+	      // the amount we're looped over above
+	      _this.accumulatedTime -= framesToCatchUp * msPerFrame;
+
+	      _this.setState({
+	        currentStyles: newCurrentStyles,
+	        currentVelocities: newCurrentVelocities,
+	        lastIdealStyles: newLastIdealStyles,
+	        lastIdealVelocities: newLastIdealVelocities
+	      });
+
+	      _this.unreadPropStyles = null;
+
+	      _this.startAnimationIfNecessary();
+	    });
+	  },
+
+	  componentDidMount: function componentDidMount() {
+	    this.prevTime = _performanceNow2['default']();
+	    this.startAnimationIfNecessary();
+	  },
+
+	  componentWillReceiveProps: function componentWillReceiveProps(props) {
+	    if (this.unreadPropStyles != null) {
+	      // previous props haven't had the chance to be set yet; set them here
+	      this.clearUnreadPropStyle(this.unreadPropStyles);
+	    }
+
+	    this.unreadPropStyles = props.styles(this.state.lastIdealStyles);
+	    if (this.animationID == null) {
+	      this.prevTime = _performanceNow2['default']();
+	      this.startAnimationIfNecessary();
+	    }
+	  },
+
+	  componentWillUnmount: function componentWillUnmount() {
+	    if (this.animationID != null) {
+	      _raf2['default'].cancel(this.animationID);
+	      this.animationID = null;
+	    }
+	  },
+
+	  render: function render() {
+	    var renderedChildren = this.props.children(this.state.currentStyles);
+	    return renderedChildren && _react2['default'].Children.only(renderedChildren);
+	  }
+	});
+
+	exports['default'] = StaggeredMotion;
+	module.exports = exports['default'];
+
+/***/ },
+/* 182 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _mapToZero = __webpack_require__(175);
+
+	var _mapToZero2 = _interopRequireDefault(_mapToZero);
+
+	var _stripStyle = __webpack_require__(176);
+
+	var _stripStyle2 = _interopRequireDefault(_stripStyle);
+
+	var _stepper3 = __webpack_require__(177);
+
+	var _stepper4 = _interopRequireDefault(_stepper3);
+
+	var _mergeDiff = __webpack_require__(183);
+
+	var _mergeDiff2 = _interopRequireDefault(_mergeDiff);
+
+	var _performanceNow = __webpack_require__(178);
+
+	var _performanceNow2 = _interopRequireDefault(_performanceNow);
+
+	var _raf = __webpack_require__(179);
+
+	var _raf2 = _interopRequireDefault(_raf);
+
+	var _shouldStopAnimation = __webpack_require__(180);
+
+	var _shouldStopAnimation2 = _interopRequireDefault(_shouldStopAnimation);
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var msPerFrame = 1000 / 60;
+
+	// the children function & (potential) styles function asks as param an
+	// Array<TransitionPlainStyle>, where each TransitionPlainStyle is of the format
+	// {key: string, data?: any, style: PlainStyle}. However, the way we keep
+	// internal states doesn't contain such a data structure (check the state and
+	// TransitionMotionState). So when children function and others ask for such
+	// data we need to generate them on the fly by combining mergedPropsStyles and
+	// currentStyles/lastIdealStyles
+	function rehydrateStyles(mergedPropsStyles, unreadPropStyles, plainStyles) {
+	  if (unreadPropStyles == null) {
+	    // $FlowFixMe
+	    return mergedPropsStyles.map(function (mergedPropsStyle, i) {
+	      return {
+	        key: mergedPropsStyle.key,
+	        data: mergedPropsStyle.data,
+	        style: plainStyles[i]
+	      };
+	    });
+	  }
+	  return mergedPropsStyles.map(function (mergedPropsStyle, i) {
+	    // $FlowFixMe
+	    for (var j = 0; j < unreadPropStyles.length; j++) {
+	      // $FlowFixMe
+	      if (unreadPropStyles[j].key === mergedPropsStyle.key) {
+	        return {
+	          // $FlowFixMe
+	          key: unreadPropStyles[j].key,
+	          data: unreadPropStyles[j].data,
+	          style: plainStyles[i]
+	        };
+	      }
+	    }
+	    // $FlowFixMe
+	    return { key: mergedPropsStyle.key, data: mergedPropsStyle.data, style: plainStyles[i] };
+	  });
+	}
+
+	function shouldStopAnimationAll(currentStyles, destStyles, currentVelocities, mergedPropsStyles) {
+	  if (mergedPropsStyles.length !== destStyles.length) {
+	    return false;
+	  }
+
+	  for (var i = 0; i < mergedPropsStyles.length; i++) {
+	    if (mergedPropsStyles[i].key !== destStyles[i].key) {
+	      return false;
+	    }
+	  }
+
+	  // we have the invariant that mergedPropsStyles and
+	  // currentStyles/currentVelocities/last* are synced in terms of cells, see
+	  // mergeAndSync comment for more info
+	  for (var i = 0; i < mergedPropsStyles.length; i++) {
+	    if (!_shouldStopAnimation2['default'](currentStyles[i], destStyles[i].style, currentVelocities[i])) {
+	      return false;
+	    }
+	  }
+
+	  return true;
+	}
+
+	// core key merging logic
+
+	// things to do: say previously merged style is {a, b}, dest style (prop) is {b,
+	// c}, previous current (interpolating) style is {a, b}
+	// **invariant**: current[i] corresponds to merged[i] in terms of key
+
+	// steps:
+	// turn merged style into {a?, b, c}
+	//    add c, value of c is destStyles.c
+	//    maybe remove a, aka call willLeave(a), then merged is either {b, c} or {a, b, c}
+	// turn current (interpolating) style from {a, b} into {a?, b, c}
+	//    maybe remove a
+	//    certainly add c, value of c is willEnter(c)
+	// loop over merged and construct new current
+	// dest doesn't change, that's owner's
+	function mergeAndSync(willEnter, willLeave, oldMergedPropsStyles, destStyles, oldCurrentStyles, oldCurrentVelocities, oldLastIdealStyles, oldLastIdealVelocities) {
+	  var newMergedPropsStyles = _mergeDiff2['default'](oldMergedPropsStyles, destStyles, function (oldIndex, oldMergedPropsStyle) {
+	    var leavingStyle = willLeave(oldMergedPropsStyle);
+	    if (leavingStyle == null) {
+	      return null;
+	    }
+	    if (_shouldStopAnimation2['default'](oldCurrentStyles[oldIndex], leavingStyle, oldCurrentVelocities[oldIndex])) {
+	      return null;
+	    }
+	    return { key: oldMergedPropsStyle.key, data: oldMergedPropsStyle.data, style: leavingStyle };
+	  });
+
+	  var newCurrentStyles = [];
+	  var newCurrentVelocities = [];
+	  var newLastIdealStyles = [];
+	  var newLastIdealVelocities = [];
+	  for (var i = 0; i < newMergedPropsStyles.length; i++) {
+	    var newMergedPropsStyleCell = newMergedPropsStyles[i];
+	    var foundOldIndex = null;
+	    for (var j = 0; j < oldMergedPropsStyles.length; j++) {
+	      if (oldMergedPropsStyles[j].key === newMergedPropsStyleCell.key) {
+	        foundOldIndex = j;
+	        break;
+	      }
+	    }
+	    // TODO: key search code
+	    if (foundOldIndex == null) {
+	      var plainStyle = willEnter(newMergedPropsStyleCell);
+	      newCurrentStyles[i] = plainStyle;
+	      newLastIdealStyles[i] = plainStyle;
+
+	      // $FlowFixMe
+	      var velocity = _mapToZero2['default'](newMergedPropsStyleCell.style);
+	      newCurrentVelocities[i] = velocity;
+	      newLastIdealVelocities[i] = velocity;
+	    } else {
+	      newCurrentStyles[i] = oldCurrentStyles[foundOldIndex];
+	      newLastIdealStyles[i] = oldLastIdealStyles[foundOldIndex];
+	      newCurrentVelocities[i] = oldCurrentVelocities[foundOldIndex];
+	      newLastIdealVelocities[i] = oldLastIdealVelocities[foundOldIndex];
+	    }
+	  }
+
+	  return [newMergedPropsStyles, newCurrentStyles, newCurrentVelocities, newLastIdealStyles, newLastIdealVelocities];
+	}
+
+	var TransitionMotion = _react2['default'].createClass({
+	  displayName: 'TransitionMotion',
+
+	  propTypes: {
+	    defaultStyles: _react.PropTypes.arrayOf(_react.PropTypes.shape({
+	      key: _react.PropTypes.string.isRequired,
+	      data: _react.PropTypes.any,
+	      style: _react.PropTypes.objectOf(_react.PropTypes.number).isRequired
+	    })),
+	    styles: _react.PropTypes.oneOfType([_react.PropTypes.func, _react.PropTypes.arrayOf(_react.PropTypes.shape({
+	      key: _react.PropTypes.string.isRequired,
+	      data: _react.PropTypes.any,
+	      style: _react.PropTypes.objectOf(_react.PropTypes.oneOfType([_react.PropTypes.number, _react.PropTypes.object])).isRequired
+	    }))]).isRequired,
+	    children: _react.PropTypes.func.isRequired,
+	    willLeave: _react.PropTypes.func,
+	    willEnter: _react.PropTypes.func
+	  },
+
+	  getDefaultProps: function getDefaultProps() {
+	    return {
+	      willEnter: function willEnter(styleThatEntered) {
+	        return _stripStyle2['default'](styleThatEntered.style);
+	      },
+	      // recall: returning null makes the current unmounting TransitionStyle
+	      // disappear immediately
+	      willLeave: function willLeave() {
+	        return null;
+	      }
+	    };
+	  },
+
+	  getInitialState: function getInitialState() {
+	    var _props = this.props;
+	    var defaultStyles = _props.defaultStyles;
+	    var styles = _props.styles;
+	    var willEnter = _props.willEnter;
+	    var willLeave = _props.willLeave;
+
+	    var destStyles = typeof styles === 'function' ? styles() : styles;
+
+	    // this is special. for the first time around, we don't have a comparison
+	    // between last (no last) and current merged props. we'll compute last so:
+	    // say default is {a, b} and styles (dest style) is {b, c}, we'll
+	    // fabricate last as {a, b}
+	    var oldMergedPropsStyles = undefined;
+	    if (defaultStyles == null) {
+	      oldMergedPropsStyles = destStyles;
+	    } else {
+	      // $FlowFixMe
+	      oldMergedPropsStyles = defaultStyles.map(function (defaultStyleCell) {
+	        // TODO: key search code
+	        for (var i = 0; i < destStyles.length; i++) {
+	          if (destStyles[i].key === defaultStyleCell.key) {
+	            return destStyles[i];
+	          }
+	        }
+	        return defaultStyleCell;
+	      });
+	    }
+	    var oldCurrentStyles = defaultStyles == null ? destStyles.map(function (s) {
+	      return _stripStyle2['default'](s.style);
+	    }) : defaultStyles.map(function (s) {
+	      return _stripStyle2['default'](s.style);
+	    });
+	    var oldCurrentVelocities = defaultStyles == null ? destStyles.map(function (s) {
+	      return _mapToZero2['default'](s.style);
+	    }) : defaultStyles.map(function (s) {
+	      return _mapToZero2['default'](s.style);
+	    });
+
+	    var _mergeAndSync = mergeAndSync(
+	    // $FlowFixMe
+	    willEnter,
+	    // $FlowFixMe
+	    willLeave, oldMergedPropsStyles, destStyles, oldCurrentStyles, oldCurrentVelocities, oldCurrentStyles, // oldLastIdealStyles really
+	    oldCurrentVelocities);
+
+	    var mergedPropsStyles = _mergeAndSync[0];
+	    var currentStyles = _mergeAndSync[1];
+	    var currentVelocities = _mergeAndSync[2];
+	    var lastIdealStyles = _mergeAndSync[3];
+	    var lastIdealVelocities = _mergeAndSync[4];
+	    // oldLastIdealVelocities really
+
+	    return {
+	      currentStyles: currentStyles,
+	      currentVelocities: currentVelocities,
+	      lastIdealStyles: lastIdealStyles,
+	      lastIdealVelocities: lastIdealVelocities,
+	      mergedPropsStyles: mergedPropsStyles
+	    };
+	  },
+
+	  animationID: null,
+	  prevTime: 0,
+	  accumulatedTime: 0,
+	  // it's possible that currentStyle's value is stale: if props is immediately
+	  // changed from 0 to 400 to spring(0) again, the async currentStyle is still
+	  // at 0 (didn't have time to tick and interpolate even once). If we naively
+	  // compare currentStyle with destVal it'll be 0 === 0 (no animation, stop).
+	  // In reality currentStyle should be 400
+	  unreadPropStyles: null,
+	  // after checking for unreadPropStyles != null, we manually go set the
+	  // non-interpolating values (those that are a number, without a spring
+	  // config)
+	  clearUnreadPropStyle: function clearUnreadPropStyle(unreadPropStyles) {
+	    var _mergeAndSync2 = mergeAndSync(
+	    // $FlowFixMe
+	    this.props.willEnter,
+	    // $FlowFixMe
+	    this.props.willLeave, this.state.mergedPropsStyles, unreadPropStyles, this.state.currentStyles, this.state.currentVelocities, this.state.lastIdealStyles, this.state.lastIdealVelocities);
+
+	    var mergedPropsStyles = _mergeAndSync2[0];
+	    var currentStyles = _mergeAndSync2[1];
+	    var currentVelocities = _mergeAndSync2[2];
+	    var lastIdealStyles = _mergeAndSync2[3];
+	    var lastIdealVelocities = _mergeAndSync2[4];
+
+	    for (var i = 0; i < unreadPropStyles.length; i++) {
+	      var unreadPropStyle = unreadPropStyles[i].style;
+	      var dirty = false;
+
+	      for (var key in unreadPropStyle) {
+	        if (!unreadPropStyle.hasOwnProperty(key)) {
+	          continue;
+	        }
+
+	        var styleValue = unreadPropStyle[key];
+	        if (typeof styleValue === 'number') {
+	          if (!dirty) {
+	            dirty = true;
+	            currentStyles[i] = _extends({}, currentStyles[i]);
+	            currentVelocities[i] = _extends({}, currentVelocities[i]);
+	            lastIdealStyles[i] = _extends({}, lastIdealStyles[i]);
+	            lastIdealVelocities[i] = _extends({}, lastIdealVelocities[i]);
+	            mergedPropsStyles[i] = {
+	              key: mergedPropsStyles[i].key,
+	              data: mergedPropsStyles[i].data,
+	              style: _extends({}, mergedPropsStyles[i].style)
+	            };
+	          }
+	          currentStyles[i][key] = styleValue;
+	          currentVelocities[i][key] = 0;
+	          lastIdealStyles[i][key] = styleValue;
+	          lastIdealVelocities[i][key] = 0;
+	          mergedPropsStyles[i].style[key] = styleValue;
+	        }
+	      }
+	    }
+
+	    // unlike the other 2 components, we can't detect staleness and optionally
+	    // opt out of setState here. each style object's data might contain new
+	    // stuff we're not/cannot compare
+	    this.setState({
+	      currentStyles: currentStyles,
+	      currentVelocities: currentVelocities,
+	      mergedPropsStyles: mergedPropsStyles,
+	      lastIdealStyles: lastIdealStyles,
+	      lastIdealVelocities: lastIdealVelocities
+	    });
+	  },
+
+	  startAnimationIfNecessary: function startAnimationIfNecessary() {
+	    var _this = this;
+
+	    // TODO: when config is {a: 10} and dest is {a: 10} do we raf once and
+	    // call cb? No, otherwise accidental parent rerender causes cb trigger
+	    this.animationID = _raf2['default'](function () {
+	      var propStyles = _this.props.styles;
+	      var destStyles = typeof propStyles === 'function' ? propStyles(rehydrateStyles(_this.state.mergedPropsStyles, _this.unreadPropStyles, _this.state.lastIdealStyles)) : propStyles;
+
+	      // check if we need to animate in the first place
+	      if (shouldStopAnimationAll(_this.state.currentStyles, destStyles, _this.state.currentVelocities, _this.state.mergedPropsStyles)) {
+	        // no need to cancel animationID here; shouldn't have any in flight
+	        _this.animationID = null;
+	        _this.accumulatedTime = 0;
+	        return;
+	      }
+
+	      var currentTime = _performanceNow2['default']();
+	      var timeDelta = currentTime - _this.prevTime;
+	      _this.prevTime = currentTime;
+	      _this.accumulatedTime = _this.accumulatedTime + timeDelta;
+	      // more than 10 frames? prolly switched browser tab. Restart
+	      if (_this.accumulatedTime > msPerFrame * 10) {
+	        _this.accumulatedTime = 0;
+	      }
+
+	      if (_this.accumulatedTime === 0) {
+	        // no need to cancel animationID here; shouldn't have any in flight
+	        _this.animationID = null;
+	        _this.startAnimationIfNecessary();
+	        return;
+	      }
+
+	      var currentFrameCompletion = (_this.accumulatedTime - Math.floor(_this.accumulatedTime / msPerFrame) * msPerFrame) / msPerFrame;
+	      var framesToCatchUp = Math.floor(_this.accumulatedTime / msPerFrame);
+
+	      var _mergeAndSync3 = mergeAndSync(
+	      // $FlowFixMe
+	      _this.props.willEnter,
+	      // $FlowFixMe
+	      _this.props.willLeave, _this.state.mergedPropsStyles, destStyles, _this.state.currentStyles, _this.state.currentVelocities, _this.state.lastIdealStyles, _this.state.lastIdealVelocities);
+
+	      var newMergedPropsStyles = _mergeAndSync3[0];
+	      var newCurrentStyles = _mergeAndSync3[1];
+	      var newCurrentVelocities = _mergeAndSync3[2];
+	      var newLastIdealStyles = _mergeAndSync3[3];
+	      var newLastIdealVelocities = _mergeAndSync3[4];
+
+	      for (var i = 0; i < newMergedPropsStyles.length; i++) {
+	        var newMergedPropsStyle = newMergedPropsStyles[i].style;
+	        var newCurrentStyle = {};
+	        var newCurrentVelocity = {};
+	        var newLastIdealStyle = {};
+	        var newLastIdealVelocity = {};
+
+	        for (var key in newMergedPropsStyle) {
+	          if (!newMergedPropsStyle.hasOwnProperty(key)) {
+	            continue;
+	          }
+
+	          var styleValue = newMergedPropsStyle[key];
+	          if (typeof styleValue === 'number') {
+	            newCurrentStyle[key] = styleValue;
+	            newCurrentVelocity[key] = 0;
+	            newLastIdealStyle[key] = styleValue;
+	            newLastIdealVelocity[key] = 0;
+	          } else {
+	            var newLastIdealStyleValue = newLastIdealStyles[i][key];
+	            var newLastIdealVelocityValue = newLastIdealVelocities[i][key];
+	            for (var j = 0; j < framesToCatchUp; j++) {
+	              var _stepper = _stepper4['default'](msPerFrame / 1000, newLastIdealStyleValue, newLastIdealVelocityValue, styleValue.val, styleValue.stiffness, styleValue.damping, styleValue.precision);
+
+	              newLastIdealStyleValue = _stepper[0];
+	              newLastIdealVelocityValue = _stepper[1];
+	            }
+
+	            var _stepper2 = _stepper4['default'](msPerFrame / 1000, newLastIdealStyleValue, newLastIdealVelocityValue, styleValue.val, styleValue.stiffness, styleValue.damping, styleValue.precision);
+
+	            var nextIdealX = _stepper2[0];
+	            var nextIdealV = _stepper2[1];
+
+	            newCurrentStyle[key] = newLastIdealStyleValue + (nextIdealX - newLastIdealStyleValue) * currentFrameCompletion;
+	            newCurrentVelocity[key] = newLastIdealVelocityValue + (nextIdealV - newLastIdealVelocityValue) * currentFrameCompletion;
+	            newLastIdealStyle[key] = newLastIdealStyleValue;
+	            newLastIdealVelocity[key] = newLastIdealVelocityValue;
+	          }
+	        }
+
+	        newLastIdealStyles[i] = newLastIdealStyle;
+	        newLastIdealVelocities[i] = newLastIdealVelocity;
+	        newCurrentStyles[i] = newCurrentStyle;
+	        newCurrentVelocities[i] = newCurrentVelocity;
+	      }
+
+	      _this.animationID = null;
+	      // the amount we're looped over above
+	      _this.accumulatedTime -= framesToCatchUp * msPerFrame;
+
+	      _this.setState({
+	        currentStyles: newCurrentStyles,
+	        currentVelocities: newCurrentVelocities,
+	        lastIdealStyles: newLastIdealStyles,
+	        lastIdealVelocities: newLastIdealVelocities,
+	        mergedPropsStyles: newMergedPropsStyles
+	      });
+
+	      _this.unreadPropStyles = null;
+
+	      _this.startAnimationIfNecessary();
+	    });
+	  },
+
+	  componentDidMount: function componentDidMount() {
+	    this.prevTime = _performanceNow2['default']();
+	    this.startAnimationIfNecessary();
+	  },
+
+	  componentWillReceiveProps: function componentWillReceiveProps(props) {
+	    if (this.unreadPropStyles) {
+	      // previous props haven't had the chance to be set yet; set them here
+	      this.clearUnreadPropStyle(this.unreadPropStyles);
+	    }
+
+	    if (typeof props.styles === 'function') {
+	      // $FlowFixMe
+	      this.unreadPropStyles = props.styles(rehydrateStyles(this.state.mergedPropsStyles, this.unreadPropStyles, this.state.lastIdealStyles));
+	    } else {
+	      this.unreadPropStyles = props.styles;
+	    }
+
+	    if (this.animationID == null) {
+	      this.prevTime = _performanceNow2['default']();
+	      this.startAnimationIfNecessary();
+	    }
+	  },
+
+	  componentWillUnmount: function componentWillUnmount() {
+	    if (this.animationID != null) {
+	      _raf2['default'].cancel(this.animationID);
+	      this.animationID = null;
+	    }
+	  },
+
+	  render: function render() {
+	    var hydratedStyles = rehydrateStyles(this.state.mergedPropsStyles, this.unreadPropStyles, this.state.currentStyles);
+	    var renderedChildren = this.props.children(hydratedStyles);
+	    return renderedChildren && _react2['default'].Children.only(renderedChildren);
+	  }
+	});
+
+	exports['default'] = TransitionMotion;
+	module.exports = exports['default'];
+
+	// list of styles, each containing interpolating values. Part of what's passed
+	// to children function. Notice that this is
+	// Array<ActualInterpolatingStyleObject>, without the wrapper that is {key: ...,
+	// data: ... style: ActualInterpolatingStyleObject}. Only mergedPropsStyles
+	// contains the key & data info (so that we only have a single source of truth
+	// for these, and to save space). Check the comment for `rehydrateStyles` to
+	// see how we regenerate the entirety of what's passed to children function
+
+	// the array that keeps track of currently rendered stuff! Including stuff
+	// that you've unmounted but that's still animating. This is where it lives
+
+/***/ },
+/* 183 */
+/***/ function(module, exports) {
+
+	
+
+	// core keys merging algorithm. If previous render's keys are [a, b], and the
+	// next render's [c, b, d], what's the final merged keys and ordering?
+
+	// - c and a must both be before b
+	// - b before d
+	// - ordering between a and c ambiguous
+
+	// this reduces to merging two partially ordered lists (e.g. lists where not
+	// every item has a definite ordering, like comparing a and c above). For the
+	// ambiguous ordering we deterministically choose to place the next render's
+	// item after the previous'; so c after a
+
+	// this is called a topological sorting. Except the existing algorithms don't
+	// work well with js bc of the amount of allocation, and isn't optimized for our
+	// current use-case bc the runtime is linear in terms of edges (see wiki for
+	// meaning), which is huge when two lists have many common elements
+	'use strict';
+
+	exports.__esModule = true;
+	exports['default'] = mergeDiff;
+
+	function mergeDiff(prev, next, onRemove) {
+	  // bookkeeping for easier access of a key's index below. This is 2 allocations +
+	  // potentially triggering chrome hash map mode for objs (so it might be faster
+
+	  var prevKeyIndex = {};
+	  for (var i = 0; i < prev.length; i++) {
+	    prevKeyIndex[prev[i].key] = i;
+	  }
+	  var nextKeyIndex = {};
+	  for (var i = 0; i < next.length; i++) {
+	    nextKeyIndex[next[i].key] = i;
+	  }
+
+	  // first, an overly elaborate way of merging prev and next, eliminating
+	  // duplicates (in terms of keys). If there's dupe, keep the item in next).
+	  // This way of writing it saves allocations
+	  var ret = [];
+	  for (var i = 0; i < next.length; i++) {
+	    ret[i] = next[i];
+	  }
+	  for (var i = 0; i < prev.length; i++) {
+	    if (!nextKeyIndex.hasOwnProperty(prev[i].key)) {
+	      // this is called my TM's `mergeAndSync`, which calls willLeave. We don't
+	      // merge in keys that the user desires to kill
+	      var fill = onRemove(i, prev[i]);
+	      if (fill != null) {
+	        ret.push(fill);
+	      }
+	    }
+	  }
+
+	  // now all the items all present. Core sorting logic to have the right order
+	  return ret.sort(function (a, b) {
+	    var nextOrderA = nextKeyIndex[a.key];
+	    var nextOrderB = nextKeyIndex[b.key];
+	    var prevOrderA = prevKeyIndex[a.key];
+	    var prevOrderB = prevKeyIndex[b.key];
+
+	    if (nextOrderA != null && nextOrderB != null) {
+	      // both keys in next
+	      return nextKeyIndex[a.key] - nextKeyIndex[b.key];
+	    } else if (prevOrderA != null && prevOrderB != null) {
+	      // both keys in prev
+	      return prevKeyIndex[a.key] - prevKeyIndex[b.key];
+	    } else if (nextOrderA != null) {
+	      // key a in next, key b in prev
+
+	      // how to determine the order between a and b? We find a "pivot" (term
+	      // abuse), a key present in both prev and next, that is sandwiched between
+	      // a and b. In the context of our above example, if we're comparing a and
+	      // d, b's (the only) pivot
+	      for (var i = 0; i < next.length; i++) {
+	        var pivot = next[i].key;
+	        if (!prevKeyIndex.hasOwnProperty(pivot)) {
+	          continue;
+	        }
+
+	        if (nextOrderA < nextKeyIndex[pivot] && prevOrderB > prevKeyIndex[pivot]) {
+	          return -1;
+	        } else if (nextOrderA > nextKeyIndex[pivot] && prevOrderB < prevKeyIndex[pivot]) {
+	          return 1;
+	        }
+	      }
+	      // pluggable. default to: next bigger than prev
+	      return 1;
+	    }
+	    // prevOrderA, nextOrderB
+	    for (var i = 0; i < next.length; i++) {
+	      var pivot = next[i].key;
+	      if (!prevKeyIndex.hasOwnProperty(pivot)) {
+	        continue;
+	      }
+	      if (nextOrderB < nextKeyIndex[pivot] && prevOrderA > prevKeyIndex[pivot]) {
+	        return 1;
+	      } else if (nextOrderB > nextKeyIndex[pivot] && prevOrderA < prevKeyIndex[pivot]) {
+	        return -1;
+	      }
+	    }
+	    // pluggable. default to: next bigger than prev
+	    return -1;
+	  });
+	}
+
+	module.exports = exports['default'];
+	// to loop through and find a key's index each time), but I no longer care
+
+/***/ },
+/* 184 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	exports['default'] = spring;
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _presets = __webpack_require__(185);
+
+	var _presets2 = _interopRequireDefault(_presets);
+
+	var defaultConfig = _extends({}, _presets2['default'].noWobble, {
+	  precision: 0.01
+	});
+
+	function spring(val, config) {
+	  return _extends({}, defaultConfig, config, { val: val });
+	}
+
+	module.exports = exports['default'];
+
+/***/ },
+/* 185 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	exports.__esModule = true;
+	exports["default"] = {
+	  noWobble: { stiffness: 170, damping: 26 }, // the default, if nothing provided
+	  gentle: { stiffness: 120, damping: 14 },
+	  wobbly: { stiffness: 180, damping: 12 },
+	  stiff: { stiffness: 210, damping: 20 }
+	};
+	module.exports = exports["default"];
+
+/***/ },
+/* 186 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
+
+	exports.__esModule = true;
+	exports['default'] = reorderKeys;
+
+	var hasWarned = false;
+
+	function reorderKeys() {
+	  if (process.env.NODE_ENV === 'development') {
+	    if (!hasWarned) {
+	      hasWarned = true;
+	      console.error('`reorderKeys` has been removed, since it is no longer needed for TransitionMotion\'s new styles array API.');
+	    }
+	  }
+	}
+
+	module.exports = exports['default'];
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ },
+/* 187 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var OUT_OF_THE_BOX_ACCELERATION = exports.OUT_OF_THE_BOX_ACCELERATION = 0.3;
+	var ACCELERATION_INSIDE_SCROLLER = exports.ACCELERATION_INSIDE_SCROLLER = 0.001;
+	// export const AUTOSCROLL_TIMEOUT = 50;
+	// export const AUTOSCROLL_SHIFT = 30;
+	var FLICK_THRESHOLD = exports.FLICK_THRESHOLD = 0.3;
+	// export const EDITABLE_SCALE = 0.5;
+	// export const DRAGGING_SCALE = 1.1;
+	// export const SHADOW_COLOR = 'rgba(0, 0, 0, 0.2)';
+	// export const SHADOW_POSITION = { x: 0, y: 0 };
+	// export const SHADOW_SIZE = 15;
+	// export const HOLD_TIME = 200;
+
+/***/ },
+/* 188 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var Vertiacal = exports.Vertiacal = 0;
+	var Horizontal = exports.Horizontal = 1;
+
+/***/ },
+/* 189 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var None = exports.None = 0;
+	var Single = exports.Single = 1;
+	var Multiple = exports.Multiple = 2;
+
+/***/ },
+/* 190 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var Normal = exports.Normal = {
+	    stiffness: 250,
+	    damping: 30,
+	    precision: 0.1
+	};
+	var Move = exports.Move = {
+	    stiffness: 170,
+	    damping: 26,
+	    precision: 0.1
+	};
+	var Bounce = exports.Bounce = {
+	    stiffness: 120,
+	    damping: 14,
+	    precision: 0.1
+	};
+	var Hard = exports.Hard = {
+	    stiffness: 390,
+	    damping: 30,
+	    precision: 0.1
+	};
+
+/***/ },
+/* 191 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.scrollerOnPoint = undefined;
+
+	var _OrientationHelpers = __webpack_require__(192);
+
+	var scrollerOnPoint = exports.scrollerOnPoint = function scrollerOnPoint(point, _ref) {
+	    var id = _ref.id;
+	    var multiple = _ref.multiple;
+	    var orientation = _ref.orientation;
+
+	    if (typeof id === 'string') {
+	        return id;
+	    }
+	    var reverseOrientation = (orientation + 1) % 2;
+	    var reverseValue = point[_OrientationHelpers.orientationProp[reverseOrientation]];
+	    var index = Math.floor((reverseValue - multiple.before) / (multiple.size + multiple.between));
+	    var delta = (reverseValue - multiple.before) % (multiple.size + multiple.between);
+	    if (delta > multiple.size) {
+	        return undefined;
+	    }
+	    return id[index];
+	};
+
+/***/ },
+/* 192 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var orientationProp = exports.orientationProp = ['y', 'x'];
+	var orientationDirection = exports.orientationDirection = [['up', 'down'], ['left', 'right']];
+
+/***/ },
+/* 193 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.pageNumberForPosition = exports.pagePositionForScroller = exports.velocityPositionCorrection = exports.paginationCorrection = exports.outOfTheBoxCorrection = undefined;
+
+	var _config = __webpack_require__(187);
+
+	var Config = _interopRequireWildcard(_config);
+
+	var _ArrayPropValue = __webpack_require__(194);
+
+	function _interopRequireWildcard(obj) {
+	    if (obj && obj.__esModule) {
+	        return obj;
+	    } else {
+	        var newObj = {};if (obj != null) {
+	            for (var key in obj) {
+	                if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+	            }
+	        }newObj.default = obj;return newObj;
+	    }
+	}
+
+	var outOfTheBoxCorrection = exports.outOfTheBoxCorrection = function outOfTheBoxCorrection(position, scroller, _ref) {
+	    var id = _ref.id;
+	    var size = _ref.size;
+	    var center = _ref.center;
+
+	    var container = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, size.container);
+	    var content = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, size.content);
+	    var containerOrContent = container < content ? container : content;
+
+	    var leftEdge = 0;
+	    var rightEdge = containerOrContent - content;
+
+	    if ((0, _ArrayPropValue.getPropValueForScroller)(scroller, id, center) && container > content) {
+	        var shift = (container - content) / 2;
+	        leftEdge += shift;
+	        rightEdge += shift;
+	    }
+
+	    if (position > leftEdge) {
+	        return leftEdge;
+	    }
+	    if (position < rightEdge) {
+	        return rightEdge;
+	    }
+
+	    return position;
+	};
+
+	var pagePosition = function pagePosition(pageNumber, pageSize, pageMargin, containerSize) {
+	    return pageSize / 2 - (pageNumber + 1) * (pageSize + pageMargin) + containerSize / 2;
+	};
+
+	var pageNumber = function pageNumber(position, pageSize, pageMargin, containerSize) {
+	    return (-position + containerSize / 2 - pageMargin - pageSize / 2) / (pageSize + pageMargin);
+	};
+
+	var paginationCorrection = exports.paginationCorrection = function paginationCorrection(position, scroller, _ref2) {
+	    var id = _ref2.id;
+	    var size = _ref2.size;
+	    var page = _ref2.page;
+	    var direction = arguments.length <= 3 || arguments[3] === undefined ? 0 : arguments[3];
+	    var prevSinglePage = arguments.length <= 4 || arguments[4] === undefined ? undefined : arguments[4];
+
+	    var pageSize = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, page.size);
+	    var pageMargin = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, page.margin);
+	    var containerSize = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, size.container);
+
+	    var k = (-position + containerSize / 2 - pageMargin - pageSize / 2) / (pageSize + pageMargin);
+	    var n = Math.round(k + direction * 0.5);
+
+	    if (prevSinglePage) {
+	        if (n > prevSinglePage + 1) {
+	            n = prevSinglePage + 1;
+	        }
+	        if (n < prevSinglePage - 1) {
+	            n = prevSinglePage - 1;
+	        }
+	    }
+
+	    return pagePosition(n, pageSize, pageMargin, containerSize);
+	};
+
+	var velocityPositionCorrection = exports.velocityPositionCorrection = function velocityPositionCorrection(position, scroller, velocity) {
+	    var distance = velocity * velocity / (2 * Config.ACCELERATION_INSIDE_SCROLLER);
+	    var direction = Math.sign(velocity);
+
+	    return position - direction * distance;
+	};
+
+	var pagePositionForScroller = exports.pagePositionForScroller = function pagePositionForScroller(pageNum, scroller, _ref3, margin) {
+	    var id = _ref3.id;
+	    var size = _ref3.size;
+	    var page = _ref3.page;
+
+	    var pageSize = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, page.size);
+	    var pageMargin = margin === undefined ? (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, page.margin) : margin;
+	    var containerSize = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, size.container);
+
+	    return pagePosition(pageNum, pageSize, pageMargin, containerSize);
+	};
+
+	var pageNumberForPosition = exports.pageNumberForPosition = function pageNumberForPosition(position, scroller, _ref4, margin) {
+	    var id = _ref4.id;
+	    var size = _ref4.size;
+	    var page = _ref4.page;
+
+	    var pageSize = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, page.size);
+	    var pageMargin = margin === undefined ? (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, page.margin) : margin;
+	    var containerSize = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, size.container);
+
+	    return Math.round(pageNumber(position, pageSize, pageMargin, containerSize));
+	};
+
+/***/ },
+/* 194 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var getPropValueForScroller = exports.getPropValueForScroller = function getPropValueForScroller(scroller, id, prop) {
+	    if (typeof id === 'string') {
+	        if (id === scroller) {
+	            return prop;
+	        }
+	        return undefined;
+	    }
+	    var index = id.indexOf(scroller);
+	    if (index >= 0) {
+	        if (prop instanceof Array) {
+	            return prop[index];
+	        }
+	        return prop;
+	    }
+	    return undefined;
 	};
 
 /***/ }

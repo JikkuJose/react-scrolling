@@ -1,5 +1,9 @@
-import { ReactScrolling } from './components/ReactScrolling';
+import { Scroller } from './components/Scroller';
+import * as Orientation from './consts/Orientation';
+import * as Pagination from './consts/Pagination';
 
 export {
-	ReactScrolling,
+	Scroller,
+	Orientation,
+	Pagination,
 };
