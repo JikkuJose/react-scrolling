@@ -2,79 +2,74 @@ import * as Config from '../config';
 import { getPropValueForScroller } from './ArrayPropValue';
 
 export const outOfTheBoxCorrection = (position, scroller, { id, size, center }) => {
-    const container = getPropValueForScroller(scroller, id, size.container);
-    const content = getPropValueForScroller(scroller, id, size.content);
-    const containerOrContent = container < content ? container : content;
+	const container = getPropValueForScroller(scroller, id, size.container);
+	const content = getPropValueForScroller(scroller, id, size.content);
+	const containerOrContent = container < content ? container : content;
 
-    let leftEdge = 0;
-    let rightEdge = containerOrContent - content;
+	let leftEdge = 0;
+	let rightEdge = containerOrContent - content;
 
-    if (getPropValueForScroller(scroller, id, center) && container > content) {
-        const shift = (container - content) / 2;
-        leftEdge += shift;
-        rightEdge += shift;
-    }
+	if (getPropValueForScroller(scroller, id, center) && container > content) {
+		const shift = (container - content) / 2;
+		leftEdge += shift;
+		rightEdge += shift;
+	}
 
-    if (position > leftEdge) {
-        return leftEdge;
-    }
-    if (position < rightEdge) {
-        return rightEdge;
-    }
+	if (position > leftEdge) {
+		return leftEdge;
+	}
+	if (position < rightEdge) {
+		return rightEdge;
+	}
 
-    return position;
+	return position;
 };
 
 const pagePosition = (pageNumber, pageSize, pageMargin, containerSize) =>
-    pageSize / 2 - (pageNumber + 1) * (pageSize + pageMargin) + containerSize / 2;
+	pageSize / 2 - (pageNumber + 1) * (pageSize + pageMargin) + containerSize / 2;
 
 const pageNumber = (position, pageSize, pageMargin, containerSize) =>
-    (-position + containerSize / 2 - pageMargin - pageSize / 2) / (pageSize + pageMargin);
+	(-position + containerSize / 2 - pageMargin - pageSize / 2) / (pageSize + pageMargin);
 
-export const paginationCorrection = (position, scroller, { id, size, page },
-                                     direction = 0, prevSinglePage = undefined) => {
-    const pageSize = getPropValueForScroller(scroller, id, page.size);
-    const pageMargin = getPropValueForScroller(scroller, id, page.margin);
-    const containerSize = getPropValueForScroller(scroller, id, size.container);
+export const paginationCorrection = (
+	position,
+	scroller,
+	{ id, size, page },
+	direction = 0,
+	prevSinglePage = undefined
+) => {
+	const pageSize = getPropValueForScroller(scroller, id, page.size);
+	const pageMargin = getPropValueForScroller(scroller, id, page.margin);
+	const containerSize = getPropValueForScroller(scroller, id, size.container);
 
-    const k = (-position + containerSize / 2 - pageMargin - pageSize / 2) / (pageSize + pageMargin);
-    let n = Math.round(k + direction * 0.5);
+	const k = (-position + containerSize / 2 - pageMargin - pageSize / 2) / (pageSize + pageMargin);
+	let n = Math.round(k + direction * 0.5);
 
-    if (prevSinglePage) {
-        if (n > prevSinglePage + 1) {
-            n = prevSinglePage + 1;
-        }
-        if (n < prevSinglePage - 1) {
-            n = prevSinglePage - 1;
-        }
-    }
+	if (prevSinglePage) {
+		if (n > prevSinglePage + 1) {
+			n = prevSinglePage + 1;
+		}
+		if (n < prevSinglePage - 1) {
+			n = prevSinglePage - 1;
+		}
+	}
 
-    return pagePosition(n, pageSize, pageMargin, containerSize);
+	return pagePosition(n, pageSize, pageMargin, containerSize);
 };
 
 export const velocityPositionCorrection = (position, scroller, velocity) => {
-    const distance = velocity * velocity / (2 * Config.ACCELERATION_INSIDE_SCROLLER);
-    const direction = Math.sign(velocity);
+	const distance = velocity * velocity / (2 * Config.ACCELERATION_INSIDE_SCROLLER);
+	const direction = Math.sign(velocity);
 
-    return position - direction * distance;
-};
-
-export const pagePositionForScroller = (pageNum, scroller, { id, size, page }, margin) => {
-    const pageSize = getPropValueForScroller(scroller, id, page.size);
-    const pageMargin = margin === undefined
-        ? getPropValueForScroller(scroller, id, page.margin)
-        : margin;
-    const containerSize = getPropValueForScroller(scroller, id, size.container);
-
-    return pagePosition(pageNum, pageSize, pageMargin, containerSize);
+	return position - direction * distance;
 };
 
 export const pageNumberForPosition = (position, scroller, { id, size, page }, margin) => {
-    const pageSize = getPropValueForScroller(scroller, id, page.size);
-    const pageMargin = margin === undefined
-        ? getPropValueForScroller(scroller, id, page.margin)
-        : margin;
-    const containerSize = getPropValueForScroller(scroller, id, size.container);
+	const pageSize = getPropValueForScroller(scroller, id, page.size);
+	const pageMargin = margin === undefined
+		? getPropValueForScroller(scroller, id, page.margin)
+		: margin;
+	const containerSize = getPropValueForScroller(scroller, id, size.container);
 
-    return Math.round(pageNumber(position, pageSize, pageMargin, containerSize));
+	return Math.round(pageNumber(position, pageSize, pageMargin, containerSize));
 };

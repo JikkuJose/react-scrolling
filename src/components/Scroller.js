@@ -1,6 +1,6 @@
 import * as React from 'react';
 import autobind from 'autobind-decorator';
-import ReactGestures from 'react-gesture';
+import ReactGesture from 'react-gesture';
 import { eventCoordinates } from '../helpers/coordinatesFromEvent';
 import { Motion, spring } from 'react-motion';
 import * as Config from '../config';
@@ -12,11 +12,17 @@ import {
 	outOfTheBoxCorrection,
 	paginationCorrection,
 	velocityPositionCorrection,
-	pagePositionForScroller,
 	pageNumberForPosition,
 } from '../helpers/PositionCorrectors';
 import { getPropValueForScroller } from '../helpers/ArrayPropValue';
 import { orientationProp, orientationDirection } from '../helpers/OrientationHelpers';
+
+const defaultProps = {
+	scale: 1,
+	orientation: Orientation.Vertiacal,
+	pagination: Pagination.None,
+	center: false,
+};
 
 export class Scroller extends React.Component {
 
@@ -46,8 +52,6 @@ export class Scroller extends React.Component {
 		}
 	}
 
-	// <publicMethods>
-
 	moveScroller(newPosition, id = this.props.id, springValue = Springs.Normal) {
 		if (id in this.state) {
 			const newPartialState = {};
@@ -56,26 +60,6 @@ export class Scroller extends React.Component {
 				spring: springValue,
 			};
 			this.setState(newPartialState);
-		}
-	}
-
-	moveScrollWithinBox(delta, scrollerId) {
-		if (scrollerId in this.state) {
-			const oldPosition = this.state[scrollerId].position;
-			const newPosition = oldPosition + delta;
-			const finalPosition = outOfTheBoxCorrection(newPosition, scrollerId, this.props);
-			if (finalPosition !== oldPosition) {
-				this.moveScroller(finalPosition, scrollerId);
-			}
-			return finalPosition !== oldPosition;
-		}
-		return false;
-	}
-
-	moveScrollerToPage(page, scrollerId, margin) {
-		if (scrollerId in this.state) {
-			const position = pagePositionForScroller(page, scrollerId, this.props, margin);
-			this.moveScroller(position, scrollerId);
 		}
 	}
 
@@ -88,33 +72,6 @@ export class Scroller extends React.Component {
 			);
 		}
 		return undefined;
-	}
-
-	isScrolling() {
-		return this.lock !== null;
-	}
-
-	releaseScroller() {
-		this.handleEventEnd({
-			gesture: {
-				velocityX: 0,
-				velocityY: 0,
-			},
-		});
-	}
-
-	scrollerPosition(scrollerId = this.props.id) {
-		return this.state[scrollerId].position;
-	}
-
-	allPositions() {
-		const res = {};
-		for (const scrollerId in this.state) {
-			if (this.state.hasOwnProperty(scrollerId)) {
-				res[scrollerId] = this.state[scrollerId].position;
-			}
-		}
-		return res;
 	}
 
 	correctOutOfTheBox(props = this.props) {
@@ -142,13 +99,6 @@ export class Scroller extends React.Component {
 			}
 		}
 	}
-
-	correctPosition() {
-		this.correctPagination();
-		this.correctOutOfTheBox();
-	}
-
-	// </publicMethods>
 
 	@autobind
 	handleEventBegin(e) {
@@ -253,17 +203,19 @@ export class Scroller extends React.Component {
 
 	render() {
 		const springStyle = {};
-		for (const scrollerId in this.state) {
-			if (this.state.hasOwnProperty(scrollerId)) {
+		const state = this.state;
+		for (const scrollerId in state) {
+			if (state.hasOwnProperty(scrollerId)) {
 				springStyle[scrollerId] = spring(
-					this.state[scrollerId].position,
-					this.state[scrollerId].spring
+					state[scrollerId].position,
+					state[scrollerId].spring
 				);
 			}
 		}
+
 		return (
-			<Motion style={springStyle} >
-				{style => {
+			<Motion style={ springStyle } >
+				{ style => {
 					this.lastRenderedStyle = style;
 					let children = null;
 					if (typeof this.props.id === 'string') {
@@ -292,23 +244,23 @@ export class Scroller extends React.Component {
 						children = this.props.children(style);
 					}
 					if (children instanceof Array) {
-						children = <div>{children}</div>;
+						children = <div>{ children }</div>;
 					}
 					return (
-						<ReactGestures
-							onTouchStart={this.handleEventBegin}
-							onMouseDown={this.handleEventBegin}
-							onTouchEnd={this.handleEventEnd}
-							onMouseUp={this.handleEventEnd}
-							onSwipeLeft={this.handleSwipe}
-							onSwipeRight={this.handleSwipe}
-							onSwipeUp={this.handleSwipe}
-							onSwipeDown={this.handleSwipe}
+						<ReactGesture
+							onTouchStart={ this.handleEventBegin }
+							onMouseDown={ this.handleEventBegin }
+							onTouchEnd={ this.handleEventEnd }
+							onMouseUp={ this.handleEventEnd }
+							onSwipeLeft={ this.handleSwipe }
+							onSwipeRight={ this.handleSwipe }
+							onSwipeUp={ this.handleSwipe }
+							onSwipeDown={ this.handleSwipe }
 						>
-							{children}
-						</ReactGestures>
+							{ children }
+						</ReactGesture>
 					);
-				}}
+				} }
 			</Motion>
 		);
 	}
@@ -325,7 +277,7 @@ Scroller.enumType = (Enum) =>
 		Object.keys(Enum).map(key => Enum[key])
 	);
 
-Scroller.propTypes = {
+const propTypes = {
 	id: Scroller.valueOrArray(React.PropTypes.string).isRequired,
 	orientation: Scroller.enumType(Orientation),
 	pagination: Scroller.valueOrArray(Scroller.enumType(Pagination)),
@@ -349,12 +301,9 @@ Scroller.propTypes = {
 		React.PropTypes.node,
 	]),
 };
-Scroller.defaultProps = {
-	scale: 1,
-	orientation: Orientation.Vertiacal,
-	pagination: Pagination.None,
-	center: false,
-};
+
+Scroller.propTypes = propTypes;
+Scroller.defaultProps = defaultProps;
 
 /*
 const propsExample = {

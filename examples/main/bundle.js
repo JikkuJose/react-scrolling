@@ -62,13 +62,21 @@
 		container: 400,
 		content: 1000
 	};
+	var style = {
+		width: '100px'
+	};
 
 	ReactDOM.render(React.createElement(
 		_reactScrolling.Scroller,
 		{ id: 'scroller-p', orientation: _reactScrolling.Orientation.Vertiacal, size: sizeProps },
 		React.createElement(
 			'p',
-			{ style: { width: '100px' } },
+			{ style: style },
+			'(Horizontal) Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur nec risus vel sapien mattis aliquam vel ullamcorper enim. Nulla fermentum euismod elit quis vulputate. Donec efficitur est justo, et sollicitudin dolor tincidunt non. Maecenas eget mattis nisi, nec vestibulum dui. Suspendisse potenti. Quisque malesuada tortor sit amet metus tempus, nec ullamcorper arcu dignissim. Phasellus dignissim leo vitae tellus molestie maximus. Integer eget orci nec ipsum faucibus rhoncus. Aliquam consectetur tempor pellentesque. Proin sit amet enim sem. Phasellus consequat consequat nisi sit amet vehicula. Duis placerat justo felis, vel tristique erat interdum eget. Maecenas scelerisque dolor mauris.'
+		),
+		React.createElement(
+			'p',
+			{ style: style },
 			'(Horizontal) Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur nec risus vel sapien mattis aliquam vel ullamcorper enim. Nulla fermentum euismod elit quis vulputate. Donec efficitur est justo, et sollicitudin dolor tincidunt non. Maecenas eget mattis nisi, nec vestibulum dui. Suspendisse potenti. Quisque malesuada tortor sit amet metus tempus, nec ullamcorper arcu dignissim. Phasellus dignissim leo vitae tellus molestie maximus. Integer eget orci nec ipsum faucibus rhoncus. Aliquam consectetur tempor pellentesque. Proin sit amet enim sem. Phasellus consequat consequat nisi sit amet vehicula. Duis placerat justo felis, vel tristique erat interdum eget. Maecenas scelerisque dolor mauris.'
 		)
 	), document.getElementById('ReactScrolling'));
@@ -20193,6 +20201,13 @@
 		return desc;
 	}
 
+	var defaultProps = {
+		scale: 1,
+		orientation: Orientation.Vertiacal,
+		pagination: Pagination.None,
+		center: false
+	};
+
 	var Scroller = exports.Scroller = (_class = function (_React$Component) {
 		_inherits(Scroller, _React$Component);
 
@@ -20247,9 +20262,6 @@
 					this.correctOutOfTheBox(props);
 				}
 			}
-
-			// <publicMethods>
-
 		}, {
 			key: 'moveScroller',
 			value: function moveScroller(newPosition) {
@@ -20266,67 +20278,12 @@
 				}
 			}
 		}, {
-			key: 'moveScrollWithinBox',
-			value: function moveScrollWithinBox(delta, scrollerId) {
-				if (scrollerId in this.state) {
-					var oldPosition = this.state[scrollerId].position;
-					var newPosition = oldPosition + delta;
-					var finalPosition = (0, _PositionCorrectors.outOfTheBoxCorrection)(newPosition, scrollerId, this.props);
-					if (finalPosition !== oldPosition) {
-						this.moveScroller(finalPosition, scrollerId);
-					}
-					return finalPosition !== oldPosition;
-				}
-				return false;
-			}
-		}, {
-			key: 'moveScrollerToPage',
-			value: function moveScrollerToPage(page, scrollerId, margin) {
-				if (scrollerId in this.state) {
-					var position = (0, _PositionCorrectors.pagePositionForScroller)(page, scrollerId, this.props, margin);
-					this.moveScroller(position, scrollerId);
-				}
-			}
-		}, {
 			key: 'currentPage',
 			value: function currentPage(scrollerId) {
 				if (scrollerId in this.state) {
 					return (0, _PositionCorrectors.pageNumberForPosition)(this.state[scrollerId].position, scrollerId, this.props);
 				}
 				return undefined;
-			}
-		}, {
-			key: 'isScrolling',
-			value: function isScrolling() {
-				return this.lock !== null;
-			}
-		}, {
-			key: 'releaseScroller',
-			value: function releaseScroller() {
-				this.handleEventEnd({
-					gesture: {
-						velocityX: 0,
-						velocityY: 0
-					}
-				});
-			}
-		}, {
-			key: 'scrollerPosition',
-			value: function scrollerPosition() {
-				var scrollerId = arguments.length <= 0 || arguments[0] === undefined ? this.props.id : arguments[0];
-
-				return this.state[scrollerId].position;
-			}
-		}, {
-			key: 'allPositions',
-			value: function allPositions() {
-				var res = {};
-				for (var scrollerId in this.state) {
-					if (this.state.hasOwnProperty(scrollerId)) {
-						res[scrollerId] = this.state[scrollerId].position;
-					}
-				}
-				return res;
 			}
 		}, {
 			key: 'correctOutOfTheBox',
@@ -20361,15 +20318,6 @@
 					}
 				}
 			}
-		}, {
-			key: 'correctPosition',
-			value: function correctPosition() {
-				this.correctPagination();
-				this.correctOutOfTheBox();
-			}
-
-			// </publicMethods>
-
 		}, {
 			key: 'handleEventBegin',
 			value: function handleEventBegin(e) {
@@ -20454,11 +20402,13 @@
 				var _this2 = this;
 
 				var springStyle = {};
-				for (var scrollerId in this.state) {
-					if (this.state.hasOwnProperty(scrollerId)) {
-						springStyle[scrollerId] = (0, _reactMotion.spring)(this.state[scrollerId].position, this.state[scrollerId].spring);
+				var state = this.state;
+				for (var scrollerId in state) {
+					if (state.hasOwnProperty(scrollerId)) {
+						springStyle[scrollerId] = (0, _reactMotion.spring)(state[scrollerId].position, state[scrollerId].spring);
 					}
 				}
+
 				return React.createElement(_reactMotion.Motion, { style: springStyle }, function (style) {
 					_this2.lastRenderedStyle = style;
 					var children = null;
@@ -20511,7 +20461,7 @@
 		}));
 	};
 
-	Scroller.propTypes = {
+	var propTypes = {
 		id: Scroller.valueOrArray(React.PropTypes.string).isRequired,
 		orientation: Scroller.enumType(Orientation),
 		pagination: Scroller.valueOrArray(Scroller.enumType(Pagination)),
@@ -20532,12 +20482,9 @@
 		scale: React.PropTypes.number,
 		children: React.PropTypes.oneOfType([React.PropTypes.func, React.PropTypes.node])
 	};
-	Scroller.defaultProps = {
-		scale: 1,
-		orientation: Orientation.Vertiacal,
-		pagination: Pagination.None,
-		center: false
-	};
+
+	Scroller.propTypes = propTypes;
+	Scroller.defaultProps = defaultProps;
 
 	/*
 	const propsExample = {
@@ -21133,22 +21080,23 @@
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+		value: true
 	});
 	var eventCoordinates = exports.eventCoordinates = function eventCoordinates(e, scale) {
-	    var shift = window.innerWidth / 2 * (1 - scale);
+		var shift = window.innerWidth / 2 * (1 - scale);
 
-	    if (e.touches && e.touches.length > 0) {
-	        return {
-	            x: (e.touches[0].clientX - shift) / scale,
-	            y: e.touches[0].clientY / scale
-	        };
-	    }
+		if (e.touches && e.touches.length > 0) {
+			var firstTouch = e.touches[0];
+			return {
+				x: (firstTouch.clientX - shift) / scale,
+				y: firstTouch.clientY / scale
+			};
+		}
 
-	    return {
-	        x: (e.clientX - shift) / scale,
-	        y: e.clientY / scale
-	    };
+		return {
+			x: (e.clientX - shift) / scale,
+			y: e.clientY / scale
+		};
 	};
 
 /***/ },
@@ -22635,15 +22583,7 @@
 	});
 	var OUT_OF_THE_BOX_ACCELERATION = exports.OUT_OF_THE_BOX_ACCELERATION = 0.3;
 	var ACCELERATION_INSIDE_SCROLLER = exports.ACCELERATION_INSIDE_SCROLLER = 0.001;
-	// export const AUTOSCROLL_TIMEOUT = 50;
-	// export const AUTOSCROLL_SHIFT = 30;
 	var FLICK_THRESHOLD = exports.FLICK_THRESHOLD = 0.3;
-	// export const EDITABLE_SCALE = 0.5;
-	// export const DRAGGING_SCALE = 1.1;
-	// export const SHADOW_COLOR = 'rgba(0, 0, 0, 0.2)';
-	// export const SHADOW_POSITION = { x: 0, y: 0 };
-	// export const SHADOW_SIZE = 15;
-	// export const HOLD_TIME = 200;
 
 /***/ },
 /* 188 */
@@ -22677,27 +22617,30 @@
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+		value: true
 	});
 	var Normal = exports.Normal = {
-	    stiffness: 250,
-	    damping: 30,
-	    precision: 0.1
+		stiffness: 250,
+		damping: 30,
+		precision: 0.1
 	};
+
 	var Move = exports.Move = {
-	    stiffness: 170,
-	    damping: 26,
-	    precision: 0.1
+		stiffness: 170,
+		damping: 26,
+		precision: 0.1
 	};
+
 	var Bounce = exports.Bounce = {
-	    stiffness: 120,
-	    damping: 14,
-	    precision: 0.1
+		stiffness: 120,
+		damping: 14,
+		precision: 0.1
 	};
+
 	var Hard = exports.Hard = {
-	    stiffness: 390,
-	    damping: 30,
-	    precision: 0.1
+		stiffness: 390,
+		damping: 30,
+		precision: 0.1
 	};
 
 /***/ },
@@ -22707,28 +22650,28 @@
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+		value: true
 	});
 	exports.scrollerOnPoint = undefined;
 
 	var _OrientationHelpers = __webpack_require__(192);
 
 	var scrollerOnPoint = exports.scrollerOnPoint = function scrollerOnPoint(point, _ref) {
-	    var id = _ref.id;
-	    var multiple = _ref.multiple;
-	    var orientation = _ref.orientation;
+		var id = _ref.id;
+		var multiple = _ref.multiple;
+		var orientation = _ref.orientation;
 
-	    if (typeof id === 'string') {
-	        return id;
-	    }
-	    var reverseOrientation = (orientation + 1) % 2;
-	    var reverseValue = point[_OrientationHelpers.orientationProp[reverseOrientation]];
-	    var index = Math.floor((reverseValue - multiple.before) / (multiple.size + multiple.between));
-	    var delta = (reverseValue - multiple.before) % (multiple.size + multiple.between);
-	    if (delta > multiple.size) {
-	        return undefined;
-	    }
-	    return id[index];
+		if (typeof id === 'string') {
+			return id;
+		}
+		var reverseOrientation = (orientation + 1) % 2;
+		var reverseValue = point[_OrientationHelpers.orientationProp[reverseOrientation]];
+		var index = Math.floor((reverseValue - multiple.before) / (multiple.size + multiple.between));
+		var delta = (reverseValue - multiple.before) % (multiple.size + multiple.between);
+		if (delta > multiple.size) {
+			return undefined;
+		}
+		return id[index];
 	};
 
 /***/ },
@@ -22750,9 +22693,9 @@
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+		value: true
 	});
-	exports.pageNumberForPosition = exports.pagePositionForScroller = exports.velocityPositionCorrection = exports.paginationCorrection = exports.outOfTheBoxCorrection = undefined;
+	exports.pageNumberForPosition = exports.velocityPositionCorrection = exports.paginationCorrection = exports.outOfTheBoxCorrection = undefined;
 
 	var _config = __webpack_require__(187);
 
@@ -22761,108 +22704,96 @@
 	var _ArrayPropValue = __webpack_require__(194);
 
 	function _interopRequireWildcard(obj) {
-	    if (obj && obj.__esModule) {
-	        return obj;
-	    } else {
-	        var newObj = {};if (obj != null) {
-	            for (var key in obj) {
-	                if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
-	            }
-	        }newObj.default = obj;return newObj;
-	    }
+		if (obj && obj.__esModule) {
+			return obj;
+		} else {
+			var newObj = {};if (obj != null) {
+				for (var key in obj) {
+					if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+				}
+			}newObj.default = obj;return newObj;
+		}
 	}
 
 	var outOfTheBoxCorrection = exports.outOfTheBoxCorrection = function outOfTheBoxCorrection(position, scroller, _ref) {
-	    var id = _ref.id;
-	    var size = _ref.size;
-	    var center = _ref.center;
+		var id = _ref.id;
+		var size = _ref.size;
+		var center = _ref.center;
 
-	    var container = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, size.container);
-	    var content = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, size.content);
-	    var containerOrContent = container < content ? container : content;
+		var container = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, size.container);
+		var content = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, size.content);
+		var containerOrContent = container < content ? container : content;
 
-	    var leftEdge = 0;
-	    var rightEdge = containerOrContent - content;
+		var leftEdge = 0;
+		var rightEdge = containerOrContent - content;
 
-	    if ((0, _ArrayPropValue.getPropValueForScroller)(scroller, id, center) && container > content) {
-	        var shift = (container - content) / 2;
-	        leftEdge += shift;
-	        rightEdge += shift;
-	    }
+		if ((0, _ArrayPropValue.getPropValueForScroller)(scroller, id, center) && container > content) {
+			var shift = (container - content) / 2;
+			leftEdge += shift;
+			rightEdge += shift;
+		}
 
-	    if (position > leftEdge) {
-	        return leftEdge;
-	    }
-	    if (position < rightEdge) {
-	        return rightEdge;
-	    }
+		if (position > leftEdge) {
+			return leftEdge;
+		}
+		if (position < rightEdge) {
+			return rightEdge;
+		}
 
-	    return position;
+		return position;
 	};
 
 	var pagePosition = function pagePosition(pageNumber, pageSize, pageMargin, containerSize) {
-	    return pageSize / 2 - (pageNumber + 1) * (pageSize + pageMargin) + containerSize / 2;
+		return pageSize / 2 - (pageNumber + 1) * (pageSize + pageMargin) + containerSize / 2;
 	};
 
 	var pageNumber = function pageNumber(position, pageSize, pageMargin, containerSize) {
-	    return (-position + containerSize / 2 - pageMargin - pageSize / 2) / (pageSize + pageMargin);
+		return (-position + containerSize / 2 - pageMargin - pageSize / 2) / (pageSize + pageMargin);
 	};
 
 	var paginationCorrection = exports.paginationCorrection = function paginationCorrection(position, scroller, _ref2) {
-	    var id = _ref2.id;
-	    var size = _ref2.size;
-	    var page = _ref2.page;
-	    var direction = arguments.length <= 3 || arguments[3] === undefined ? 0 : arguments[3];
-	    var prevSinglePage = arguments.length <= 4 || arguments[4] === undefined ? undefined : arguments[4];
+		var id = _ref2.id;
+		var size = _ref2.size;
+		var page = _ref2.page;
+		var direction = arguments.length <= 3 || arguments[3] === undefined ? 0 : arguments[3];
+		var prevSinglePage = arguments.length <= 4 || arguments[4] === undefined ? undefined : arguments[4];
 
-	    var pageSize = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, page.size);
-	    var pageMargin = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, page.margin);
-	    var containerSize = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, size.container);
+		var pageSize = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, page.size);
+		var pageMargin = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, page.margin);
+		var containerSize = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, size.container);
 
-	    var k = (-position + containerSize / 2 - pageMargin - pageSize / 2) / (pageSize + pageMargin);
-	    var n = Math.round(k + direction * 0.5);
+		var k = (-position + containerSize / 2 - pageMargin - pageSize / 2) / (pageSize + pageMargin);
+		var n = Math.round(k + direction * 0.5);
 
-	    if (prevSinglePage) {
-	        if (n > prevSinglePage + 1) {
-	            n = prevSinglePage + 1;
-	        }
-	        if (n < prevSinglePage - 1) {
-	            n = prevSinglePage - 1;
-	        }
-	    }
+		if (prevSinglePage) {
+			if (n > prevSinglePage + 1) {
+				n = prevSinglePage + 1;
+			}
+			if (n < prevSinglePage - 1) {
+				n = prevSinglePage - 1;
+			}
+		}
 
-	    return pagePosition(n, pageSize, pageMargin, containerSize);
+		return pagePosition(n, pageSize, pageMargin, containerSize);
 	};
 
 	var velocityPositionCorrection = exports.velocityPositionCorrection = function velocityPositionCorrection(position, scroller, velocity) {
-	    var distance = velocity * velocity / (2 * Config.ACCELERATION_INSIDE_SCROLLER);
-	    var direction = Math.sign(velocity);
+		var distance = velocity * velocity / (2 * Config.ACCELERATION_INSIDE_SCROLLER);
+		var direction = Math.sign(velocity);
 
-	    return position - direction * distance;
+		return position - direction * distance;
 	};
 
-	var pagePositionForScroller = exports.pagePositionForScroller = function pagePositionForScroller(pageNum, scroller, _ref3, margin) {
-	    var id = _ref3.id;
-	    var size = _ref3.size;
-	    var page = _ref3.page;
+	var pageNumberForPosition = exports.pageNumberForPosition = function pageNumberForPosition(position, scroller, _ref3, margin) {
+		var id = _ref3.id;
+		var size = _ref3.size;
+		var page = _ref3.page;
 
-	    var pageSize = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, page.size);
-	    var pageMargin = margin === undefined ? (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, page.margin) : margin;
-	    var containerSize = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, size.container);
+		var pageSize = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, page.size);
+		var pageMargin = margin === undefined ? (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, page.margin) : margin;
+		var containerSize = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, size.container);
 
-	    return pagePosition(pageNum, pageSize, pageMargin, containerSize);
-	};
-
-	var pageNumberForPosition = exports.pageNumberForPosition = function pageNumberForPosition(position, scroller, _ref4, margin) {
-	    var id = _ref4.id;
-	    var size = _ref4.size;
-	    var page = _ref4.page;
-
-	    var pageSize = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, page.size);
-	    var pageMargin = margin === undefined ? (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, page.margin) : margin;
-	    var containerSize = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, size.container);
-
-	    return Math.round(pageNumber(position, pageSize, pageMargin, containerSize));
+		return Math.round(pageNumber(position, pageSize, pageMargin, containerSize));
 	};
 
 /***/ },
@@ -22872,23 +22803,23 @@
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+		value: true
 	});
 	var getPropValueForScroller = exports.getPropValueForScroller = function getPropValueForScroller(scroller, id, prop) {
-	    if (typeof id === 'string') {
-	        if (id === scroller) {
-	            return prop;
-	        }
-	        return undefined;
-	    }
-	    var index = id.indexOf(scroller);
-	    if (index >= 0) {
-	        if (prop instanceof Array) {
-	            return prop[index];
-	        }
-	        return prop;
-	    }
-	    return undefined;
+		if (typeof id === 'string') {
+			if (id === scroller) {
+				return prop;
+			}
+			return undefined;
+		}
+		var index = id.indexOf(scroller);
+		if (index >= 0) {
+			if (prop instanceof Array) {
+				return prop[index];
+			}
+			return prop;
+		}
+		return undefined;
 	};
 
 /***/ }
