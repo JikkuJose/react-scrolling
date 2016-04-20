@@ -15,13 +15,18 @@ import {
 	pageNumberForPosition,
 } from '../helpers/PositionCorrectors';
 import { getPropValueForScroller } from '../helpers/ArrayPropValue';
-import { orientationProp, orientationDirection } from '../helpers/OrientationHelpers';
+import {
+	orientationProp,
+	orientationDirection,
+	orientationSize,
+} from '../helpers/OrientationHelpers';
 
 const defaultProps = {
 	scale: 1,
 	orientation: Orientation.Vertiacal,
 	pagination: Pagination.None,
 	center: false,
+	loop: false,
 };
 
 export class Scroller extends React.Component {
@@ -30,19 +35,28 @@ export class Scroller extends React.Component {
 		super(props);
 
 		this.state = {};
-		const defaultSingleState = {
-			position: 0,
-			spring: Springs.Normal,
-		};
 		if (typeof props.id === 'string') {
-			this.state[props.id] = defaultSingleState;
+			this.state[props.id] = {
+				position: this.getInitialPosition(props.id, props),
+				spring: Springs.Normal,
+			};
 		} else {
 			for (const id of props.id) {
-				this.state[id] = Object.assign({}, defaultSingleState);
+				this.state[id] = {
+					position: this.getInitialPosition(id, props),
+					spring: Springs.Normal,
+				};
 			}
 		}
+		this.autosize = props.size.content === undefined;
 		this.lock = null;
-		this.correctOutOfTheBox(props);
+	}
+
+	componentDidMount() {
+		this.correctOutOfTheBox();
+		if (this.props.loop) {
+			this.correctPagination();
+		}
 	}
 
 	componentWillReceiveProps(props) {
@@ -50,6 +64,17 @@ export class Scroller extends React.Component {
 			this.correctPagination(props, Springs.Hard);
 			this.correctOutOfTheBox(props);
 		}
+		this.updateContentSize();
+	}
+
+	getInitialPosition(scrollerId, props = this.props) {
+		const pagination = getPropValueForScroller(scrollerId, props.id, props.pagination);
+		if (pagination === Pagination.First) {
+			const pageSize = getPropValueForScroller(scrollerId, props.id, props.page.size);
+			const pageMargin = getPropValueForScroller(scrollerId, props.id, props.page.margin);
+			return -(pageSize + 2 * pageMargin);
+		}
+		return 0;
 	}
 
 	moveScroller(newPosition, id = this.props.id, springValue = Springs.Normal) {
@@ -92,7 +117,7 @@ export class Scroller extends React.Component {
 				if (getPropValueForScroller(scrollerId, props.id, props.pagination) !== Pagination.None) {
 					const oldPosition = this.state[scrollerId].position;
 					const newPosition = paginationCorrection(oldPosition, scrollerId, props);
-					if (newPosition !== oldPosition && oldPosition !== 0) {
+					if (newPosition !== oldPosition && (oldPosition !== 0 || props.loop)) {
 						this.moveScroller(newPosition, scrollerId, springValue);
 					}
 				}
@@ -102,12 +127,13 @@ export class Scroller extends React.Component {
 
 	@autobind
 	handleEventBegin(e) {
-		if (!this.lock) {
+		if (!Scroller.Scrolling && !this.lock) {
 			const coordinates = eventCoordinates(e, this.props.scale);
 			const coordinateValue = coordinates[orientationProp[this.props.orientation]];
 
 			const scroller = scrollerOnPoint(coordinates, this.props);
 			if (scroller) {
+				Scroller.Scrolling = true;
 				this.lock = {
 					scroller,
 					coordinateValue,
@@ -138,11 +164,12 @@ export class Scroller extends React.Component {
 
 			let springValue = Springs.Move;
 			let newPosition = this.state[this.lock.scroller].position;
-			if (getPropValueForScroller(
-					this.lock.scroller,
-					this.props.id,
-					this.props.pagination
-				) === Pagination.Single) {
+			const pagination = getPropValueForScroller(
+				this.lock.scroller,
+				this.props.id,
+				this.props.pagination
+			);
+			if (pagination === Pagination.Single) {
 				newPosition = paginationCorrection(
 					newPosition,
 					this.lock.scroller,
@@ -156,27 +183,30 @@ export class Scroller extends React.Component {
 					this.lock.scroller,
 					signedVelocity
 				);
-				if (getPropValueForScroller(
-						this.lock.scroller,
-						this.props.id,
-						this.props.pagination
-					) === Pagination.Multiple) {
+				if (pagination === Pagination.Multiple || pagination === Pagination.First) {
 					newPosition = paginationCorrection(
 						newPosition,
 						this.lock.scroller,
-						this.props
+						this.props,
+						0,
+						undefined, // prevSinglePage
+						pagination === Pagination.First
 					);
 					springValue = Springs.Bounce;
 				}
 			}
 
-			const finalPosition = outOfTheBoxCorrection(newPosition, this.lock.scroller, this.props);
+			let finalPosition = newPosition;
+			if (!this.props.loop) {
+				finalPosition = outOfTheBoxCorrection(newPosition, this.lock.scroller, this.props);
+			}
 			if (newPosition !== finalPosition) {
 				springValue = Springs.Bounce;
 			}
 			this.moveScroller(finalPosition, this.lock.scroller, springValue);
 		}
-		this.lock = null;
+		this.lock = undefined;
+		Scroller.Scrolling = false;
 	}
 
 	@autobind
@@ -190,7 +220,8 @@ export class Scroller extends React.Component {
 
 				const oldPosition = this.state[this.lock.scroller].position;
 				let newPosition = oldPosition + delta;
-				if (outOfTheBoxCorrection(newPosition, this.lock.scroller, this.props) !== newPosition) {
+				if (!this.props.loop &&
+					outOfTheBoxCorrection(newPosition, this.lock.scroller, this.props) !== newPosition) {
 					newPosition = oldPosition + delta * Config.OUT_OF_THE_BOX_ACCELERATION;
 				}
 
@@ -199,6 +230,21 @@ export class Scroller extends React.Component {
 				this.moveScroller(newPosition, this.lock.scroller);
 			}
 		}
+	}
+
+	updateContentSize() {
+		if (!this.autosize || this.contentDom === undefined) {
+			return;
+		}
+		const sizeProp = orientationSize[this.props.orientation];
+		const capitalSizeProp = sizeProp.charAt(0).toUpperCase() + sizeProp.slice(1);
+		this.props.size.content = this.contentDom[`client${capitalSizeProp}`];
+	}
+
+	@autobind
+	initContentDom(ref) {
+		this.contentDom = ref;
+		this.updateContentSize();
 	}
 
 	render() {
@@ -214,26 +260,36 @@ export class Scroller extends React.Component {
 		}
 
 		return (
-			<Motion style={ springStyle } >
+			<Motion style={springStyle} >
 				{ style => {
 					this.lastRenderedStyle = style;
 					let children = null;
 					if (typeof this.props.id === 'string') {
 						if (typeof this.props.children === 'function') {
-							children = this.props.children(style[this.props.id]);
+							let pos = style[this.props.id];
+							if (this.props.loop) {
+								pos %= this.props.size.content;
+								if (pos > 0) {
+									pos -= this.props.size.content;
+								}
+							}
+							children = this.props.children(pos);
 						} else {
 							const translate = { x: 0, y: 0 };
 							translate[orientationProp[this.props.orientation]] = style[this.props.id];
+							const containerStyle = {
+								overflow: 'hidden',
+								width: '100%',
+								height: '100%',
+							};
+							containerStyle[orientationSize[this.props.orientation]] =
+								`${this.props.size.container}px`;
 							children = (
-								<div style={{
-									overflow: 'hidden',
-									width: '100%',
-									height: '100%',
-								}}
-								>
+								<div style={containerStyle} >
 									<div style={{
 										transform: `translate3d(${translate.x}px, ${translate.y}px, 0px)`,
 									}}
+										ref={this.initContentDom}
 									>
 										{this.props.children}
 									</div>
@@ -282,6 +338,7 @@ const propTypes = {
 	orientation: Scroller.enumType(Orientation),
 	pagination: Scroller.valueOrArray(Scroller.enumType(Pagination)),
 	center: Scroller.valueOrArray(React.PropTypes.bool),
+	loop: Scroller.valueOrArray(React.PropTypes.bool),
 	size: React.PropTypes.shape({
 		container: Scroller.valueOrArray(React.PropTypes.number),
 		content: Scroller.valueOrArray(React.PropTypes.number),
@@ -301,6 +358,8 @@ const propTypes = {
 		React.PropTypes.node,
 	]),
 };
+
+Scroller.Scrolling = false;
 
 Scroller.propTypes = propTypes;
 Scroller.defaultProps = defaultProps;

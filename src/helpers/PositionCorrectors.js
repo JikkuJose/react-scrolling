@@ -36,16 +36,27 @@ export const paginationCorrection = (
 	scroller,
 	{ id, size, page },
 	direction = 0,
-	prevSinglePage = undefined
+	prevSinglePage = undefined,
+	onlyFirst = false
 ) => {
 	const pageSize = getPropValueForScroller(scroller, id, page.size);
 	const pageMargin = getPropValueForScroller(scroller, id, page.margin);
 	const containerSize = getPropValueForScroller(scroller, id, size.container);
 
+	if (onlyFirst) {
+		if (-position < pageMargin + pageSize / 2) {
+			return 0;
+		}
+		if (-position < pageSize + 2 * pageMargin) {
+			return -(pageSize + 2 * pageMargin);
+		}
+		return position;
+	}
+
 	const k = (-position + containerSize / 2 - pageMargin - pageSize / 2) / (pageSize + pageMargin);
 	let n = Math.round(k + direction * 0.5);
 
-	if (prevSinglePage) {
+	if (prevSinglePage !== undefined) {
 		if (n > prevSinglePage + 1) {
 			n = prevSinglePage + 1;
 		}
