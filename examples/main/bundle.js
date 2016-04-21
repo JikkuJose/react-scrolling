@@ -62,34 +62,14 @@
 		container: 400
 	};
 	var style = {
-		width: '200px'
+		width: '300px'
 	};
 	var searchStyle = {
-		width: '200px',
+		width: '300px',
 		padding: '5px',
 		backgroundColor: '#eee',
 		borderRadius: '5px',
 		color: '#888'
-	};
-	
-	var carouselPage = {
-		size: 150,
-		margin: 10
-	};
-	var colors = ['red', 'green', 'blue', 'yellow'];
-	var carouselSize = {
-		container: 200,
-		content: colors.length * (carouselPage.size + carouselPage.margin) + carouselPage.margin
-	};
-	var carouselItemPosition = function carouselItemPosition(position, item, page, count) {
-		var realPos = item * (page.size + page.margin) + page.margin + position;
-		if (item === 0 && realPos < -page.size) {
-			return count * (page.size + page.margin) + page.margin + position;
-		}
-		if (item === count - 1 && realPos > (count - 1) * (page.size + page.margin) + page.margin) {
-			return -page.size + position;
-		}
-		return realPos;
 	};
 	
 	ReactDOM.render(React.createElement(
@@ -97,8 +77,9 @@
 		null,
 		React.createElement(
 			_reactScrolling.Scroller,
-			{ id: 'scroller-p', orientation: _reactScrolling.Orientation.Vertiacal, size: sizeProps,
-				pagination: _reactScrolling.Pagination.First, page: { size: 35, margin: 0 }
+			{ id: 'scroller-p', orientation: _reactScrolling.Orientation.Vertiacal,
+				size: Object.assign({}, sizeProps),
+				pagination: _reactScrolling.Pagination.First, page: { size: 40, margin: 0 }
 			},
 			React.createElement(
 				'div',
@@ -108,7 +89,7 @@
 			React.createElement(
 				'p',
 				{ style: style },
-				'(Horizontal) Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur nec risus vel sapien mattis aliquam vel ullamcorper enim. Nulla fermentum euismod elit quis vulputate. Donec efficitur est justo, et sollicitudin dolor tincidunt non. Maecenas eget mattis nisi, nec vestibulum dui. Suspendisse potenti. Quisque malesuada tortor sit amet metus tempus, nec ullamcorper arcu dignissim. Phasellus dignissim leo vitae tellus molestie maximus. Integer eget orci nec ipsum faucibus rhoncus. Aliquam consectetur tempor pellentesque. Proin sit amet enim sem. Phasellus consequat consequat nisi sit amet vehicula. Duis placerat justo felis, vel tristique erat interdum eget. Maecenas scelerisque dolor mauris.'
+				'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur nec risus vel sapien mattis aliquam vel ullamcorper enim. Nulla fermentum euismod elit quis vulputate. Donec efficitur est justo, et sollicitudin dolor tincidunt non. Maecenas eget mattis nisi, nec vestibulum dui. Suspendisse potenti. Quisque malesuada tortor sit amet metus tempus, nec ullamcorper arcu dignissim. Phasellus dignissim leo vitae tellus molestie maximus. Integer eget orci nec ipsum faucibus rhoncus. Aliquam consectetur tempor pellentesque. Proin sit amet enim sem. Phasellus consequat consequat nisi sit amet vehicula. Duis placerat justo felis, vel tristique erat interdum eget. Maecenas scelerisque dolor mauris.'
 			),
 			React.createElement(
 				'p',
@@ -119,33 +100,27 @@
 		React.createElement(
 			'div',
 			{ style: {
-					position: 'relative',
-					width: carouselSize.container,
-					height: carouselSize.container,
-					overflow: 'hidden'
+					position: 'absolute',
+					top: '10px',
+					left: '325px'
 				}
 			},
 			React.createElement(
 				_reactScrolling.Scroller,
-				{ id: 'carousel',
-					orientation: _reactScrolling.Orientation.Horizontal,
-					size: carouselSize,
-					pagination: _reactScrolling.Pagination.Single,
-					page: carouselPage,
-					loop: true
+				{ id: 'scroller-2', orientation: _reactScrolling.Orientation.Vertiacal,
+					size: Object.assign({}, sizeProps),
+					pagination: _reactScrolling.Pagination.First, page: { size: 40, margin: 0 }
 				},
-				function (position) {
-					return colors.map(function (color, i) {
-						return React.createElement('div', { key: color, style: {
-								position: 'absolute',
-								backgroundColor: color,
-								width: carouselPage.size,
-								height: carouselPage.size,
-								transform: 'translate3d(' + carouselItemPosition(position, i, carouselPage, colors.length) + 'px, 50px, 0px)'
-							}
-						});
-					});
-				}
+				React.createElement(
+					'div',
+					{ style: searchStyle },
+					'Search...'
+				),
+				React.createElement(
+					'p',
+					{ style: style },
+					'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur nec risus vel sapien mattis aliquam vel ullamcorper enim. Nulla fermentum euismod elit quis vulputate. Donec efficitur est justo, et sollicitudin dolor tincidunt non. Maecenas eget mattis nisi, nec vestibulum dui. Suspendisse potenti. Quisque malesuada tortor sit amet metus tempus, nec ullamcorper arcu dignissim. Phasellus dignissim leo vitae tellus molestie maximus. Integer eget orci nec ipsum faucibus rhoncus. Aliquam consectetur tempor pellentesque. Proin sit amet enim sem. Phasellus consequat consequat nisi sit amet vehicula. Duis placerat justo felis, vel tristique erat interdum eget. Maecenas scelerisque dolor mauris.'
+				)
 			)
 		)
 	), document.getElementById('ReactScrolling'));
