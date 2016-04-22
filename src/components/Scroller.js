@@ -53,18 +53,19 @@ export class Scroller extends React.Component {
 	}
 
 	componentDidMount() {
-		this.correctOutOfTheBox();
+		this.updateContentSize();
+		this.correctOutOfTheBox(this.props, null);
 		if (this.props.loop) {
-			this.correctPagination();
+			this.correctPagination(this.props, null);
 		}
 	}
 
 	componentWillReceiveProps(props) {
+		this.updateContentSize();
 		if (!this.lock) {
 			this.correctPagination(props, Springs.Hard);
 			this.correctOutOfTheBox(props);
 		}
-		this.updateContentSize();
 	}
 
 	getInitialPosition(scrollerId, props = this.props) {
@@ -99,13 +100,13 @@ export class Scroller extends React.Component {
 		return undefined;
 	}
 
-	correctOutOfTheBox(props = this.props) {
+	correctOutOfTheBox(props = this.props, springValue = Springs.Normal) {
 		for (const scrollerId in this.state) {
 			if (this.state.hasOwnProperty(scrollerId)) {
 				const oldPosition = this.state[scrollerId].position;
 				const newPosition = outOfTheBoxCorrection(oldPosition, scrollerId, props);
 				if (newPosition !== oldPosition) {
-					this.moveScroller(newPosition, scrollerId);
+					this.moveScroller(newPosition, scrollerId, springValue);
 				}
 			}
 		}
@@ -143,7 +144,7 @@ export class Scroller extends React.Component {
 					this.lock.page = this.currentPage(scroller);
 				}
 				if (this.lastRenderedStyle[scroller] !== this.state[scroller].position) {
-					this.moveScroller(this.lastRenderedStyle[scroller], scroller, Springs.Hard);
+					this.moveScroller(this.lastRenderedStyle[scroller], scroller, null);
 					this.lock.swiped = true;
 				}
 			}
@@ -244,7 +245,6 @@ export class Scroller extends React.Component {
 	@autobind
 	initContentDom(ref) {
 		this.contentDom = ref;
-		this.updateContentSize();
 	}
 
 	render() {
@@ -252,10 +252,14 @@ export class Scroller extends React.Component {
 		const state = this.state;
 		for (const scrollerId in state) {
 			if (state.hasOwnProperty(scrollerId)) {
-				springStyle[scrollerId] = spring(
-					state[scrollerId].position,
-					state[scrollerId].spring
-				);
+				if (state[scrollerId].spring !== null) {
+					springStyle[scrollerId] = spring(
+						state[scrollerId].position,
+						state[scrollerId].spring
+					);
+				} else {
+					springStyle[scrollerId] = state[scrollerId].position;
+				}
 			}
 		}
 

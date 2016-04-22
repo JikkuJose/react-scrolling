@@ -20304,19 +20304,20 @@
 		_createClass(Scroller, [{
 			key: 'componentDidMount',
 			value: function componentDidMount() {
-				this.correctOutOfTheBox();
+				this.updateContentSize();
+				this.correctOutOfTheBox(this.props, null);
 				if (this.props.loop) {
-					this.correctPagination();
+					this.correctPagination(this.props, null);
 				}
 			}
 		}, {
 			key: 'componentWillReceiveProps',
 			value: function componentWillReceiveProps(props) {
+				this.updateContentSize();
 				if (!this.lock) {
 					this.correctPagination(props, Springs.Hard);
 					this.correctOutOfTheBox(props);
 				}
-				this.updateContentSize();
 			}
 		}, {
 			key: 'getInitialPosition',
@@ -20358,13 +20359,14 @@
 			key: 'correctOutOfTheBox',
 			value: function correctOutOfTheBox() {
 				var props = arguments.length <= 0 || arguments[0] === undefined ? this.props : arguments[0];
+				var springValue = arguments.length <= 1 || arguments[1] === undefined ? Springs.Normal : arguments[1];
 	
 				for (var scrollerId in this.state) {
 					if (this.state.hasOwnProperty(scrollerId)) {
 						var oldPosition = this.state[scrollerId].position;
 						var newPosition = (0, _PositionCorrectors.outOfTheBoxCorrection)(oldPosition, scrollerId, props);
 						if (newPosition !== oldPosition) {
-							this.moveScroller(newPosition, scrollerId);
+							this.moveScroller(newPosition, scrollerId, springValue);
 						}
 					}
 				}
@@ -20405,7 +20407,7 @@
 							this.lock.page = this.currentPage(scroller);
 						}
 						if (this.lastRenderedStyle[scroller] !== this.state[scroller].position) {
-							this.moveScroller(this.lastRenderedStyle[scroller], scroller, Springs.Hard);
+							this.moveScroller(this.lastRenderedStyle[scroller], scroller, null);
 							this.lock.swiped = true;
 						}
 					}
@@ -20486,7 +20488,6 @@
 			key: 'initContentDom',
 			value: function initContentDom(ref) {
 				this.contentDom = ref;
-				this.updateContentSize();
 			}
 		}, {
 			key: 'render',
@@ -20497,7 +20498,11 @@
 				var state = this.state;
 				for (var scrollerId in state) {
 					if (state.hasOwnProperty(scrollerId)) {
-						springStyle[scrollerId] = (0, _reactMotion.spring)(state[scrollerId].position, state[scrollerId].spring);
+						if (state[scrollerId].spring !== null) {
+							springStyle[scrollerId] = (0, _reactMotion.spring)(state[scrollerId].position, state[scrollerId].spring);
+						} else {
+							springStyle[scrollerId] = state[scrollerId].position;
+						}
 					}
 				}
 	
