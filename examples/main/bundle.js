@@ -20087,30 +20087,30 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	  value: true
 	});
 	exports.Pagination = exports.Orientation = exports.Scroller = undefined;
 	
 	var _Scroller = __webpack_require__(167);
 	
-	var _Orientation = __webpack_require__(191);
+	var _Orientation = __webpack_require__(188);
 	
 	var Orientation = _interopRequireWildcard(_Orientation);
 	
-	var _Pagination = __webpack_require__(192);
+	var _Pagination = __webpack_require__(189);
 	
 	var Pagination = _interopRequireWildcard(_Pagination);
 	
 	function _interopRequireWildcard(obj) {
-		if (obj && obj.__esModule) {
-			return obj;
-		} else {
-			var newObj = {};if (obj != null) {
-				for (var key in obj) {
-					if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
-				}
-			}newObj.default = obj;return newObj;
-		}
+	  if (obj && obj.__esModule) {
+	    return obj;
+	  } else {
+	    var newObj = {};if (obj != null) {
+	      for (var key in obj) {
+	        if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+	      }
+	    }newObj.default = obj;return newObj;
+	  }
 	}
 	
 	exports.Scroller = _Scroller.Scroller;
@@ -20126,25 +20126,25 @@
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 	
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	  value: true
 	});
 	exports.Scroller = undefined;
 	
 	var _createClass = function () {
-		function defineProperties(target, props) {
-			for (var i = 0; i < props.length; i++) {
-				var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-			}
-		}return function (Constructor, protoProps, staticProps) {
-			if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-		};
+	  function defineProperties(target, props) {
+	    for (var i = 0; i < props.length; i++) {
+	      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+	    }
+	  }return function (Constructor, protoProps, staticProps) {
+	    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	  };
 	}();
 	
 	var _desc, _value, _class;
 	
 	var _react = __webpack_require__(1);
 	
-	var React = _interopRequireWildcard(_react);
+	var _react2 = _interopRequireDefault(_react);
 	
 	var _autobindDecorator = __webpack_require__(168);
 	
@@ -20154,440 +20154,439 @@
 	
 	var _reactGesture2 = _interopRequireDefault(_reactGesture);
 	
-	var _coordinatesFromEvent = __webpack_require__(175);
+	var _coordinatesFromEvent = __webpack_require__(172);
 	
-	var _reactMotion = __webpack_require__(176);
+	var _reactMotion = __webpack_require__(173);
 	
-	var _config = __webpack_require__(190);
+	var _config = __webpack_require__(187);
 	
 	var Config = _interopRequireWildcard(_config);
 	
-	var _Orientation = __webpack_require__(191);
+	var _Orientation = __webpack_require__(188);
 	
 	var Orientation = _interopRequireWildcard(_Orientation);
 	
-	var _Pagination = __webpack_require__(192);
+	var _Pagination = __webpack_require__(189);
 	
 	var Pagination = _interopRequireWildcard(_Pagination);
 	
-	var _Springs = __webpack_require__(193);
+	var _Springs = __webpack_require__(190);
 	
 	var Springs = _interopRequireWildcard(_Springs);
 	
-	var _ScrollerOnPoint = __webpack_require__(194);
+	var _ScrollerOnPoint = __webpack_require__(191);
 	
-	var _PositionCorrectors = __webpack_require__(196);
+	var _PositionCorrectors = __webpack_require__(193);
 	
-	var _ArrayPropValue = __webpack_require__(197);
+	var _ArrayPropValue = __webpack_require__(194);
 	
-	var _OrientationHelpers = __webpack_require__(195);
-	
-	function _interopRequireDefault(obj) {
-		return obj && obj.__esModule ? obj : { default: obj };
-	}
+	var _OrientationHelpers = __webpack_require__(192);
 	
 	function _interopRequireWildcard(obj) {
-		if (obj && obj.__esModule) {
-			return obj;
-		} else {
-			var newObj = {};if (obj != null) {
-				for (var key in obj) {
-					if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
-				}
-			}newObj.default = obj;return newObj;
-		}
+	  if (obj && obj.__esModule) {
+	    return obj;
+	  } else {
+	    var newObj = {};if (obj != null) {
+	      for (var key in obj) {
+	        if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+	      }
+	    }newObj.default = obj;return newObj;
+	  }
+	}
+	
+	function _interopRequireDefault(obj) {
+	  return obj && obj.__esModule ? obj : { default: obj };
 	}
 	
 	function _classCallCheck(instance, Constructor) {
-		if (!(instance instanceof Constructor)) {
-			throw new TypeError("Cannot call a class as a function");
-		}
+	  if (!(instance instanceof Constructor)) {
+	    throw new TypeError("Cannot call a class as a function");
+	  }
 	}
 	
 	function _possibleConstructorReturn(self, call) {
-		if (!self) {
-			throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-		}return call && ((typeof call === "undefined" ? "undefined" : _typeof(call)) === "object" || typeof call === "function") ? call : self;
+	  if (!self) {
+	    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+	  }return call && ((typeof call === "undefined" ? "undefined" : _typeof(call)) === "object" || typeof call === "function") ? call : self;
 	}
 	
 	function _inherits(subClass, superClass) {
-		if (typeof superClass !== "function" && superClass !== null) {
-			throw new TypeError("Super expression must either be null or a function, not " + (typeof superClass === "undefined" ? "undefined" : _typeof(superClass)));
-		}subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+	  if (typeof superClass !== "function" && superClass !== null) {
+	    throw new TypeError("Super expression must either be null or a function, not " + (typeof superClass === "undefined" ? "undefined" : _typeof(superClass)));
+	  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 	}
 	
 	function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
-		var desc = {};
-		Object['ke' + 'ys'](descriptor).forEach(function (key) {
-			desc[key] = descriptor[key];
-		});
-		desc.enumerable = !!desc.enumerable;
-		desc.configurable = !!desc.configurable;
+	  var desc = {};
+	  Object['ke' + 'ys'](descriptor).forEach(function (key) {
+	    desc[key] = descriptor[key];
+	  });
+	  desc.enumerable = !!desc.enumerable;
+	  desc.configurable = !!desc.configurable;
 	
-		if ('value' in desc || desc.initializer) {
-			desc.writable = true;
-		}
+	  if ('value' in desc || desc.initializer) {
+	    desc.writable = true;
+	  }
 	
-		desc = decorators.slice().reverse().reduce(function (desc, decorator) {
-			return decorator(target, property, desc) || desc;
-		}, desc);
+	  desc = decorators.slice().reverse().reduce(function (desc, decorator) {
+	    return decorator(target, property, desc) || desc;
+	  }, desc);
 	
-		if (context && desc.initializer !== void 0) {
-			desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
-			desc.initializer = undefined;
-		}
+	  if (context && desc.initializer !== void 0) {
+	    desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
+	    desc.initializer = undefined;
+	  }
 	
-		if (desc.initializer === void 0) {
-			Object['define' + 'Property'](target, property, desc);
-			desc = null;
-		}
+	  if (desc.initializer === void 0) {
+	    Object['define' + 'Property'](target, property, desc);
+	    desc = null;
+	  }
 	
-		return desc;
+	  return desc;
 	}
 	
 	var defaultProps = {
-		scale: 1,
-		orientation: Orientation.Vertiacal,
-		pagination: Pagination.None,
-		center: false,
-		loop: false
+	  scale: 1,
+	  orientation: Orientation.Vertiacal,
+	  pagination: Pagination.None,
+	  center: false,
+	  loop: false
 	};
 	
 	var Scroller = exports.Scroller = (_class = function (_React$Component) {
-		_inherits(Scroller, _React$Component);
+	  _inherits(Scroller, _React$Component);
 	
-		function Scroller(props) {
-			_classCallCheck(this, Scroller);
+	  function Scroller(props) {
+	    _classCallCheck(this, Scroller);
 	
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Scroller).call(this, props));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Scroller).call(this, props));
 	
-			_this.state = {};
-			if (typeof props.id === 'string') {
-				_this.state[props.id] = {
-					position: _this.getInitialPosition(props.id, props),
-					spring: Springs.Normal
-				};
-			} else {
-				var _iteratorNormalCompletion = true;
-				var _didIteratorError = false;
-				var _iteratorError = undefined;
+	    _this.state = {};
+	    if (typeof props.id === 'string') {
+	      _this.state[props.id] = {
+	        position: _this.getInitialPosition(props.id, props),
+	        spring: Springs.Normal
+	      };
+	    } else {
+	      var _iteratorNormalCompletion = true;
+	      var _didIteratorError = false;
+	      var _iteratorError = undefined;
 	
-				try {
-					for (var _iterator = props.id[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-						var id = _step.value;
+	      try {
+	        for (var _iterator = props.id[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	          var id = _step.value;
 	
-						_this.state[id] = {
-							position: _this.getInitialPosition(id, props),
-							spring: Springs.Normal
-						};
-					}
-				} catch (err) {
-					_didIteratorError = true;
-					_iteratorError = err;
-				} finally {
-					try {
-						if (!_iteratorNormalCompletion && _iterator.return) {
-							_iterator.return();
-						}
-					} finally {
-						if (_didIteratorError) {
-							throw _iteratorError;
-						}
-					}
-				}
-			}
-			_this.autosize = props.size.content === undefined;
-			_this.lock = null;
-			return _this;
-		}
+	          _this.state[id] = {
+	            position: _this.getInitialPosition(id, props),
+	            spring: Springs.Normal
+	          };
+	        }
+	      } catch (err) {
+	        _didIteratorError = true;
+	        _iteratorError = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion && _iterator.return) {
+	            _iterator.return();
+	          }
+	        } finally {
+	          if (_didIteratorError) {
+	            throw _iteratorError;
+	          }
+	        }
+	      }
+	    }
+	    _this.autosize = props.size.content === undefined;
+	    _this.lock = null;
+	    return _this;
+	  }
 	
-		_createClass(Scroller, [{
-			key: 'componentDidMount',
-			value: function componentDidMount() {
-				this.updateContentSize();
-				this.correctOutOfTheBox(this.props, null);
-				if (this.props.loop) {
-					this.correctPagination(this.props, null);
-				}
-			}
-		}, {
-			key: 'componentWillReceiveProps',
-			value: function componentWillReceiveProps(props) {
-				this.updateContentSize();
-				if (!this.lock) {
-					this.correctPagination(props, Springs.Hard);
-					this.correctOutOfTheBox(props);
-				}
-			}
-		}, {
-			key: 'getInitialPosition',
-			value: function getInitialPosition(scrollerId) {
-				var props = arguments.length <= 1 || arguments[1] === undefined ? this.props : arguments[1];
+	  _createClass(Scroller, [{
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      this.updateContentSize();
+	      this.correctOutOfTheBox(this.props, null);
+	      if (this.props.loop) {
+	        this.correctPagination(this.props, null);
+	      }
+	    }
+	  }, {
+	    key: 'componentWillReceiveProps',
+	    value: function componentWillReceiveProps(props) {
+	      this.updateContentSize();
+	      if (!this.lock) {
+	        this.correctPagination(props, Springs.Hard);
+	        this.correctOutOfTheBox(props);
+	      }
+	    }
+	  }, {
+	    key: 'getInitialPosition',
+	    value: function getInitialPosition(scrollerId) {
+	      var props = arguments.length <= 1 || arguments[1] === undefined ? this.props : arguments[1];
 	
-				var pagination = (0, _ArrayPropValue.getPropValueForScroller)(scrollerId, props.id, props.pagination);
-				if (pagination === Pagination.First) {
-					var pageSize = (0, _ArrayPropValue.getPropValueForScroller)(scrollerId, props.id, props.page.size);
-					var pageMargin = (0, _ArrayPropValue.getPropValueForScroller)(scrollerId, props.id, props.page.margin);
-					return -(pageSize + 2 * pageMargin);
-				}
-				return 0;
-			}
-		}, {
-			key: 'moveScroller',
-			value: function moveScroller(newPosition) {
-				var id = arguments.length <= 1 || arguments[1] === undefined ? this.props.id : arguments[1];
-				var springValue = arguments.length <= 2 || arguments[2] === undefined ? Springs.Normal : arguments[2];
+	      var pagination = (0, _ArrayPropValue.getPropValueForScroller)(scrollerId, props.id, props.pagination);
+	      if (pagination === Pagination.First) {
+	        var pageSize = (0, _ArrayPropValue.getPropValueForScroller)(scrollerId, props.id, props.page.size);
+	        var pageMargin = (0, _ArrayPropValue.getPropValueForScroller)(scrollerId, props.id, props.page.margin);
+	        return -(pageSize + 2 * pageMargin);
+	      }
+	      return 0;
+	    }
+	  }, {
+	    key: 'moveScroller',
+	    value: function moveScroller(newPosition) {
+	      var id = arguments.length <= 1 || arguments[1] === undefined ? this.props.id : arguments[1];
+	      var springValue = arguments.length <= 2 || arguments[2] === undefined ? Springs.Normal : arguments[2];
 	
-				if (id in this.state) {
-					var newPartialState = {};
-					newPartialState[id] = {
-						position: newPosition,
-						spring: springValue
-					};
-					this.setState(newPartialState);
-				}
-			}
-		}, {
-			key: 'currentPage',
-			value: function currentPage(scrollerId) {
-				if (scrollerId in this.state) {
-					return (0, _PositionCorrectors.pageNumberForPosition)(this.state[scrollerId].position, scrollerId, this.props);
-				}
-				return undefined;
-			}
-		}, {
-			key: 'correctOutOfTheBox',
-			value: function correctOutOfTheBox() {
-				var props = arguments.length <= 0 || arguments[0] === undefined ? this.props : arguments[0];
-				var springValue = arguments.length <= 1 || arguments[1] === undefined ? Springs.Normal : arguments[1];
+	      if (id in this.state) {
+	        var newPartialState = {};
+	        newPartialState[id] = {
+	          position: newPosition,
+	          spring: springValue
+	        };
+	        this.setState(newPartialState);
+	      }
+	    }
+	  }, {
+	    key: 'currentPage',
+	    value: function currentPage(scrollerId) {
+	      if (scrollerId in this.state) {
+	        return (0, _PositionCorrectors.pageNumberForPosition)(this.state[scrollerId].position, scrollerId, this.props);
+	      }
+	      return undefined;
+	    }
+	  }, {
+	    key: 'correctOutOfTheBox',
+	    value: function correctOutOfTheBox() {
+	      var props = arguments.length <= 0 || arguments[0] === undefined ? this.props : arguments[0];
+	      var springValue = arguments.length <= 1 || arguments[1] === undefined ? Springs.Normal : arguments[1];
 	
-				for (var scrollerId in this.state) {
-					if (this.state.hasOwnProperty(scrollerId)) {
-						var oldPosition = this.state[scrollerId].position;
-						var newPosition = (0, _PositionCorrectors.outOfTheBoxCorrection)(oldPosition, scrollerId, props);
-						if (newPosition !== oldPosition) {
-							this.moveScroller(newPosition, scrollerId, springValue);
-						}
-					}
-				}
-			}
-		}, {
-			key: 'correctPagination',
-			value: function correctPagination() {
-				var props = arguments.length <= 0 || arguments[0] === undefined ? this.props : arguments[0];
-				var springValue = arguments.length <= 1 || arguments[1] === undefined ? Springs.Normal : arguments[1];
+	      for (var scrollerId in this.state) {
+	        if (this.state.hasOwnProperty(scrollerId)) {
+	          var oldPosition = this.state[scrollerId].position;
+	          var newPosition = (0, _PositionCorrectors.outOfTheBoxCorrection)(oldPosition, scrollerId, props);
+	          if (newPosition !== oldPosition) {
+	            this.moveScroller(newPosition, scrollerId, springValue);
+	          }
+	        }
+	      }
+	    }
+	  }, {
+	    key: 'correctPagination',
+	    value: function correctPagination() {
+	      var props = arguments.length <= 0 || arguments[0] === undefined ? this.props : arguments[0];
+	      var springValue = arguments.length <= 1 || arguments[1] === undefined ? Springs.Normal : arguments[1];
 	
-				for (var scrollerId in this.state) {
-					if (this.state.hasOwnProperty(scrollerId)) {
-						if ((0, _ArrayPropValue.getPropValueForScroller)(scrollerId, props.id, props.pagination) !== Pagination.None) {
-							var oldPosition = this.state[scrollerId].position;
-							var newPosition = (0, _PositionCorrectors.paginationCorrection)(oldPosition, scrollerId, props);
-							if (newPosition !== oldPosition && (oldPosition !== 0 || props.loop)) {
-								this.moveScroller(newPosition, scrollerId, springValue);
-							}
-						}
-					}
-				}
-			}
-		}, {
-			key: 'handleEventBegin',
-			value: function handleEventBegin(e) {
-				if (!Scroller.Scrolling && !this.lock) {
-					var coordinates = (0, _coordinatesFromEvent.eventCoordinates)(e, this.props.scale);
-					var coordinateValue = coordinates[_OrientationHelpers.orientationProp[this.props.orientation]];
+	      for (var scrollerId in this.state) {
+	        if (this.state.hasOwnProperty(scrollerId)) {
+	          if ((0, _ArrayPropValue.getPropValueForScroller)(scrollerId, props.id, props.pagination) !== Pagination.None) {
+	            var oldPosition = this.state[scrollerId].position;
+	            var newPosition = (0, _PositionCorrectors.paginationCorrection)(oldPosition, scrollerId, props);
+	            if (newPosition !== oldPosition && (oldPosition !== 0 || props.loop)) {
+	              this.moveScroller(newPosition, scrollerId, springValue);
+	            }
+	          }
+	        }
+	      }
+	    }
+	  }, {
+	    key: 'handleEventBegin',
+	    value: function handleEventBegin(e) {
+	      if (!Scroller.Scrolling && !this.lock) {
+	        var coordinates = (0, _coordinatesFromEvent.eventCoordinates)(e, this.props.scale);
+	        var coordinateValue = coordinates[_OrientationHelpers.orientationProp[this.props.orientation]];
 	
-					var scroller = (0, _ScrollerOnPoint.scrollerOnPoint)(coordinates, this.props);
-					if (scroller) {
-						Scroller.Scrolling = true;
-						this.lock = {
-							scroller: scroller,
-							coordinateValue: coordinateValue
-						};
-						if ((0, _ArrayPropValue.getPropValueForScroller)(scroller, this.props.id, this.props.pagination) === Pagination.Single) {
-							this.lock.page = this.currentPage(scroller);
-						}
-						if (this.lastRenderedStyle[scroller] !== this.state[scroller].position) {
-							this.moveScroller(this.lastRenderedStyle[scroller], scroller, null);
-							this.lock.swiped = true;
-						}
-					}
-				}
-			}
-		}, {
-			key: 'handleEventEnd',
-			value: function handleEventEnd(e) {
-				if (this.lock && this.lock.swiped) {
-					var velocityProp = 'velocity' + _OrientationHelpers.orientationProp[this.props.orientation].toUpperCase();
-					var signedVelocity = e.gesture[velocityProp];
-					if (Math.abs(signedVelocity) < Config.FLICK_THRESHOLD) {
-						signedVelocity = 0;
-					} else {
-						var deltaProp = 'delta' + _OrientationHelpers.orientationProp[this.props.orientation].toUpperCase();
-						signedVelocity *= Math.sign(e.gesture[deltaProp]);
-					}
+	        var scroller = (0, _ScrollerOnPoint.scrollerOnPoint)(coordinates, this.props);
+	        if (scroller) {
+	          Scroller.Scrolling = true;
+	          this.lock = {
+	            scroller: scroller,
+	            coordinateValue: coordinateValue
+	          };
+	          if ((0, _ArrayPropValue.getPropValueForScroller)(scroller, this.props.id, this.props.pagination) === Pagination.Single) {
+	            this.lock.page = this.currentPage(scroller);
+	          }
+	          if (this.lastRenderedStyle[scroller] !== this.state[scroller].position) {
+	            this.moveScroller(this.lastRenderedStyle[scroller], scroller, null);
+	            this.lock.swiped = true;
+	          }
+	        }
+	      }
+	    }
+	  }, {
+	    key: 'handleEventEnd',
+	    value: function handleEventEnd(e) {
+	      if (this.lock && this.lock.swiped) {
+	        var velocityProp = 'velocity' + _OrientationHelpers.orientationProp[this.props.orientation].toUpperCase();
+	        var signedVelocity = e.gesture[velocityProp];
+	        if (Math.abs(signedVelocity) < Config.FLICK_THRESHOLD) {
+	          signedVelocity = 0;
+	        } else {
+	          var deltaProp = 'delta' + _OrientationHelpers.orientationProp[this.props.orientation].toUpperCase();
+	          signedVelocity *= Math.sign(e.gesture[deltaProp]);
+	        }
 	
-					var springValue = Springs.Move;
-					var newPosition = this.state[this.lock.scroller].position;
-					var pagination = (0, _ArrayPropValue.getPropValueForScroller)(this.lock.scroller, this.props.id, this.props.pagination);
-					if (pagination === Pagination.Single) {
-						newPosition = (0, _PositionCorrectors.paginationCorrection)(newPosition, this.lock.scroller, this.props, Math.sign(signedVelocity), this.lock.page);
-					} else {
-						newPosition = (0, _PositionCorrectors.velocityPositionCorrection)(newPosition, this.lock.scroller, signedVelocity);
-						if (pagination === Pagination.Multiple || pagination === Pagination.First) {
-							newPosition = (0, _PositionCorrectors.paginationCorrection)(newPosition, this.lock.scroller, this.props, 0, undefined, // prevSinglePage
-							pagination === Pagination.First);
-							springValue = Springs.Bounce;
-						}
-					}
+	        var springValue = Springs.Move;
+	        var newPosition = this.state[this.lock.scroller].position;
+	        var pagination = (0, _ArrayPropValue.getPropValueForScroller)(this.lock.scroller, this.props.id, this.props.pagination);
+	        if (pagination === Pagination.Single) {
+	          newPosition = (0, _PositionCorrectors.paginationCorrection)(newPosition, this.lock.scroller, this.props, Math.sign(signedVelocity), this.lock.page);
+	        } else {
+	          newPosition = (0, _PositionCorrectors.velocityPositionCorrection)(newPosition, this.lock.scroller, signedVelocity);
+	          if (pagination === Pagination.Multiple || pagination === Pagination.First) {
+	            newPosition = (0, _PositionCorrectors.paginationCorrection)(newPosition, this.lock.scroller, this.props, 0, undefined, // prevSinglePage
+	            pagination === Pagination.First);
+	            springValue = Springs.Bounce;
+	          }
+	        }
 	
-					var finalPosition = newPosition;
-					if (!this.props.loop) {
-						finalPosition = (0, _PositionCorrectors.outOfTheBoxCorrection)(newPosition, this.lock.scroller, this.props);
-					}
-					if (newPosition !== finalPosition) {
-						springValue = Springs.Bounce;
-					}
-					this.moveScroller(finalPosition, this.lock.scroller, springValue);
-				}
-				this.lock = undefined;
-				Scroller.Scrolling = false;
-			}
-		}, {
-			key: 'handleSwipe',
-			value: function handleSwipe(e) {
-				var direction = e.gesture.type.replace('swipe', '');
-				if (_OrientationHelpers.orientationDirection[this.props.orientation].indexOf(direction) >= 0) {
-					if (this.lock) {
-						var coordinates = (0, _coordinatesFromEvent.eventCoordinates)(e, this.props.scale);
-						var coordinateValue = coordinates[_OrientationHelpers.orientationProp[this.props.orientation]];
-						var delta = coordinateValue - this.lock.coordinateValue;
+	        var finalPosition = newPosition;
+	        if (!this.props.loop) {
+	          finalPosition = (0, _PositionCorrectors.outOfTheBoxCorrection)(newPosition, this.lock.scroller, this.props);
+	        }
+	        if (newPosition !== finalPosition) {
+	          springValue = Springs.Bounce;
+	        }
+	        this.moveScroller(finalPosition, this.lock.scroller, springValue);
+	      }
+	      this.lock = undefined;
+	      Scroller.Scrolling = false;
+	    }
+	  }, {
+	    key: 'handleSwipe',
+	    value: function handleSwipe(e) {
+	      var direction = e.gesture.type.replace('swipe', '');
+	      if (_OrientationHelpers.orientationDirection[this.props.orientation].indexOf(direction) >= 0) {
+	        if (this.lock) {
+	          var coordinates = (0, _coordinatesFromEvent.eventCoordinates)(e, this.props.scale);
+	          var coordinateValue = coordinates[_OrientationHelpers.orientationProp[this.props.orientation]];
+	          var delta = coordinateValue - this.lock.coordinateValue;
 	
-						var oldPosition = this.state[this.lock.scroller].position;
-						var newPosition = oldPosition + delta;
-						if (!this.props.loop && (0, _PositionCorrectors.outOfTheBoxCorrection)(newPosition, this.lock.scroller, this.props) !== newPosition) {
-							newPosition = oldPosition + delta * Config.OUT_OF_THE_BOX_ACCELERATION;
-						}
+	          var oldPosition = this.state[this.lock.scroller].position;
+	          var newPosition = oldPosition + delta;
+	          if (!this.props.loop && (0, _PositionCorrectors.outOfTheBoxCorrection)(newPosition, this.lock.scroller, this.props) !== newPosition) {
+	            newPosition = oldPosition + delta * Config.OUT_OF_THE_BOX_ACCELERATION;
+	          }
 	
-						this.lock.coordinateValue = coordinateValue;
-						this.lock.swiped = true;
-						this.moveScroller(newPosition, this.lock.scroller);
-					}
-				}
-			}
-		}, {
-			key: 'updateContentSize',
-			value: function updateContentSize() {
-				if (!this.autosize || this.contentDom === undefined) {
-					return;
-				}
-				var sizeProp = _OrientationHelpers.orientationSize[this.props.orientation];
-				var capitalSizeProp = sizeProp.charAt(0).toUpperCase() + sizeProp.slice(1);
-				this.props.size.content = this.contentDom['client' + capitalSizeProp];
-			}
-		}, {
-			key: 'initContentDom',
-			value: function initContentDom(ref) {
-				this.contentDom = ref;
-			}
-		}, {
-			key: 'render',
-			value: function render() {
-				var _this2 = this;
+	          this.lock.coordinateValue = coordinateValue;
+	          this.lock.swiped = true;
+	          this.moveScroller(newPosition, this.lock.scroller);
+	        }
+	      }
+	    }
+	  }, {
+	    key: 'updateContentSize',
+	    value: function updateContentSize() {
+	      if (!this.autosize || this.contentDom === undefined) {
+	        return;
+	      }
+	      var sizeProp = _OrientationHelpers.orientationSize[this.props.orientation];
+	      var capitalSizeProp = sizeProp.charAt(0).toUpperCase() + sizeProp.slice(1);
+	      this.props.size.content = this.contentDom['client' + capitalSizeProp];
+	    }
+	  }, {
+	    key: 'initContentDom',
+	    value: function initContentDom(ref) {
+	      this.contentDom = ref;
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var _this2 = this;
 	
-				var springStyle = {};
-				var state = this.state;
-				for (var scrollerId in state) {
-					if (state.hasOwnProperty(scrollerId)) {
-						if (state[scrollerId].spring !== null) {
-							springStyle[scrollerId] = (0, _reactMotion.spring)(state[scrollerId].position, state[scrollerId].spring);
-						} else {
-							springStyle[scrollerId] = state[scrollerId].position;
-						}
-					}
-				}
+	      var springStyle = {};
+	      var state = this.state;
+	      for (var scrollerId in state) {
+	        if (state.hasOwnProperty(scrollerId)) {
+	          if (state[scrollerId].spring !== null) {
+	            springStyle[scrollerId] = (0, _reactMotion.spring)(state[scrollerId].position, state[scrollerId].spring);
+	          } else {
+	            springStyle[scrollerId] = state[scrollerId].position;
+	          }
+	        }
+	      }
 	
-				return React.createElement(_reactMotion.Motion, { style: springStyle }, function (style) {
-					_this2.lastRenderedStyle = style;
-					var children = null;
-					if (typeof _this2.props.id === 'string') {
-						if (typeof _this2.props.children === 'function') {
-							var pos = style[_this2.props.id];
-							if (_this2.props.loop) {
-								pos %= _this2.props.size.content;
-								if (pos > 0) {
-									pos -= _this2.props.size.content;
-								}
-							}
-							children = _this2.props.children(pos);
-						} else {
-							var translate = { x: 0, y: 0 };
-							translate[_OrientationHelpers.orientationProp[_this2.props.orientation]] = style[_this2.props.id];
-							var containerStyle = {
-								overflow: 'hidden',
-								width: '100%',
-								height: '100%'
-							};
-							containerStyle[_OrientationHelpers.orientationSize[_this2.props.orientation]] = _this2.props.size.container + 'px';
-							children = React.createElement('div', { style: containerStyle }, React.createElement('div', { style: {
-									transform: 'translate3d(' + translate.x + 'px, ' + translate.y + 'px, 0px)'
-								},
-								ref: _this2.initContentDom
-							}, _this2.props.children));
-						}
-					} else {
-						children = _this2.props.children(style);
-					}
-					if (children instanceof Array) {
-						children = React.createElement('div', null, children);
-					}
-					return React.createElement(_reactGesture2.default, {
-						onTouchStart: _this2.handleEventBegin,
-						onMouseDown: _this2.handleEventBegin,
-						onTouchEnd: _this2.handleEventEnd,
-						onMouseUp: _this2.handleEventEnd,
-						onSwipeLeft: _this2.handleSwipe,
-						onSwipeRight: _this2.handleSwipe,
-						onSwipeUp: _this2.handleSwipe,
-						onSwipeDown: _this2.handleSwipe
-					}, children);
-				});
-			}
-		}]);
+	      return _react2.default.createElement(_reactMotion.Motion, { style: springStyle }, function (style) {
+	        _this2.lastRenderedStyle = style;
+	        var children = null;
+	        if (typeof _this2.props.id === 'string') {
+	          if (typeof _this2.props.children === 'function') {
+	            var pos = style[_this2.props.id];
+	            if (_this2.props.loop) {
+	              pos %= _this2.props.size.content;
+	              if (pos > 0) {
+	                pos -= _this2.props.size.content;
+	              }
+	            }
+	            children = _this2.props.children(pos);
+	          } else {
+	            var translate = { x: 0, y: 0 };
+	            translate[_OrientationHelpers.orientationProp[_this2.props.orientation]] = style[_this2.props.id];
+	            var containerStyle = {
+	              overflow: 'hidden',
+	              width: '100%',
+	              height: '100%'
+	            };
+	            containerStyle[_OrientationHelpers.orientationSize[_this2.props.orientation]] = _this2.props.size.container + 'px';
+	            var containerItemStyle = {
+	              transform: 'translate3d(' + translate.x + 'px, ' + translate.y + 'px, 0px)'
+	            };
+	            children = _react2.default.createElement('div', { style: containerStyle }, _react2.default.createElement('div', { style: containerItemStyle, ref: _this2.initContentDom }, _this2.props.children));
+	          }
+	        } else {
+	          children = _this2.props.children(style);
+	        }
+	        if (children instanceof Array) {
+	          children = _react2.default.createElement('div', null, children);
+	        }
+	        return _react2.default.createElement(_reactGesture2.default, {
+	          onTouchStart: _this2.handleEventBegin,
+	          onMouseDown: _this2.handleEventBegin,
+	          onTouchEnd: _this2.handleEventEnd,
+	          onMouseUp: _this2.handleEventEnd,
+	          onSwipeLeft: _this2.handleSwipe,
+	          onSwipeRight: _this2.handleSwipe,
+	          onSwipeUp: _this2.handleSwipe,
+	          onSwipeDown: _this2.handleSwipe
+	        }, children);
+	      });
+	    }
+	  }]);
 	
-		return Scroller;
-	}(React.Component), (_applyDecoratedDescriptor(_class.prototype, 'handleEventBegin', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'handleEventBegin'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'handleEventEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'handleEventEnd'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'handleSwipe', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'handleSwipe'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'initContentDom', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'initContentDom'), _class.prototype)), _class);
+	  return Scroller;
+	}(_react2.default.Component), (_applyDecoratedDescriptor(_class.prototype, 'handleEventBegin', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'handleEventBegin'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'handleEventEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'handleEventEnd'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'handleSwipe', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'handleSwipe'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'initContentDom', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'initContentDom'), _class.prototype)), _class);
 	
 	Scroller.valueOrArray = function (ReactType) {
-		return React.PropTypes.oneOfType([ReactType, React.PropTypes.arrayOf(ReactType)]);
+	  return _react2.default.PropTypes.oneOfType([ReactType, _react2.default.PropTypes.arrayOf(ReactType)]);
 	};
 	
 	Scroller.enumType = function (Enum) {
-		return React.PropTypes.oneOf(Object.keys(Enum).map(function (key) {
-			return Enum[key];
-		}));
+	  return _react2.default.PropTypes.oneOf(Object.keys(Enum).map(function (key) {
+	    return Enum[key];
+	  }));
 	};
 	
 	var propTypes = {
-		id: Scroller.valueOrArray(React.PropTypes.string).isRequired,
-		orientation: Scroller.enumType(Orientation),
-		pagination: Scroller.valueOrArray(Scroller.enumType(Pagination)),
-		center: Scroller.valueOrArray(React.PropTypes.bool),
-		loop: Scroller.valueOrArray(React.PropTypes.bool),
-		size: React.PropTypes.shape({
-			container: Scroller.valueOrArray(React.PropTypes.number),
-			content: Scroller.valueOrArray(React.PropTypes.number)
-		}).isRequired,
-		page: React.PropTypes.shape({
-			size: Scroller.valueOrArray(React.PropTypes.number),
-			margin: Scroller.valueOrArray(React.PropTypes.number)
-		}),
-		multiple: React.PropTypes.shape({
-			before: React.PropTypes.number,
-			between: React.PropTypes.number,
-			size: React.PropTypes.number
-		}),
-		scale: React.PropTypes.number,
-		children: React.PropTypes.oneOfType([React.PropTypes.func, React.PropTypes.node])
+	  id: Scroller.valueOrArray(_react2.default.PropTypes.string).isRequired,
+	  orientation: Scroller.enumType(Orientation),
+	  pagination: Scroller.valueOrArray(Scroller.enumType(Pagination)),
+	  center: Scroller.valueOrArray(_react2.default.PropTypes.bool),
+	  loop: Scroller.valueOrArray(_react2.default.PropTypes.bool),
+	  size: _react2.default.PropTypes.shape({
+	    container: Scroller.valueOrArray(_react2.default.PropTypes.number),
+	    content: Scroller.valueOrArray(_react2.default.PropTypes.number)
+	  }).isRequired,
+	  page: _react2.default.PropTypes.shape({
+	    size: Scroller.valueOrArray(_react2.default.PropTypes.number),
+	    margin: Scroller.valueOrArray(_react2.default.PropTypes.number)
+	  }),
+	  multiple: _react2.default.PropTypes.shape({
+	    before: _react2.default.PropTypes.number,
+	    between: _react2.default.PropTypes.number,
+	    size: _react2.default.PropTypes.number
+	  }),
+	  scale: _react2.default.PropTypes.number,
+	  children: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.func, _react2.default.PropTypes.node])
 	};
 	
 	Scroller.Scrolling = false;
@@ -20597,23 +20596,23 @@
 	
 	/*
 	const propsExample = {
-		id: ['scr-a', 'scr-b'],
-		orientation: Orientation.Horizontal, // single value only
-		pagination: [Pagination.Multiple, Pagination.None],
-		center: [true, false],
-		size: {
-			container: 1366,
-			content: [900, 2000]
-		},
-		page: {
-			size: 300,
-			margin: 30
-		},
-		multiple: {
-			before: 30,
-			between: 200,
-			size: 400
-		}
+	  id: ['scr-a', 'scr-b'],
+	  orientation: Orientation.Horizontal, // single value only
+	  pagination: [Pagination.Multiple, Pagination.None],
+	  center: [true, false],
+	  size: {
+	    container: 1366,
+	    content: [900, 2000]
+	  },
+	  page: {
+	    size: 300,
+	    margin: 30
+	  },
+	  multiple: {
+	    before: 30,
+	    between: 200,
+	    size: 400
+	  }
 	};
 	*/
 
@@ -20750,7 +20749,7 @@
 	
 	var _react = __webpack_require__(1);
 	
-	var _react2 = _interopRequireDefault(_react);
+	var React = _interopRequireWildcard(_react);
 	
 	var _autobindDecorator = __webpack_require__(168);
 	
@@ -20758,11 +20757,9 @@
 	
 	var _getureCalculations = __webpack_require__(171);
 	
-	var _validations = __webpack_require__(173);
-	
-	var _event = __webpack_require__(174);
-	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -20799,37 +20796,7 @@
 		return desc;
 	}
 	
-	var propTypes = {
-		onSwipeUp: _react2.default.PropTypes.func,
-		onSwipeDown: _react2.default.PropTypes.func,
-		onSwipeLeft: _react2.default.PropTypes.func,
-		onSwipeRight: _react2.default.PropTypes.func,
-		onTap: _react2.default.PropTypes.func,
-		onClick: _react2.default.PropTypes.func,
-		onHold: _react2.default.PropTypes.func,
-		onPinchToZoom: _react2.default.PropTypes.func,
-		onTouchStart: _react2.default.PropTypes.func,
-		onTouchMove: _react2.default.PropTypes.func,
-		onTouchCancel: _react2.default.PropTypes.func,
-		onTouchEnd: _react2.default.PropTypes.func,
-		onMouseDown: _react2.default.PropTypes.func,
-		onMouseMove: _react2.default.PropTypes.func,
-		onMouseUp: _react2.default.PropTypes.func,
-		onScroll: _react2.default.PropTypes.func,
-		onScrollEnd: _react2.default.PropTypes.func,
-		flickThreshold: _react2.default.PropTypes.number,
-		swipeThreshold: _react2.default.PropTypes.number,
-		holdTime: _react2.default.PropTypes.number,
-		scrollEndTimeout: _react2.default.PropTypes.number,
-		children: _react2.default.PropTypes.element
-	};
-	
-	var defaultProps = {
-		flickThreshold: 0.6,
-		swipeThreshold: 10,
-		holdTime: 400,
-		scrollEndTimeout: 200
-	};
+	var LINE_HEIGHT = 20;
 	
 	var ReactGesture = exports.ReactGesture = (_class = function (_React$Component) {
 		_inherits(ReactGesture, _React$Component);
@@ -20843,7 +20810,6 @@
 				x: null,
 				y: null,
 				swiping: false,
-				swipingDirection: undefined,
 				pinch: false,
 				start: 0,
 				holdTimer: null,
@@ -20851,404 +20817,319 @@
 				fingers: []
 			};
 	
-			window.addEventListener('mousemove', _this.onMouseMove);
-			window.addEventListener('mouseup', _this.onMouseUp);
-			window.addEventListener('touchmove', _this.onTouchMove);
-			window.addEventListener('touchend', _this.onTouchEnd);
-			window.addEventListener('wheel', _this.onWheel);
+			window.addEventListener('mousemove', _this._handleMouseMove);
+			window.addEventListener('mouseup', _this._handleMouseUp);
+			window.addEventListener('touchmove', _this._handleTouchMove);
+			window.addEventListener('touchend', _this._handleTouchEnd);
+			window.addEventListener('wheel', _this._handleWheel);
 			return _this;
 		}
 	
 		_createClass(ReactGesture, [{
-			key: 'onTouchStart',
-			value: function onTouchStart(e) {
-				this.pseudoState = {};
-				this.emitEvent('onTouchStart', e);
-				this.setPSStartDateNow();
-				this.setPSHoldTimerInitIfNeed(e);
-				this.setPSPosCurrentTouchDown(e);
-				this.setPSPinch(false);
-				this.setPSSwiping(false);
-				this.setPSFingers(e);
-				e.preventDefault();
+			key: '_resetState',
+			value: function _resetState() {
+				clearTimeout(this.pseudoState.holdTimer);
+				this.pseudoState = {
+					x: null,
+					y: null,
+					swiping: false,
+					pinch: false,
+					start: Number.POSITIVE_INFINITY,
+					holdTimer: null,
+					wheelTimer: null,
+					fingers: []
+				};
 			}
 		}, {
-			key: 'onTouchMove',
-			value: function onTouchMove(e) {
-				e.preventDefault();
-				var eventWithGesture = this.getEventWithGesture(e);
-				this.emitEvent('onTouchMove', eventWithGesture);
-				var pseudoState = this.pseudoState;
-				// TODO: why?
-				if (pseudoState.x === null) {
-					return;
-				}
-				var isPinch = e.touches.length === 2;
-				if (isPinch) {
-					// TODO: why?
-					if (pseudoState.fingers.length === 2) {
-						this.handlePinch(e);
-					}
-					this.setPSFingers(e);
-					return;
-				}
-				var eventGesture = (0, _event.getEventGesture)(eventWithGesture);
-				if (this.isSwipeGesture(eventGesture)) {
-					this.handleSwipeGesture(eventWithGesture);
-					return;
+			key: '_emitEvent',
+			value: function _emitEvent(name, e) {
+				if (this.props[name]) {
+					this.props[name](e);
 				}
 			}
 		}, {
-			key: 'onTouchCancel',
-			value: function onTouchCancel(e) {
-				this.emitEvent('onTouchCancel', e);
-				this.resetState();
-			}
-		}, {
-			key: 'onTouchEnd',
-			value: function onTouchEnd(e) {
-				var eventWithGesture = this.getEventWithGesture(e);
-				this.emitEvent('onTouchEnd', eventWithGesture);
-				if (this.getPSSwiping()) {
-					this.handleSwipeGesture(eventWithGesture);
-					this.resetState();
-					return;
-				}
-				if (this.isTapGesture(eventWithGesture)) {
-					this.handleTapGesture(eventWithGesture);
-					this.resetState();
-					return;
-				}
-				this.resetState();
-			}
-		}, {
-			key: 'onMouseDown',
-			value: function onMouseDown(e) {
-				this.pseudoState = {};
-				this.emitEvent('onMouseDown', e);
-				this.setPSHoldTimerInit(e);
-				this.setPSStartDateNow();
-				this.setPSPosCurrentMouseDown(e);
-				this.setPSPinch(false);
-				this.setPSSwiping(false);
-			}
-		}, {
-			key: 'onMouseMove',
-			value: function onMouseMove(e) {
-				var eventWithGesture = this.getEventWithGesture(e);
-				this.emitEvent('onMouseMove', eventWithGesture);
-				var pseudoState = this.pseudoState;
-				var canBeGesture = pseudoState.x !== null && pseudoState.y !== null;
-				if (canBeGesture && this.isSwipeGesture((0, _event.getEventGesture)(eventWithGesture))) {
-					this.handleSwipeGesture(eventWithGesture);
-					return;
-				}
-			}
-		}, {
-			key: 'onMouseUp',
-			value: function onMouseUp(e) {
-				var eventWithGesture = this.getEventWithGesture(e);
-				this.emitEvent('onMouseUp', eventWithGesture);
-				if (this.getPSSwiping()) {
-					this.handleSwipeGesture(eventWithGesture);
-					this.resetState();
-					return;
-				}
-				var eventGesture = (0, _event.getEventGesture)(eventWithGesture);
-				if (eventGesture.duration > 0) {
-					this.handleClickGesture(eventWithGesture);
-					this.resetState();
-					return;
-				}
-				this.resetState();
-			}
-		}, {
-			key: 'onHoldGesture',
-			value: function onHoldGesture(e) {
-				var pseudoState = this.pseudoState;
-				var fingers = pseudoState.fingers;
-				if (!this.getPSSwiping() && (!fingers || fingers.length === 1)) {
-					this.emitEvent('onHold', e);
-				}
-			}
-		}, {
-			key: 'onWheel',
-			value: function onWheel(e) {
-				var eventWithGesture = this.getEventWithGesture(e);
-				(0, _event.setGestureScrollDelta)(eventWithGesture, e);
-				this.emitEvent('onScroll', eventWithGesture);
-				this.setPSWheelTimerClearIfNeed();
-				this.setPSWheelTimerInit();
-			}
-		}, {
-			key: 'onScrollEnd',
-			value: function onScrollEnd(e) {
-				this.emitEvent('onScrollEnd', e);
-				this.setPSWheelTimerClear();
-			}
-		}, {
-			key: 'getEventWithGesture',
-			value: function getEventWithGesture(e) {
-				var changedTouches = e.changedTouches;
-	
-				var _ref = changedTouches ? changedTouches[0] : e;
+			key: '_getGestureDetails',
+			value: function _getGestureDetails(e) {
+				var _ref = e.changedTouches ? e.changedTouches[0] : e;
 	
 				var clientX = _ref.clientX;
 				var clientY = _ref.clientY;
 	
-				var pseudoState = this.pseudoState;
-				var deltaX = pseudoState.x - clientX;
-				var deltaY = pseudoState.y - clientY;
+				var deltaX = this.pseudoState.x - clientX;
+				var deltaY = this.pseudoState.y - clientY;
 				var absX = Math.abs(deltaX);
 				var absY = Math.abs(deltaY);
-				var duration = Date.now() - pseudoState.start;
+				var duration = Date.now() - this.pseudoState.start;
 				var velocity = Math.sqrt(absX * absX + absY * absY) / duration;
 				var velocityX = absX / duration;
 				var velocityY = absY / duration;
 				var done = e.type === 'touchend';
-				(0, _event.initGestureData)(e, deltaX, deltaY, absX, absY, velocity, velocityX, velocityY, duration, done);
+	
+				e.gesture = {
+					deltaX: deltaX,
+					deltaY: deltaY,
+					absX: absX,
+					absY: absY,
+					velocity: velocity,
+					velocityX: velocityX,
+					velocityY: velocityY,
+					duration: duration,
+					done: done
+				};
+	
 				return e;
 			}
 		}, {
-			key: 'getInitHoldTimer',
-			value: function getInitHoldTimer(e) {
-				return setTimeout(this.onHoldGesture, this.props.holdTime, e);
-			}
-		}, {
-			key: 'setGestureIsFlick',
-			value: function setGestureIsFlick(eventWithGesture) {
-				var eventGesture = (0, _event.getEventGesture)(eventWithGesture);
-				(0, _event.setEvGestureIsFlick)(eventGesture, eventGesture.velocity > this.props.flickThreshold);
-			}
-		}, {
-			key: 'setGestureDetailsPos',
-			value: function setGestureDetailsPos(eventWithGesture) {
-				var pseudoState = this.pseudoState;
-				(0, _event.setEvGestureDetailsPos)(eventWithGesture, pseudoState.x, pseudoState.y);
-			}
-		}, {
-			key: 'getPSSwiping',
-			value: function getPSSwiping() {
-				return this.pseudoState.swiping;
-			}
-		}, {
-			key: 'getPSSwipingDirection',
-			value: function getPSSwipingDirection() {
-				return this.pseudoState.swipingDirection;
-			}
-		}, {
-			key: 'setPSFingers',
-			value: function setPSFingers(e) {
-				this.pseudoState.fingers = (0, _getureCalculations.touchListMap)(e.touches);
-			}
-		}, {
-			key: 'setPSFingersEmpty',
-			value: function setPSFingersEmpty() {
-				this.pseudoState.fingers = [];
-			}
-		}, {
-			key: 'setPSHoldTimerInitIfNeed',
-			value: function setPSHoldTimerInitIfNeed(e) {
-				var pseudoState = this.pseudoState;
-				var holdTimer = pseudoState.holdTimer;
+			key: '_handleTouchStart',
+			value: function _handleTouchStart(e) {
+				this._emitEvent('onTouchStart', e);
+	
+				var holdTimer = this.pseudoState.holdTimer;
 				if (holdTimer === null) {
-					holdTimer = this.getInitHoldTimer(e);
+					holdTimer = setTimeout(this._handleHoldGesture.bind(this), this.props.holdTime, e);
 				}
-				pseudoState.holdTimer = holdTimer;
+	
+				this.pseudoState = {
+					start: Date.now(),
+					x: e.touches[0].clientX,
+					y: e.touches[0].clientY,
+					swiping: false,
+					pinch: false,
+					holdTimer: holdTimer,
+					fingers: (0, _getureCalculations.touchListMap)(e.touches, _getureCalculations.getXY)
+				};
+	
+				e.preventDefault();
 			}
 		}, {
-			key: 'setPSHoldTimerClear',
-			value: function setPSHoldTimerClear() {
-				clearTimeout(this.pseudoState.holdTimer);
-			}
-		}, {
-			key: 'setPSHoldTimerInit',
-			value: function setPSHoldTimerInit(e) {
-				this.pseudoState.holdTimer = this.getInitHoldTimer(e);
-			}
-		}, {
-			key: 'setPSHoldTimerNull',
-			value: function setPSHoldTimerNull() {
-				this.pseudoState.holdTimer = null;
-			}
-		}, {
-			key: 'setPSStartDateNow',
-			value: function setPSStartDateNow() {
-				this.pseudoState.start = Date.now();
-			}
-		}, {
-			key: 'setPSStartInfinite',
-			value: function setPSStartInfinite() {
-				this.pseudoState.start = Number.POSITIVE_INFINITY;
-			}
-		}, {
-			key: 'setPSPinch',
-			value: function setPSPinch(pinch) {
-				this.pseudoState.pinch = pinch;
-			}
-		}, {
-			key: 'setPSPosEmpty',
-			value: function setPSPosEmpty() {
-				var pseudoState = this.pseudoState;
-				pseudoState.x = null;
-				pseudoState.y = null;
-			}
-		}, {
-			key: 'setPSPosCurrentMouseDown',
-			value: function setPSPosCurrentMouseDown(e) {
-				var pseudoState = this.pseudoState;
-				pseudoState.x = e.clientX;
-				pseudoState.y = e.clientY;
-			}
-		}, {
-			key: 'setPSPosCurrentTouchDown',
-			value: function setPSPosCurrentTouchDown(e) {
-				var pseudoState = this.pseudoState;
-				var touches = e.touches;
-				var firstTouche = touches[0];
-				pseudoState.x = firstTouche.clientX;
-				pseudoState.y = firstTouche.clientY;
-			}
-		}, {
-			key: 'setPSSwiping',
-			value: function setPSSwiping(swiping) {
-				this.pseudoState.swiping = swiping;
-			}
-		}, {
-			key: 'setPSSwipingDirection',
-			value: function setPSSwipingDirection(swipingDirection) {
-				this.pseudoState.swipingDirection = swipingDirection;
-			}
-		}, {
-			key: 'setPSWheelTimerInit',
-			value: function setPSWheelTimerInit() {
-				this.pseudoState.wheelTimer = setTimeout(this.onScrollEnd, this.props.scrollEndTimeout);
-			}
-		}, {
-			key: 'setPSWheelTimerClear',
-			value: function setPSWheelTimerClear() {
-				clearTimeout(this.pseudoState.wheelTimer);
-			}
-		}, {
-			key: 'setPSWheelTimerNull',
-			value: function setPSWheelTimerNull() {
-				this.pseudoState.wheelTimer = null;
-			}
-		}, {
-			key: 'setPSWheelTimerClearIfNeed',
-			value: function setPSWheelTimerClearIfNeed() {
-				var pseudoStateWheelTimer = this.pseudoState.wheelTimer;
-				if (pseudoStateWheelTimer) {
-					clearTimeout(pseudoStateWheelTimer);
+			key: '_handleTouchMove',
+			value: function _handleTouchMove(e) {
+				e.preventDefault();
+				var gestureDetails = this._getGestureDetails(e);
+	
+				this._emitEvent('onTouchMove', gestureDetails);
+	
+				if (this.pseudoState.x !== null) {
+					if (e.touches.length === 2) {
+						if (this.pseudoState.fingers.length === 2) {
+							this._handlePinch(e);
+						}
+	
+						this.pseudoState.fingers = (0, _getureCalculations.touchListMap)(e.touches, _getureCalculations.getXY);
+	
+						return;
+					}
+	
+					if (this.pseudoState.swiping || gestureDetails.gesture.absX > this.props.swipeThreshold || gestureDetails.gesture.absY > this.props.swipeThreshold) {
+						this._handleSwipeGesture(gestureDetails);
+						return;
+					}
 				}
 			}
 		}, {
-			key: 'handlePinch',
-			value: function handlePinch(e) {
-				this.setPSPinch(true);
-				var pseudoState = this.pseudoState;
-				var fingers = pseudoState.fingers;
-				var prevDist = (0, _getureCalculations.distance)(fingers);
+			key: '_handlePinch',
+			value: function _handlePinch(e) {
+				this.pseudoState.pinch = true;
+				var prevDist = (0, _getureCalculations.distance)(this.pseudoState.fingers);
 				var currDist = (0, _getureCalculations.distance)(e.touches, 'clientX', 'clientY');
 				var scale = currDist / prevDist;
-				var zeroFinger = fingers[0];
-				var firstFinger = fingers[1];
 				var origin = {
-					x: (zeroFinger.x + firstFinger.x) / 2,
-					y: (zeroFinger.y + firstFinger.y) / 2
+					x: (this.pseudoState.fingers[0].x + this.pseudoState.fingers[1].x) / 2,
+					y: (this.pseudoState.fingers[0].y + this.pseudoState.fingers[1].y) / 2
 				};
-				(0, _event.setEventPinch)(e, scale, origin);
-				this.emitEvent('onPinchToZoom', e);
+	
+				e.pinch = {
+					scale: scale,
+					origin: origin
+				};
+	
+				this._emitEvent('onPinchToZoom', e);
 			}
 		}, {
-			key: 'handleTapGesture',
-			value: function handleTapGesture(eventWithGesture) {
-				(0, _event.setGestureType)(eventWithGesture, 'tap');
-				this.setGestureDetailsPos(eventWithGesture);
-				this.emitEvent('onTap', eventWithGesture);
+			key: '_handleTouchCancel',
+			value: function _handleTouchCancel(e) {
+				this._emitEvent('onTouchCancel', e);
+				this._resetState();
 			}
 		}, {
-			key: 'handleClickGesture',
-			value: function handleClickGesture(eventWithGesture) {
-				(0, _event.setGestureType)(eventWithGesture, 'click');
-				this.emitEvent('onClick', eventWithGesture);
+			key: '_handleTouchEnd',
+			value: function _handleTouchEnd(e) {
+				var ge = this._getGestureDetails(e);
+	
+				this._emitEvent('onTouchEnd', ge);
+	
+				if (this.pseudoState.swiping) {
+					this._handleSwipeGesture(ge);
+					this._resetState();
+					return;
+				}
+				if (!this.pseudoState.pinch && ge.gesture.duration > 0) {
+					this._handleTapGesture(ge);
+				}
+				this._resetState();
 			}
 		}, {
-			key: 'handleSwipeGesture',
-			value: function handleSwipeGesture(eventWithGesture) {
-				var eventGesture = (0, _event.getEventGesture)(eventWithGesture);
-				var deltaX = eventGesture.deltaX;
-				var absX = eventGesture.absX;
-				var deltaY = eventGesture.deltaY;
-				var absY = eventGesture.absY;
+			key: '_handleTapGesture',
+			value: function _handleTapGesture(ge) {
+				ge.gesture.type = 'tap';
+				// no more fingers on the screen => no position
+				ge.clientX = this.pseudoState.x;
+				ge.clientY = this.pseudoState.y;
+				this._emitEvent('onTap', ge);
+			}
+		}, {
+			key: '_handleMouseDown',
+			value: function _handleMouseDown(e) {
+				this._emitEvent('onMouseDown', e);
+	
+				var holdTimer = setTimeout(this._handleHoldGesture.bind(this), this.props.holdTime, e);
+	
+				this.pseudoState = {
+					start: Date.now(),
+					x: e.clientX,
+					y: e.clientY,
+					swiping: false,
+					pinch: false,
+					holdTimer: holdTimer
+				};
+			}
+		}, {
+			key: '_handleMouseMove',
+			value: function _handleMouseMove(e) {
+				var gestureDetails = this._getGestureDetails(e);
+	
+				this._emitEvent('onMouseMove', gestureDetails);
+	
+				if (this.pseudoState.x !== null && this.pseudoState.y !== null && (this.pseudoState.swiping || gestureDetails.gesture.absX > this.props.swipeThreshold || gestureDetails.gesture.absY > this.props.swipeThreshold)) {
+					this._handleSwipeGesture(gestureDetails);
+					return;
+				}
+			}
+		}, {
+			key: '_handleMouseUp',
+			value: function _handleMouseUp(e) {
+				var gestureDetails = this._getGestureDetails(e);
+	
+				this._emitEvent('onMouseUp', gestureDetails);
+	
+				if (this.pseudoState.swiping) {
+					this._handleSwipeGesture(gestureDetails);
+					this._resetState();
+					return;
+				}
+	
+				if (gestureDetails.gesture.duration > 0) {
+					this._handleClickGesture(gestureDetails);
+				}
+	
+				this._resetState();
+			}
+		}, {
+			key: '_handleClickGesture',
+			value: function _handleClickGesture(gestureDetails) {
+				gestureDetails.gesture.type = 'click';
+				this._emitEvent('onClick', gestureDetails);
+			}
+		}, {
+			key: '_handleSwipeGesture',
+			value: function _handleSwipeGesture(gestureDetails) {
+				var _gestureDetails$gestu = gestureDetails.gesture;
+				var deltaX = _gestureDetails$gestu.deltaX;
+				var absX = _gestureDetails$gestu.absX;
+				var deltaY = _gestureDetails$gestu.deltaY;
+				var absY = _gestureDetails$gestu.absY;
 	
 				var direction = (0, _getureCalculations.getDirection)(deltaX, absX, deltaY, absY);
-				if (!this.getPSSwiping()) {
-					this.setPSSwiping(true);
-					this.setPSSwipingDirection(absX > absY ? 'x' : 'y');
+	
+				if (!this.pseudoState.swiping) {
+					this.pseudoState.swiping = true;
+					this.pseudoState.swipingDirection = absX > absY ? 'x' : 'y';
 				}
-				var swipingDirection = this.getPSSwipingDirection();
-				if ((0, _validations.isCorrectSwipe)(swipingDirection, absX, absY)) {
-					this.setGestureIsFlick(eventWithGesture);
-					(0, _event.setGestureType)(eventWithGesture, 'swipe' + direction.toLowerCase());
-					this.emitEvent('onSwipe' + direction, eventWithGesture);
-					eventWithGesture.preventDefault();
+	
+				if (this.pseudoState.swipingDirection === 'x' && absX > absY || this.pseudoState.swipingDirection === 'y' && absY > absX) {
+					gestureDetails.gesture.isFlick = gestureDetails.gesture.velocity > this.props.flickThreshold;
+					gestureDetails.gesture.type = 'swipe' + direction.toLowerCase();
+					this._emitEvent('onSwipe' + direction, gestureDetails);
+					gestureDetails.preventDefault();
 				}
 			}
 		}, {
-			key: 'isSwipeGesture',
-			value: function isSwipeGesture(eventWithGestureGesture) {
-				var swipeThreshold = this.props.swipeThreshold;
-				return this.getPSSwiping() || eventWithGestureGesture.absX > swipeThreshold || eventWithGestureGesture.absY > swipeThreshold;
-			}
-		}, {
-			key: 'isTapGesture',
-			value: function isTapGesture(eventWithGesture) {
-				return !this.pseudoState.pinch && (0, _event.getEventGesture)(eventWithGesture).duration > 0;
-			}
-		}, {
-			key: 'resetState',
-			value: function resetState() {
-				this.pseudoState = {};
-				this.setPSHoldTimerClear();
-				this.setPSStartInfinite();
-				this.setPSHoldTimerNull();
-				this.setPSPosEmpty();
-				this.setPSFingersEmpty();
-				this.setPSWheelTimerNull();
-				this.setPSPinch(false);
-				this.setPSSwiping(false);
-			}
-		}, {
-			key: 'emitEvent',
-			value: function emitEvent(name, e) {
-				var eventMethod = this.props[name];
-				if (eventMethod) {
-					eventMethod(e);
+			key: '_handleHoldGesture',
+			value: function _handleHoldGesture(e) {
+				if (!this.pseudoState.swiping && (!this.pseudoState.fingers || this.pseudoState.fingers.length === 1)) {
+					this._emitEvent('onHold', e);
 				}
+			}
+		}, {
+			key: '_handleWheel',
+			value: function _handleWheel(e) {
+				var gestureDetails = this._getGestureDetails(e);
+				gestureDetails.gesture.scrollDelta = e.deltaY * (e.deltaMode ? LINE_HEIGHT : 1);
+				this._emitEvent('onScroll', gestureDetails);
+				if (this.pseudoState.wheelTimer) {
+					clearTimeout(this.pseudoState.wheelTimer);
+				}
+				this.pseudoState.wheelTimer = setTimeout(this._handleScrollEnd.bind(this, gestureDetails), this.props.scrollEndTimeout);
+			}
+		}, {
+			key: '_handleScrollEnd',
+			value: function _handleScrollEnd(e) {
+				this._emitEvent('onScrollEnd', e);
+				clearTimeout(this.pseudoState.wheelTimer);
 			}
 		}, {
 			key: 'render',
 			value: function render() {
-				var element = _react2.default.Children.only(this.props.children);
-				return _react2.default.cloneElement(element, {
-					onTouchStart: this.onTouchStart,
-					onTouchCancel: this.onTouchCancel,
-					onMouseDown: this.onMouseDown
+				var children = this.props.children;
+				var element = React.Children.only(children);
+	
+				return React.cloneElement(element, {
+					onTouchStart: this._handleTouchStart,
+					onTouchCancel: this._handleTouchCancel,
+					onMouseDown: this._handleMouseDown
 				});
 			}
 		}]);
 	
 		return ReactGesture;
-	}(_react2.default.Component), (_applyDecoratedDescriptor(_class.prototype, 'onTouchStart', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onTouchStart'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onTouchMove', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onTouchMove'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onTouchCancel', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onTouchCancel'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onTouchEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onTouchEnd'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onMouseDown', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onMouseDown'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onMouseMove', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onMouseMove'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onMouseUp', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onMouseUp'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onHoldGesture', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onHoldGesture'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onWheel', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onWheel'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onScrollEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onScrollEnd'), _class.prototype)), _class);
+	}(React.Component), (_applyDecoratedDescriptor(_class.prototype, '_handleTouchStart', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleTouchStart'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleTouchMove', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleTouchMove'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleTouchCancel', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleTouchCancel'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleTouchEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleTouchEnd'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleMouseDown', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleMouseDown'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleMouseMove', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleMouseMove'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleMouseUp', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleMouseUp'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleWheel', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleWheel'), _class.prototype)), _class);
 	
 	
-	ReactGesture.propTypes = propTypes;
-	ReactGesture.defaultProps = defaultProps;
+	ReactGesture.propTypes = {
+		onSwipeUp: React.PropTypes.func,
+		onSwipeDown: React.PropTypes.func,
+		onSwipeLeft: React.PropTypes.func,
+		onSwipeRight: React.PropTypes.func,
+		onTap: React.PropTypes.func,
+		onClick: React.PropTypes.func,
+		onHold: React.PropTypes.func,
+		onPinchToZoom: React.PropTypes.func,
+		onTouchStart: React.PropTypes.func,
+		onTouchMove: React.PropTypes.func,
+		onTouchCancel: React.PropTypes.func,
+		onTouchEnd: React.PropTypes.func,
+		onMouseDown: React.PropTypes.func,
+		onMouseMove: React.PropTypes.func,
+		onMouseUp: React.PropTypes.func,
+		onScroll: React.PropTypes.func,
+		onScrollEnd: React.PropTypes.func,
+		flickThreshold: React.PropTypes.number,
+		swipeThreshold: React.PropTypes.number,
+		holdTime: React.PropTypes.number,
+		scrollEndTimeout: React.PropTypes.number,
+		children: React.PropTypes.element
+	};
+	
+	ReactGesture.defaultProps = {
+		flickThreshold: 0.6,
+		swipeThreshold: 10,
+		holdTime: 400,
+		scrollEndTimeout: 200
+	};
 
 /***/ },
 /* 171 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	'use strict';
 	
@@ -21258,22 +21139,16 @@
 	exports.touchListMap = touchListMap;
 	exports.distance = distance;
 	exports.getDirection = getDirection;
-	
-	var _directionTypes = __webpack_require__(172);
-	
-	function getXY(touch) {
-		return {
-			x: touch.clientX,
-			y: touch.clientY
-		};
-	}
-	
-	function touchListMap(list) {
+	exports.getXY = getXY;
+	function touchListMap(list, callback) {
+		// TouchList.map is not defined
+		// return list.map(listItem => callback(listItem));
 		var result = [];
-		var listLength = list.length;
-		for (var i = 0; i < listLength; ++i) {
-			result.push(getXY(list[i]));
+	
+		for (var i = 0, listLength = list.length; i < listLength; ++i) {
+			result.push(callback(list[i]));
 		}
+	
 		return result;
 	}
 	
@@ -21281,146 +21156,59 @@
 		var x = arguments.length <= 1 || arguments[1] === undefined ? 'x' : arguments[1];
 		var y = arguments.length <= 2 || arguments[2] === undefined ? 'y' : arguments[2];
 	
-		var firstPoint = points[1];
-		var zeroPoint = points[0];
-		var dX = firstPoint[x] - zeroPoint[x];
-		var dY = firstPoint[y] - zeroPoint[y];
+		var dX = points[1][x] - points[0][x];
+		var dY = points[1][y] - points[0][y];
+	
 		return Math.sqrt(dX * dX + dY * dY);
 	}
 	
 	function getDirectionX(deltaX) {
-		return deltaX < 0 ? _directionTypes.Right : _directionTypes.Left;
+		return deltaX < 0 ? 'Right' : 'Left';
 	}
 	
 	function getDirectionY(deltaY) {
-		return deltaY < 0 ? _directionTypes.Down : _directionTypes.Up;
+		return deltaY < 0 ? 'Down' : 'Up';
 	}
 	
 	function getDirection(deltaX, absX, deltaY, absY) {
 		return absX > absY ? getDirectionX(deltaX) : getDirectionY(deltaY);
+	}
+	
+	function getXY(touch) {
+		return {
+			x: touch.clientX,
+			y: touch.clientY
+		};
 	}
 
 /***/ },
 /* 172 */
 /***/ function(module, exports) {
 
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var Right = exports.Right = 'Right';
-	var Left = exports.Left = 'Left';
-	var Down = exports.Down = 'Down';
-	var Up = exports.Up = 'Up';
-
-/***/ },
-/* 173 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	exports.isCorrectSwipe = isCorrectSwipe;
-	function isCorrectSwipe(swipingDirection, absX, absY) {
-		return swipingDirection === 'x' && absX > absY || swipingDirection === 'y' && absY > absX;
-	}
-
-/***/ },
-/* 174 */
-/***/ function(module, exports) {
-
 	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
-	});
-	exports.initGestureData = initGestureData;
-	exports.getEventGesture = getEventGesture;
-	exports.setEventPinch = setEventPinch;
-	exports.setGestureType = setGestureType;
-	exports.setGestureScrollDelta = setGestureScrollDelta;
-	exports.setEvGestureDetailsPos = setEvGestureDetailsPos;
-	exports.setEvGestureIsFlick = setEvGestureIsFlick;
-	
-	var LINE_HEIGHT = 20;
-	
-	function getScrollDelta(e) {
-	  return e.deltaY * (e.deltaMode ? LINE_HEIGHT : 1);
-	}
-	
-	function initGestureData(e, deltaX, deltaY, absX, absY, velocity, velocityX, velocityY, duration, done) {
-	  e.gesture = {
-	    deltaX: deltaX,
-	    deltaY: deltaY,
-	    absX: absX,
-	    absY: absY,
-	    velocity: velocity,
-	    velocityX: velocityX,
-	    velocityY: velocityY,
-	    duration: duration,
-	    done: done
-	  };
-	}
-	
-	function getEventGesture(e) {
-	  return e.gesture;
-	}
-	
-	function setEventPinch(e, scale, origin) {
-	  e.pinch = {
-	    scale: scale,
-	    origin: origin
-	  };
-	}
-	
-	function setGestureType(eventWithGesture, gestureType) {
-	  eventWithGesture.gesture.type = gestureType;
-	}
-	
-	function setGestureScrollDelta(eventWithGesture, e) {
-	  eventWithGesture.gesture.scrollDelta = getScrollDelta(e);
-	}
-	
-	function setEvGestureDetailsPos(eventWithGesture, clientX, clientY) {
-	  eventWithGesture.clientX = clientX;
-	  eventWithGesture.clientY = clientY;
-	}
-	
-	function setEvGestureIsFlick(eventGesture, isFlick) {
-	  eventGesture.isFlick = isFlick;
-	}
-
-/***/ },
-/* 175 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
 	});
 	var eventCoordinates = exports.eventCoordinates = function eventCoordinates(e, scale) {
-		var shift = window.innerWidth / 2 * (1 - scale);
+	  var shift = window.innerWidth / 2 * (1 - scale);
 	
-		if (e.touches && e.touches.length > 0) {
-			var firstTouch = e.touches[0];
-			return {
-				x: (firstTouch.clientX - shift) / scale,
-				y: firstTouch.clientY / scale
-			};
-		}
+	  if (e.touches && e.touches.length > 0) {
+	    var firstTouch = e.touches[0];
+	    return {
+	      x: (firstTouch.clientX - shift) / scale,
+	      y: firstTouch.clientY / scale
+	    };
+	  }
 	
-		return {
-			x: (e.clientX - shift) / scale,
-			y: e.clientY / scale
-		};
+	  return {
+	    x: (e.clientX - shift) / scale,
+	    y: e.clientY / scale
+	  };
 	};
 
 /***/ },
-/* 176 */
+/* 173 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21429,34 +21217,34 @@
 	
 	function _interopRequire(obj) { return obj && obj.__esModule ? obj['default'] : obj; }
 	
-	var _Motion = __webpack_require__(177);
+	var _Motion = __webpack_require__(174);
 	
 	exports.Motion = _interopRequire(_Motion);
 	
-	var _StaggeredMotion = __webpack_require__(184);
+	var _StaggeredMotion = __webpack_require__(181);
 	
 	exports.StaggeredMotion = _interopRequire(_StaggeredMotion);
 	
-	var _TransitionMotion = __webpack_require__(185);
+	var _TransitionMotion = __webpack_require__(182);
 	
 	exports.TransitionMotion = _interopRequire(_TransitionMotion);
 	
-	var _spring = __webpack_require__(187);
+	var _spring = __webpack_require__(184);
 	
 	exports.spring = _interopRequire(_spring);
 	
-	var _presets = __webpack_require__(188);
+	var _presets = __webpack_require__(185);
 	
 	exports.presets = _interopRequire(_presets);
 	
 	// deprecated, dummy warning function
 	
-	var _reorderKeys = __webpack_require__(189);
+	var _reorderKeys = __webpack_require__(186);
 	
 	exports.reorderKeys = _interopRequire(_reorderKeys);
 
 /***/ },
-/* 177 */
+/* 174 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21467,27 +21255,27 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _mapToZero = __webpack_require__(178);
+	var _mapToZero = __webpack_require__(175);
 	
 	var _mapToZero2 = _interopRequireDefault(_mapToZero);
 	
-	var _stripStyle = __webpack_require__(179);
+	var _stripStyle = __webpack_require__(176);
 	
 	var _stripStyle2 = _interopRequireDefault(_stripStyle);
 	
-	var _stepper3 = __webpack_require__(180);
+	var _stepper3 = __webpack_require__(177);
 	
 	var _stepper4 = _interopRequireDefault(_stepper3);
 	
-	var _performanceNow = __webpack_require__(181);
+	var _performanceNow = __webpack_require__(178);
 	
 	var _performanceNow2 = _interopRequireDefault(_performanceNow);
 	
-	var _raf = __webpack_require__(182);
+	var _raf = __webpack_require__(179);
 	
 	var _raf2 = _interopRequireDefault(_raf);
 	
-	var _shouldStopAnimation = __webpack_require__(183);
+	var _shouldStopAnimation = __webpack_require__(180);
 	
 	var _shouldStopAnimation2 = _interopRequireDefault(_shouldStopAnimation);
 	
@@ -21702,7 +21490,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 178 */
+/* 175 */
 /***/ function(module, exports) {
 
 	
@@ -21726,7 +21514,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 179 */
+/* 176 */
 /***/ function(module, exports) {
 
 	
@@ -21752,7 +21540,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 180 */
+/* 177 */
 /***/ function(module, exports) {
 
 	
@@ -21800,7 +21588,7 @@
 	// array reference around.
 
 /***/ },
-/* 181 */
+/* 178 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {// Generated by CoffeeScript 1.7.1
@@ -21839,10 +21627,10 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 182 */
+/* 179 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {var now = __webpack_require__(181)
+	/* WEBPACK VAR INJECTION */(function(global) {var now = __webpack_require__(178)
 	  , root = typeof window === 'undefined' ? global : window
 	  , vendors = ['moz', 'webkit']
 	  , suffix = 'AnimationFrame'
@@ -21918,7 +21706,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 183 */
+/* 180 */
 /***/ function(module, exports) {
 
 	
@@ -21954,7 +21742,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 184 */
+/* 181 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21965,27 +21753,27 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _mapToZero = __webpack_require__(178);
+	var _mapToZero = __webpack_require__(175);
 	
 	var _mapToZero2 = _interopRequireDefault(_mapToZero);
 	
-	var _stripStyle = __webpack_require__(179);
+	var _stripStyle = __webpack_require__(176);
 	
 	var _stripStyle2 = _interopRequireDefault(_stripStyle);
 	
-	var _stepper3 = __webpack_require__(180);
+	var _stepper3 = __webpack_require__(177);
 	
 	var _stepper4 = _interopRequireDefault(_stepper3);
 	
-	var _performanceNow = __webpack_require__(181);
+	var _performanceNow = __webpack_require__(178);
 	
 	var _performanceNow2 = _interopRequireDefault(_performanceNow);
 	
-	var _raf = __webpack_require__(182);
+	var _raf = __webpack_require__(179);
 	
 	var _raf2 = _interopRequireDefault(_raf);
 	
-	var _shouldStopAnimation = __webpack_require__(183);
+	var _shouldStopAnimation = __webpack_require__(180);
 	
 	var _shouldStopAnimation2 = _interopRequireDefault(_shouldStopAnimation);
 	
@@ -22221,7 +22009,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 185 */
+/* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22232,31 +22020,31 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _mapToZero = __webpack_require__(178);
+	var _mapToZero = __webpack_require__(175);
 	
 	var _mapToZero2 = _interopRequireDefault(_mapToZero);
 	
-	var _stripStyle = __webpack_require__(179);
+	var _stripStyle = __webpack_require__(176);
 	
 	var _stripStyle2 = _interopRequireDefault(_stripStyle);
 	
-	var _stepper3 = __webpack_require__(180);
+	var _stepper3 = __webpack_require__(177);
 	
 	var _stepper4 = _interopRequireDefault(_stepper3);
 	
-	var _mergeDiff = __webpack_require__(186);
+	var _mergeDiff = __webpack_require__(183);
 	
 	var _mergeDiff2 = _interopRequireDefault(_mergeDiff);
 	
-	var _performanceNow = __webpack_require__(181);
+	var _performanceNow = __webpack_require__(178);
 	
 	var _performanceNow2 = _interopRequireDefault(_performanceNow);
 	
-	var _raf = __webpack_require__(182);
+	var _raf = __webpack_require__(179);
 	
 	var _raf2 = _interopRequireDefault(_raf);
 	
-	var _shouldStopAnimation = __webpack_require__(183);
+	var _shouldStopAnimation = __webpack_require__(180);
 	
 	var _shouldStopAnimation2 = _interopRequireDefault(_shouldStopAnimation);
 	
@@ -22714,7 +22502,7 @@
 	// that you've unmounted but that's still animating. This is where it lives
 
 /***/ },
-/* 186 */
+/* 183 */
 /***/ function(module, exports) {
 
 	
@@ -22827,7 +22615,7 @@
 	// to loop through and find a key's index each time), but I no longer care
 
 /***/ },
-/* 187 */
+/* 184 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22840,7 +22628,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _presets = __webpack_require__(188);
+	var _presets = __webpack_require__(185);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
@@ -22855,7 +22643,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 188 */
+/* 185 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -22870,7 +22658,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 189 */
+/* 186 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -22893,7 +22681,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 190 */
+/* 187 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -22906,7 +22694,7 @@
 	var FLICK_THRESHOLD = exports.FLICK_THRESHOLD = 0.3;
 
 /***/ },
-/* 191 */
+/* 188 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -22918,7 +22706,7 @@
 	var Horizontal = exports.Horizontal = 1;
 
 /***/ },
-/* 192 */
+/* 189 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -22932,71 +22720,71 @@
 	var First = exports.First = 3;
 
 /***/ },
-/* 193 */
+/* 190 */
 /***/ function(module, exports) {
 
 	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	  value: true
 	});
 	var Normal = exports.Normal = {
-		stiffness: 250,
-		damping: 30,
-		precision: 0.1
+	  stiffness: 250,
+	  damping: 30,
+	  precision: 0.1
 	};
 	
 	var Move = exports.Move = {
-		stiffness: 170,
-		damping: 26,
-		precision: 0.1
+	  stiffness: 170,
+	  damping: 26,
+	  precision: 0.1
 	};
 	
 	var Bounce = exports.Bounce = {
-		stiffness: 120,
-		damping: 14,
-		precision: 0.1
+	  stiffness: 120,
+	  damping: 14,
+	  precision: 0.1
 	};
 	
 	var Hard = exports.Hard = {
-		stiffness: 390,
-		damping: 30,
-		precision: 0.1
+	  stiffness: 390,
+	  damping: 30,
+	  precision: 0.1
 	};
 
 /***/ },
-/* 194 */
+/* 191 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	  value: true
 	});
 	exports.scrollerOnPoint = undefined;
 	
-	var _OrientationHelpers = __webpack_require__(195);
+	var _OrientationHelpers = __webpack_require__(192);
 	
 	var scrollerOnPoint = exports.scrollerOnPoint = function scrollerOnPoint(point, _ref) {
-		var id = _ref.id;
-		var multiple = _ref.multiple;
-		var orientation = _ref.orientation;
+	  var id = _ref.id;
+	  var multiple = _ref.multiple;
+	  var orientation = _ref.orientation;
 	
-		if (typeof id === 'string') {
-			return id;
-		}
-		var reverseOrientation = (orientation + 1) % 2;
-		var reverseValue = point[_OrientationHelpers.orientationProp[reverseOrientation]];
-		var index = Math.floor((reverseValue - multiple.before) / (multiple.size + multiple.between));
-		var delta = (reverseValue - multiple.before) % (multiple.size + multiple.between);
-		if (delta > multiple.size) {
-			return undefined;
-		}
-		return id[index];
+	  if (typeof id === 'string') {
+	    return id;
+	  }
+	  var reverseOrientation = (orientation + 1) % 2;
+	  var reverseValue = point[_OrientationHelpers.orientationProp[reverseOrientation]];
+	  var index = Math.floor((reverseValue - multiple.before) / (multiple.size + multiple.between));
+	  var delta = (reverseValue - multiple.before) % (multiple.size + multiple.between);
+	  if (delta > multiple.size) {
+	    return undefined;
+	  }
+	  return id[index];
 	};
 
 /***/ },
-/* 195 */
+/* 192 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23009,150 +22797,150 @@
 	var orientationSize = exports.orientationSize = ['height', 'width'];
 
 /***/ },
-/* 196 */
+/* 193 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	  value: true
 	});
 	exports.pageNumberForPosition = exports.velocityPositionCorrection = exports.paginationCorrection = exports.outOfTheBoxCorrection = undefined;
 	
-	var _config = __webpack_require__(190);
+	var _config = __webpack_require__(187);
 	
 	var Config = _interopRequireWildcard(_config);
 	
-	var _ArrayPropValue = __webpack_require__(197);
+	var _ArrayPropValue = __webpack_require__(194);
 	
 	function _interopRequireWildcard(obj) {
-		if (obj && obj.__esModule) {
-			return obj;
-		} else {
-			var newObj = {};if (obj != null) {
-				for (var key in obj) {
-					if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
-				}
-			}newObj.default = obj;return newObj;
-		}
+	  if (obj && obj.__esModule) {
+	    return obj;
+	  } else {
+	    var newObj = {};if (obj != null) {
+	      for (var key in obj) {
+	        if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+	      }
+	    }newObj.default = obj;return newObj;
+	  }
 	}
 	
 	var outOfTheBoxCorrection = exports.outOfTheBoxCorrection = function outOfTheBoxCorrection(position, scroller, _ref) {
-		var id = _ref.id;
-		var size = _ref.size;
-		var center = _ref.center;
+	  var id = _ref.id;
+	  var size = _ref.size;
+	  var center = _ref.center;
 	
-		var container = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, size.container);
-		var content = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, size.content);
-		var containerOrContent = container < content ? container : content;
+	  var container = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, size.container);
+	  var content = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, size.content);
+	  var containerOrContent = container < content ? container : content;
 	
-		var leftEdge = 0;
-		var rightEdge = containerOrContent - content;
+	  var leftEdge = 0;
+	  var rightEdge = containerOrContent - content;
 	
-		if ((0, _ArrayPropValue.getPropValueForScroller)(scroller, id, center) && container > content) {
-			var shift = (container - content) / 2;
-			leftEdge += shift;
-			rightEdge += shift;
-		}
+	  if ((0, _ArrayPropValue.getPropValueForScroller)(scroller, id, center) && container > content) {
+	    var shift = (container - content) / 2;
+	    leftEdge += shift;
+	    rightEdge += shift;
+	  }
 	
-		if (position > leftEdge) {
-			return leftEdge;
-		}
-		if (position < rightEdge) {
-			return rightEdge;
-		}
+	  if (position > leftEdge) {
+	    return leftEdge;
+	  }
+	  if (position < rightEdge) {
+	    return rightEdge;
+	  }
 	
-		return position;
+	  return position;
 	};
 	
 	var pagePosition = function pagePosition(pageNumber, pageSize, pageMargin, containerSize) {
-		return pageSize / 2 - (pageNumber + 1) * (pageSize + pageMargin) + containerSize / 2;
+	  return pageSize / 2 - (pageNumber + 1) * (pageSize + pageMargin) + containerSize / 2;
 	};
 	
 	var pageNumber = function pageNumber(position, pageSize, pageMargin, containerSize) {
-		return (-position + containerSize / 2 - pageMargin - pageSize / 2) / (pageSize + pageMargin);
+	  return (-position + containerSize / 2 - pageMargin - pageSize / 2) / (pageSize + pageMargin);
 	};
 	
 	var paginationCorrection = exports.paginationCorrection = function paginationCorrection(position, scroller, _ref2) {
-		var id = _ref2.id;
-		var size = _ref2.size;
-		var page = _ref2.page;
-		var direction = arguments.length <= 3 || arguments[3] === undefined ? 0 : arguments[3];
-		var prevSinglePage = arguments.length <= 4 || arguments[4] === undefined ? undefined : arguments[4];
-		var onlyFirst = arguments.length <= 5 || arguments[5] === undefined ? false : arguments[5];
+	  var id = _ref2.id;
+	  var size = _ref2.size;
+	  var page = _ref2.page;
+	  var direction = arguments.length <= 3 || arguments[3] === undefined ? 0 : arguments[3];
+	  var prevSinglePage = arguments.length <= 4 || arguments[4] === undefined ? undefined : arguments[4];
+	  var onlyFirst = arguments.length <= 5 || arguments[5] === undefined ? false : arguments[5];
 	
-		var pageSize = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, page.size);
-		var pageMargin = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, page.margin);
-		var containerSize = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, size.container);
+	  var pageSize = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, page.size);
+	  var pageMargin = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, page.margin);
+	  var containerSize = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, size.container);
 	
-		if (onlyFirst) {
-			if (-position < pageMargin + pageSize / 2) {
-				return 0;
-			}
-			if (-position < pageSize + 2 * pageMargin) {
-				return -(pageSize + 2 * pageMargin);
-			}
-			return position;
-		}
+	  if (onlyFirst) {
+	    if (-position < pageMargin + pageSize / 2) {
+	      return 0;
+	    }
+	    if (-position < pageSize + 2 * pageMargin) {
+	      return -(pageSize + 2 * pageMargin);
+	    }
+	    return position;
+	  }
 	
-		var k = (-position + containerSize / 2 - pageMargin - pageSize / 2) / (pageSize + pageMargin);
-		var n = Math.round(k + direction * 0.5);
+	  var k = (-position + containerSize / 2 - pageMargin - pageSize / 2) / (pageSize + pageMargin);
+	  var n = Math.round(k + direction * 0.5);
 	
-		if (prevSinglePage !== undefined) {
-			if (n > prevSinglePage + 1) {
-				n = prevSinglePage + 1;
-			}
-			if (n < prevSinglePage - 1) {
-				n = prevSinglePage - 1;
-			}
-		}
+	  if (prevSinglePage !== undefined) {
+	    if (n > prevSinglePage + 1) {
+	      n = prevSinglePage + 1;
+	    }
+	    if (n < prevSinglePage - 1) {
+	      n = prevSinglePage - 1;
+	    }
+	  }
 	
-		return pagePosition(n, pageSize, pageMargin, containerSize);
+	  return pagePosition(n, pageSize, pageMargin, containerSize);
 	};
 	
 	var velocityPositionCorrection = exports.velocityPositionCorrection = function velocityPositionCorrection(position, scroller, velocity) {
-		var distance = velocity * velocity / (2 * Config.ACCELERATION_INSIDE_SCROLLER);
-		var direction = Math.sign(velocity);
+	  var distance = velocity * velocity / (2 * Config.ACCELERATION_INSIDE_SCROLLER);
+	  var direction = Math.sign(velocity);
 	
-		return position - direction * distance;
+	  return position - direction * distance;
 	};
 	
 	var pageNumberForPosition = exports.pageNumberForPosition = function pageNumberForPosition(position, scroller, _ref3, margin) {
-		var id = _ref3.id;
-		var size = _ref3.size;
-		var page = _ref3.page;
+	  var id = _ref3.id;
+	  var size = _ref3.size;
+	  var page = _ref3.page;
 	
-		var pageSize = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, page.size);
-		var pageMargin = margin === undefined ? (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, page.margin) : margin;
-		var containerSize = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, size.container);
+	  var pageSize = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, page.size);
+	  var pageMargin = margin === undefined ? (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, page.margin) : margin;
+	  var containerSize = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, size.container);
 	
-		return Math.round(pageNumber(position, pageSize, pageMargin, containerSize));
+	  return Math.round(pageNumber(position, pageSize, pageMargin, containerSize));
 	};
 
 /***/ },
-/* 197 */
+/* 194 */
 /***/ function(module, exports) {
 
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	  value: true
 	});
 	var getPropValueForScroller = exports.getPropValueForScroller = function getPropValueForScroller(scroller, id, prop) {
-		if (typeof id === 'string') {
-			if (id === scroller) {
-				return prop;
-			}
-			return undefined;
-		}
-		var index = id.indexOf(scroller);
-		if (index >= 0) {
-			if (prop instanceof Array) {
-				return prop[index];
-			}
-			return prop;
-		}
-		return undefined;
+	  if (typeof id === 'string') {
+	    if (id === scroller) {
+	      return prop;
+	    }
+	    return undefined;
+	  }
+	  var index = id.indexOf(scroller);
+	  if (index >= 0) {
+	    if (prop instanceof Array) {
+	      return prop[index];
+	    }
+	    return prop;
+	  }
+	  return undefined;
 	};
 
 /***/ }
