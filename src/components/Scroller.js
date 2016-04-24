@@ -247,7 +247,7 @@ export class Scroller extends React.Component {
       this.lock.swiped = true;
     }
   }
-
+тзь
   correctLoopPosition(position) {
     let pos = position % this.props.size.content;
     if (pos > 0) {
