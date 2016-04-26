@@ -1,9 +1,16 @@
 import * as Config from '../config';
 import { getPropValueForScroller } from './ArrayPropValue';
 
-export const outOfTheBoxCorrection = (position, scroller, { id, size, center }) => {
+export const outOfTheBoxCorrection = (
+    position,
+    scroller,
+    { id, size, center },
+    contentAutoSize) => {
   const container = getPropValueForScroller(scroller, id, size.container);
-  const content = getPropValueForScroller(scroller, id, size.content);
+  let content = getPropValueForScroller(scroller, id, size.content);
+  if (content === undefined) {
+    content = contentAutoSize;
+  }
   const containerOrContent = container < content ? container : content;
 
   let leftEdge = 0;

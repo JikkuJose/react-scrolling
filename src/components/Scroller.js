@@ -137,7 +137,12 @@ export class Scroller extends React.Component {
     if (scrollerId in this.state) {
       const oldPosition = this.state[scrollerId].position;
       const newPosition = oldPosition + delta;
-      const finalPosition = outOfTheBoxCorrection(newPosition, scrollerId, this.props);
+      const finalPosition = outOfTheBoxCorrection(
+          newPosition,
+          scrollerId,
+          this.props,
+          this.contentAutoSize
+      );
       if (finalPosition !== oldPosition) {
         this.moveScroller(finalPosition, scrollerId);
         return true;
@@ -195,7 +200,11 @@ export class Scroller extends React.Component {
     for (const scrollerId in this.state) {
       if (this.state.hasOwnProperty(scrollerId)) {
         const oldPosition = this.state[scrollerId].position;
-        const newPosition = outOfTheBoxCorrection(oldPosition, scrollerId, props);
+        const newPosition = outOfTheBoxCorrection(
+            oldPosition,
+            scrollerId,
+            props,
+            this.contentAutoSize);
         if (newPosition !== oldPosition) {
           this.moveScroller(newPosition, scrollerId, springValue);
         }
@@ -210,7 +219,14 @@ export class Scroller extends React.Component {
           const oldPosition = this.state[scrollerId].position;
           const ignorePagination = oldPosition === 0 && !props.loop;
           if (!ignorePagination) {
-            const newPosition = paginationCorrection(oldPosition, scrollerId, props);
+            const newPosition = paginationCorrection(
+                oldPosition,
+                scrollerId,
+                props,
+                0,
+                undefined, // prevSinglePage
+                props.pagination === Pagination.First
+            );
             if (newPosition !== oldPosition) {
               this.moveScroller(newPosition, scrollerId, springValue);
             }
@@ -247,11 +263,15 @@ export class Scroller extends React.Component {
       this.lock.swiped = true;
     }
   }
-тзь
+
   correctLoopPosition(position) {
-    let pos = position % this.props.size.content;
+    let contentSize = this.props.size.content;
+    if (contentSize === undefined) {
+      contentSize = this.contentAutoSize;
+    }
+    let pos = position % contentSize;
     if (pos > 0) {
-      pos -= this.props.size.content;
+      pos -= contentSize;
     }
     return pos;
   }
@@ -264,7 +284,12 @@ export class Scroller extends React.Component {
 
   isOutOfTheBox(position) {
     return !this.props.loop &&
-      outOfTheBoxCorrection(position, this.lock.scroller, this.props) !== position;
+      outOfTheBoxCorrection(
+          position,
+          this.lock.scroller,
+          this.props,
+          this.contentAutoSize
+      ) !== position;
   }
 
   @autobind
@@ -328,7 +353,12 @@ export class Scroller extends React.Component {
 
       let finalPosition = newPosition;
       if (!this.props.loop) {
-        finalPosition = outOfTheBoxCorrection(newPosition, this.lock.scroller, this.props);
+        finalPosition = outOfTheBoxCorrection(
+            newPosition,
+            this.lock.scroller,
+            this.props,
+            this.contentAutoSize
+        );
       }
       if (newPosition !== finalPosition) {
         springValue = Springs.Bounce;
@@ -367,7 +397,7 @@ export class Scroller extends React.Component {
     }
     const sizeProp = orientationSize[this.props.orientation];
     const capitalSizeProp = sizeProp.charAt(0).toUpperCase() + sizeProp.slice(1);
-    this.props.size.content = this.contentDom[`client${capitalSizeProp}`];
+    this.contentAutoSize = this.contentDom[`client${capitalSizeProp}`];
   }
 
   @autobind
@@ -450,7 +480,7 @@ const propTypes = {
   center: Scroller.valueOrArray(React.PropTypes.bool),
   loop: Scroller.valueOrArray(React.PropTypes.bool),
   size: React.PropTypes.shape({
-    container: Scroller.valueOrArray(React.PropTypes.number),
+    container: Scroller.valueOrArray(React.PropTypes.number).isRequired,
     content: Scroller.valueOrArray(React.PropTypes.number),
   }).isRequired,
   page: React.PropTypes.shape({
