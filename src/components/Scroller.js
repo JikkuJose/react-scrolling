@@ -23,11 +23,12 @@ import {
 } from '../helpers/OrientationHelpers';
 import { getSpringByPagination, getAdjustedSpring } from '../utils/effects';
 import { getContainerWithOrientationStyle } from '../utils/style-api';
-import { getVelocityProp, getDeltaProp } from '../utils/properties';
+import { getVelocityProp, getDeltaProp, getTranslate3D } from '../utils/properties';
 import {
   getSpringStyleForScroller,
   getPositionAndSpring,
   getEmptyVelocity,
+  setOrientationPos,
 } from '../utils/logic';
 
 const defaultProps = {
@@ -105,9 +106,10 @@ export class Scroller extends React.Component {
   }
 
   getTransformString(position) {
-    const translate = { x: 0, y: 0 };
-    translate[orientationProp[this.props.orientation]] = position;
-    return `translate3d(${translate.x}px, ${translate.y}px, 0px)`;
+    const initTranslate = { x: 0, y: 0 };
+    const { orientation } = this.props;
+    const translate = setOrientationPos(initTranslate, orientation, position);
+    return getTranslate3D(translate);
   }
 
   getFinalPosition(newPosition) {

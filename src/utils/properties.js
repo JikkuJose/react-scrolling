@@ -9,3 +9,7 @@ export function getVelocityProp(orientation) {
 export function getDeltaProp(orientation) {
   return `delta${orientationProp[orientation].toUpperCase()}`;
 }
+
+export function getTranslate3D(translate) {
+  return `translate3d(${translate.x}px, ${translate.y}px, 0px)`;
+}

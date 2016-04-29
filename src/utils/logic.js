@@ -1,4 +1,5 @@
 import { spring } from 'react-motion';
+import { orientationProp } from '../helpers/OrientationHelpers';
 
 export function getSpringStyleForScroller(scrollerState) {
   if (scrollerState.spring !== null) {
@@ -31,4 +32,10 @@ export function correctLoopPosition(position, contentSize, contentAutoSize) {
     pos -= contentSize2;
   }
   return pos;
+}
+
+export function setOrientationPos(translate, orientation, position) {
+  return Object.assign({}, translate, {
+    [orientationProp[orientation]]: position,
+  });
 }

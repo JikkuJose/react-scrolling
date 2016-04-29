@@ -20417,9 +20417,11 @@
 	  }, {
 	    key: 'getTransformString',
 	    value: function getTransformString(position) {
-	      var translate = { x: 0, y: 0 };
-	      translate[_OrientationHelpers.orientationProp[this.props.orientation]] = position;
-	      return 'translate3d(' + translate.x + 'px, ' + translate.y + 'px, 0px)';
+	      var initTranslate = { x: 0, y: 0 };
+	      var orientation = this.props.orientation;
+	
+	      var translate = (0, _logic.setOrientationPos)(initTranslate, orientation, position);
+	      return (0, _properties.getTranslate3D)(translate);
 	    }
 	  }, {
 	    key: 'getFinalPosition',
@@ -23248,6 +23250,7 @@
 	});
 	exports.getVelocityProp = getVelocityProp;
 	exports.getDeltaProp = getDeltaProp;
+	exports.getTranslate3D = getTranslate3D;
 	
 	var _OrientationHelpers = __webpack_require__(192);
 	
@@ -23257,6 +23260,10 @@
 	
 	function getDeltaProp(orientation) {
 	  return 'delta' + _OrientationHelpers.orientationProp[orientation].toUpperCase();
+	}
+	
+	function getTranslate3D(translate) {
+	  return 'translate3d(' + translate.x + 'px, ' + translate.y + 'px, 0px)';
 	}
 
 /***/ },
@@ -23272,8 +23279,19 @@
 	exports.getPositionAndSpring = getPositionAndSpring;
 	exports.getEmptyVelocity = getEmptyVelocity;
 	exports.correctLoopPosition = correctLoopPosition;
+	exports.setOrientationPos = setOrientationPos;
 	
 	var _reactMotion = __webpack_require__(173);
+	
+	var _OrientationHelpers = __webpack_require__(192);
+	
+	function _defineProperty(obj, key, value) {
+	  if (key in obj) {
+	    Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });
+	  } else {
+	    obj[key] = value;
+	  }return obj;
+	}
 	
 	function getSpringStyleForScroller(scrollerState) {
 	  if (scrollerState.spring !== null) {
@@ -23303,6 +23321,10 @@
 	    pos -= contentSize2;
 	  }
 	  return pos;
+	}
+	
+	function setOrientationPos(translate, orientation, position) {
+	  return Object.assign({}, translate, _defineProperty({}, _OrientationHelpers.orientationProp[orientation], position));
 	}
 
 /***/ }
