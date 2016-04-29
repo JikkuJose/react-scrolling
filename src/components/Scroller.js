@@ -2,7 +2,7 @@ import React from 'react';
 import autobind from 'autobind-decorator';
 import ReactGesture from 'react-gesture';
 import { eventCoordinates } from '../helpers/coordinatesFromEvent';
-import { Motion, spring } from 'react-motion';
+import { Motion } from 'react-motion';
 import * as Config from '../config';
 import * as Orientation from '../consts/Orientation';
 import * as Pagination from '../consts/Pagination';
@@ -23,6 +23,12 @@ import {
 } from '../helpers/OrientationHelpers';
 import { getSpringByPagination, getAdjustedSpring } from '../utils/effects';
 import { getContainerWithOrientationStyle } from '../utils/style-api';
+import { getVelocityProp, getDeltaProp } from '../utils/properties';
+import {
+  getSpringStyleForScroller,
+  getPositionAndSpring,
+  getEmptyVelocity,
+} from '../utils/logic';
 
 const defaultProps = {
   scale: 1,
@@ -71,22 +77,20 @@ export class Scroller extends React.Component {
     if (pagination === Pagination.First) {
       const pageSize = getPropValueForScroller(scrollerId, props.id, props.page.size);
       const pageMargin = getPropValueForScroller(scrollerId, props.id, props.page.margin);
-      return -(pageSize + 2 * pageMargin);
+      return - (pageSize + 2 * pageMargin);
     }
     return 0;
   }
 
   getSignedVelocity(e) {
     const { orientation } = this.props;
-    const velocityProp = `velocity${orientationProp[orientation].toUpperCase()}`;
-    let signedVelocity = e.gesture[velocityProp];
+    const velocityProp = getVelocityProp(orientation);
+    const signedVelocity = e.gesture[velocityProp];
     if (Math.abs(signedVelocity) < Config.FLICK_THRESHOLD) {
-      signedVelocity = 0;
-    } else {
-      const deltaProp = `delta${orientationProp[orientation].toUpperCase()}`;
-      signedVelocity *= Math.sign(e.gesture[deltaProp]);
+      return 0;
     }
-    return signedVelocity;
+    const deltaProp = getDeltaProp(orientation);
+    return signedVelocity * Math.sign(e.gesture[deltaProp]);
   }
 
   getSpringStyle() {
@@ -94,14 +98,7 @@ export class Scroller extends React.Component {
     const state = this.state;
     for (const scrollerId in state) {
       if (state.hasOwnProperty(scrollerId)) {
-        if (state[scrollerId].spring !== null) {
-          springStyle[scrollerId] = spring(
-              state[scrollerId].position,
-              state[scrollerId].spring
-          );
-        } else {
-          springStyle[scrollerId] = state[scrollerId].position;
-        }
+        springStyle[scrollerId] = getSpringStyleForScroller(state[scrollerId]);
       }
     }
     return springStyle;
@@ -125,25 +122,31 @@ export class Scroller extends React.Component {
     return newPosition;
   }
 
-  setLockedOrientation(orientation) {
-    Scroller.Locks[orientation] = undefined;
+  setLockerEmpty(orientation) {
     this.lock = undefined;
+    Scroller.Locks[orientation] = undefined;
+  }
+
+  setLocker(orientation, scroller, coordinateValue) {
+    this.lock = {
+      scroller,
+      coordinateValue,
+    };
+    Scroller.Locks[orientation] = scroller;
   }
 
   moveScroller(newPosition, id = this.props.id, springValue = Springs.Normal) {
     if (id in this.state) {
-      const newPartialState = {};
-      newPartialState[id] = {
-        position: newPosition,
-        spring: springValue,
-      };
-      this.setState(newPartialState);
+      this.setState({
+        [id]: getPositionAndSpring(newPosition, springValue),
+      });
     }
   }
 
   moveScrollerWithinBox(delta, scrollerId) {
-    if (scrollerId in this.state) {
-      const oldPosition = this.state[scrollerId].position;
+    const state = this.state;
+    if (scrollerId in state) {
+      const oldPosition = state[scrollerId].position;
       const newPosition = oldPosition + delta;
       const finalPosition = outOfTheBoxCorrection(
           newPosition,
@@ -167,9 +170,10 @@ export class Scroller extends React.Component {
   }
 
   currentPage(scrollerId) {
-    if (scrollerId in this.state) {
+    const state = this.state;
+    if (scrollerId in state) {
       return pageNumberForPosition(
-        this.state[scrollerId].position,
+        state[scrollerId].position,
         scrollerId,
         this.props
       );
@@ -183,10 +187,7 @@ export class Scroller extends React.Component {
 
   releaseScroller() {
     this.handleEventEnd({
-      gesture: {
-        velocityX: 0,
-        velocityY: 0,
-      },
+      gesture: getEmptyVelocity(),
     });
   }
 
@@ -195,21 +196,23 @@ export class Scroller extends React.Component {
   }
 
   allPositions() {
-    const res = {};
-    for (const scrollerId in this.state) {
-      if (this.state.hasOwnProperty(scrollerId)) {
-        res[scrollerId] = this.state[scrollerId].position;
+    const scrolelrs = {};
+    const state = this.state;
+    for (const scrollerId in state) {
+      if (state.hasOwnProperty(scrollerId)) {
+        scrolelrs[scrollerId] = state[scrollerId].position;
       }
     }
-    return res;
+    return scrolelrs;
   }
 
   correctOutOfTheBox(props = this.props, springValue = Springs.Normal) {
-    for (const scrollerId in this.state) {
-      if (!this.state.hasOwnProperty(scrollerId)) {
+    const state = this.state;
+    for (const scrollerId in state) {
+      if (!state.hasOwnProperty(scrollerId)) {
         return;
       }
-      const oldPosition = this.state[scrollerId].position;
+      const oldPosition = state[scrollerId].position;
       const newPosition = outOfTheBoxCorrection(
         oldPosition,
         scrollerId,
@@ -222,12 +225,13 @@ export class Scroller extends React.Component {
   }
 
   correctPagination(props = this.props, springValue = Springs.Normal) {
-    for (const scrollerId in this.state) {
-      if (!this.state.hasOwnProperty(scrollerId)) {
+    const state = this.state;
+    for (const scrollerId in state) {
+      if (!state.hasOwnProperty(scrollerId)) {
         return;
       }
       if (getPropValueForScroller(scrollerId, props.id, props.pagination) !== Pagination.None) {
-        const oldPosition = this.state[scrollerId].position;
+        const oldPosition = state[scrollerId].position;
         const ignorePagination = oldPosition === 0 && !props.loop;
         if (!ignorePagination) {
           const newPosition = paginationCorrection(
@@ -274,18 +278,6 @@ export class Scroller extends React.Component {
     }
   }
 
-  correctLoopPosition(position) {
-    let contentSize = this.props.size.content;
-    if (contentSize === undefined) {
-      contentSize = this.contentAutoSize;
-    }
-    let pos = position % contentSize;
-    if (pos > 0) {
-      pos -= contentSize;
-    }
-    return pos;
-  }
-
   isSwipeInRightDirection(e) {
     const { orientation } = this.props;
     const direction = e.gesture.type.replace('swipe', '');
@@ -313,11 +305,7 @@ export class Scroller extends React.Component {
       const coordinateValue = coordinates[orientationProp[orientation]];
       const scroller = scrollerOnPoint(coordinates, this.props);
       if (scroller) {
-        this.lock = {
-          scroller,
-          coordinateValue,
-        };
-        Scroller.Locks[orientation] = scroller;
+        this.setLocker(orientation, scroller, coordinateValue);
         this.lockPage();
         this.stopLockedScroller();
       }
@@ -328,7 +316,7 @@ export class Scroller extends React.Component {
   handleEventEnd(e) {
     const { orientation } = this.props;
     if (!this.lock || !this.lock.swiped) {
-      this.setLockedOrientation(orientation);
+      this.setLockerEmpty(orientation);
       return;
     }
     const signedVelocity = this.getSignedVelocity(e);
@@ -367,28 +355,27 @@ export class Scroller extends React.Component {
     const paginationSpring = getSpringByPagination(pagination);
     const adjustedSpring = getAdjustedSpring(paginationSpring);
     this.moveScroller(finalPosition, this.lock.scroller, adjustedSpring);
-    this.setLockedOrientation(orientation);
+    this.setLockerEmpty(orientation);
   }
 
   @autobind
   handleSwipe(e) {
+    if (!this.isSwipeInRightDirection(e)) {
+      return;
+    }
     const { orientation } = this.props;
-    if (this.isSwipeInRightDirection(e)) {
-      if (this.lock && Scroller.Locks[orientation] === this.lock.scroller) {
-        const coordinates = eventCoordinates(e, this.props.scale, Scroller.windowWidth);
-        const coordinateValue = coordinates[orientationProp[orientation]];
-        const delta = coordinateValue - this.lock.coordinateValue;
-
-        const oldPosition = this.state[this.lock.scroller].position;
-        let newPosition = oldPosition + delta;
-        if (this.isOutOfTheBox(newPosition)) {
-          newPosition = oldPosition + delta * Config.OUT_OF_THE_BOX_ACCELERATION;
-        }
-
-        this.lock.coordinateValue = coordinateValue;
-        this.lock.swiped = true;
-        this.moveScroller(newPosition, this.lock.scroller);
+    if (this.lock && Scroller.Locks[orientation] === this.lock.scroller) {
+      const coordinates = eventCoordinates(e, this.props.scale, Scroller.windowWidth);
+      const coordinateValue = coordinates[orientationProp[orientation]];
+      const delta = coordinateValue - this.lock.coordinateValue;
+      const oldPosition = this.state[this.lock.scroller].position;
+      let newPosition = oldPosition + delta;
+      if (this.isOutOfTheBox(newPosition)) {
+        newPosition = oldPosition + delta * Config.OUT_OF_THE_BOX_ACCELERATION;
       }
+      this.lock.coordinateValue = coordinateValue;
+      this.lock.swiped = true;
+      this.moveScroller(newPosition, this.lock.scroller);
     }
   }
 
@@ -417,7 +404,11 @@ export class Scroller extends React.Component {
             if (typeof this.props.children === 'function') {
               let pos = style[this.props.id];
               if (this.props.loop) {
-                pos = this.correctLoopPosition(pos);
+                pos = this.correctLoopPosition(
+                  pos,
+                  this.props.size.content,
+                  this.contentAutoSize
+                );
               }
               children = this.props.children(pos);
             } else {

@@ -20232,6 +20232,10 @@
 	
 	var _styleApi = __webpack_require__(196);
 	
+	var _properties = __webpack_require__(198);
+	
+	var _logic = __webpack_require__(199);
+	
 	function _interopRequireWildcard(obj) {
 	  if (obj && obj.__esModule) {
 	    return obj;
@@ -20246,6 +20250,14 @@
 	
 	function _interopRequireDefault(obj) {
 	  return obj && obj.__esModule ? obj : { default: obj };
+	}
+	
+	function _defineProperty(obj, key, value) {
+	  if (key in obj) {
+	    Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });
+	  } else {
+	    obj[key] = value;
+	  }return obj;
 	}
 	
 	function _classCallCheck(instance, Constructor) {
@@ -20382,15 +20394,13 @@
 	    value: function getSignedVelocity(e) {
 	      var orientation = this.props.orientation;
 	
-	      var velocityProp = 'velocity' + _OrientationHelpers.orientationProp[orientation].toUpperCase();
+	      var velocityProp = (0, _properties.getVelocityProp)(orientation);
 	      var signedVelocity = e.gesture[velocityProp];
 	      if (Math.abs(signedVelocity) < Config.FLICK_THRESHOLD) {
-	        signedVelocity = 0;
-	      } else {
-	        var deltaProp = 'delta' + _OrientationHelpers.orientationProp[orientation].toUpperCase();
-	        signedVelocity *= Math.sign(e.gesture[deltaProp]);
+	        return 0;
 	      }
-	      return signedVelocity;
+	      var deltaProp = (0, _properties.getDeltaProp)(orientation);
+	      return signedVelocity * Math.sign(e.gesture[deltaProp]);
 	    }
 	  }, {
 	    key: 'getSpringStyle',
@@ -20399,11 +20409,7 @@
 	      var state = this.state;
 	      for (var scrollerId in state) {
 	        if (state.hasOwnProperty(scrollerId)) {
-	          if (state[scrollerId].spring !== null) {
-	            springStyle[scrollerId] = (0, _reactMotion.spring)(state[scrollerId].position, state[scrollerId].spring);
-	          } else {
-	            springStyle[scrollerId] = state[scrollerId].position;
-	          }
+	          springStyle[scrollerId] = (0, _logic.getSpringStyleForScroller)(state[scrollerId]);
 	        }
 	      }
 	      return springStyle;
@@ -20424,10 +20430,19 @@
 	      return newPosition;
 	    }
 	  }, {
-	    key: 'setLockedOrientation',
-	    value: function setLockedOrientation(orientation) {
-	      Scroller.Locks[orientation] = undefined;
+	    key: 'setLockerEmpty',
+	    value: function setLockerEmpty(orientation) {
 	      this.lock = undefined;
+	      Scroller.Locks[orientation] = undefined;
+	    }
+	  }, {
+	    key: 'setLocker',
+	    value: function setLocker(orientation, scroller, coordinateValue) {
+	      this.lock = {
+	        scroller: scroller,
+	        coordinateValue: coordinateValue
+	      };
+	      Scroller.Locks[orientation] = scroller;
 	    }
 	  }, {
 	    key: 'moveScroller',
@@ -20436,19 +20451,15 @@
 	      var springValue = arguments.length <= 2 || arguments[2] === undefined ? Springs.Normal : arguments[2];
 	
 	      if (id in this.state) {
-	        var newPartialState = {};
-	        newPartialState[id] = {
-	          position: newPosition,
-	          spring: springValue
-	        };
-	        this.setState(newPartialState);
+	        this.setState(_defineProperty({}, id, (0, _logic.getPositionAndSpring)(newPosition, springValue)));
 	      }
 	    }
 	  }, {
 	    key: 'moveScrollerWithinBox',
 	    value: function moveScrollerWithinBox(delta, scrollerId) {
-	      if (scrollerId in this.state) {
-	        var oldPosition = this.state[scrollerId].position;
+	      var state = this.state;
+	      if (scrollerId in state) {
+	        var oldPosition = state[scrollerId].position;
 	        var newPosition = oldPosition + delta;
 	        var finalPosition = (0, _PositionCorrectors.outOfTheBoxCorrection)(newPosition, scrollerId, this.props, this.contentAutoSize);
 	        if (finalPosition !== oldPosition) {
@@ -20469,8 +20480,9 @@
 	  }, {
 	    key: 'currentPage',
 	    value: function currentPage(scrollerId) {
-	      if (scrollerId in this.state) {
-	        return (0, _PositionCorrectors.pageNumberForPosition)(this.state[scrollerId].position, scrollerId, this.props);
+	      var state = this.state;
+	      if (scrollerId in state) {
+	        return (0, _PositionCorrectors.pageNumberForPosition)(state[scrollerId].position, scrollerId, this.props);
 	      }
 	      return undefined;
 	    }
@@ -20483,10 +20495,7 @@
 	    key: 'releaseScroller',
 	    value: function releaseScroller() {
 	      this.handleEventEnd({
-	        gesture: {
-	          velocityX: 0,
-	          velocityY: 0
-	        }
+	        gesture: (0, _logic.getEmptyVelocity)()
 	      });
 	    }
 	  }, {
@@ -20499,13 +20508,14 @@
 	  }, {
 	    key: 'allPositions',
 	    value: function allPositions() {
-	      var res = {};
-	      for (var scrollerId in this.state) {
-	        if (this.state.hasOwnProperty(scrollerId)) {
-	          res[scrollerId] = this.state[scrollerId].position;
+	      var scrolelrs = {};
+	      var state = this.state;
+	      for (var scrollerId in state) {
+	        if (state.hasOwnProperty(scrollerId)) {
+	          scrolelrs[scrollerId] = state[scrollerId].position;
 	        }
 	      }
-	      return res;
+	      return scrolelrs;
 	    }
 	  }, {
 	    key: 'correctOutOfTheBox',
@@ -20513,11 +20523,12 @@
 	      var props = arguments.length <= 0 || arguments[0] === undefined ? this.props : arguments[0];
 	      var springValue = arguments.length <= 1 || arguments[1] === undefined ? Springs.Normal : arguments[1];
 	
-	      for (var scrollerId in this.state) {
-	        if (!this.state.hasOwnProperty(scrollerId)) {
+	      var state = this.state;
+	      for (var scrollerId in state) {
+	        if (!state.hasOwnProperty(scrollerId)) {
 	          return;
 	        }
-	        var oldPosition = this.state[scrollerId].position;
+	        var oldPosition = state[scrollerId].position;
 	        var newPosition = (0, _PositionCorrectors.outOfTheBoxCorrection)(oldPosition, scrollerId, props, this.contentAutoSize);
 	        if (newPosition !== oldPosition) {
 	          this.moveScroller(newPosition, scrollerId, springValue);
@@ -20530,12 +20541,13 @@
 	      var props = arguments.length <= 0 || arguments[0] === undefined ? this.props : arguments[0];
 	      var springValue = arguments.length <= 1 || arguments[1] === undefined ? Springs.Normal : arguments[1];
 	
-	      for (var scrollerId in this.state) {
-	        if (!this.state.hasOwnProperty(scrollerId)) {
+	      var state = this.state;
+	      for (var scrollerId in state) {
+	        if (!state.hasOwnProperty(scrollerId)) {
 	          return;
 	        }
 	        if ((0, _ArrayPropValue.getPropValueForScroller)(scrollerId, props.id, props.pagination) !== Pagination.None) {
-	          var oldPosition = this.state[scrollerId].position;
+	          var oldPosition = state[scrollerId].position;
 	          var ignorePagination = oldPosition === 0 && !props.loop;
 	          if (!ignorePagination) {
 	            var newPosition = (0, _PositionCorrectors.paginationCorrection)(oldPosition, scrollerId, props, 0, undefined, // prevSinglePage
@@ -20584,19 +20596,6 @@
 	      }
 	    }
 	  }, {
-	    key: 'correctLoopPosition',
-	    value: function correctLoopPosition(position) {
-	      var contentSize = this.props.size.content;
-	      if (contentSize === undefined) {
-	        contentSize = this.contentAutoSize;
-	      }
-	      var pos = position % contentSize;
-	      if (pos > 0) {
-	        pos -= contentSize;
-	      }
-	      return pos;
-	    }
-	  }, {
 	    key: 'isSwipeInRightDirection',
 	    value: function isSwipeInRightDirection(e) {
 	      var orientation = this.props.orientation;
@@ -20623,11 +20622,7 @@
 	        var coordinateValue = coordinates[_OrientationHelpers.orientationProp[orientation]];
 	        var scroller = (0, _ScrollerOnPoint.scrollerOnPoint)(coordinates, this.props);
 	        if (scroller) {
-	          this.lock = {
-	            scroller: scroller,
-	            coordinateValue: coordinateValue
-	          };
-	          Scroller.Locks[orientation] = scroller;
+	          this.setLocker(orientation, scroller, coordinateValue);
 	          this.lockPage();
 	          this.stopLockedScroller();
 	        }
@@ -20639,7 +20634,7 @@
 	      var orientation = this.props.orientation;
 	
 	      if (!this.lock || !this.lock.swiped) {
-	        this.setLockedOrientation(orientation);
+	        this.setLockerEmpty(orientation);
 	        return;
 	      }
 	      var signedVelocity = this.getSignedVelocity(e);
@@ -20658,29 +20653,28 @@
 	      var paginationSpring = (0, _effects.getSpringByPagination)(pagination);
 	      var adjustedSpring = (0, _effects.getAdjustedSpring)(paginationSpring);
 	      this.moveScroller(finalPosition, this.lock.scroller, adjustedSpring);
-	      this.setLockedOrientation(orientation);
+	      this.setLockerEmpty(orientation);
 	    }
 	  }, {
 	    key: 'handleSwipe',
 	    value: function handleSwipe(e) {
+	      if (!this.isSwipeInRightDirection(e)) {
+	        return;
+	      }
 	      var orientation = this.props.orientation;
 	
-	      if (this.isSwipeInRightDirection(e)) {
-	        if (this.lock && Scroller.Locks[orientation] === this.lock.scroller) {
-	          var coordinates = (0, _coordinatesFromEvent.eventCoordinates)(e, this.props.scale, Scroller.windowWidth);
-	          var coordinateValue = coordinates[_OrientationHelpers.orientationProp[orientation]];
-	          var delta = coordinateValue - this.lock.coordinateValue;
-	
-	          var oldPosition = this.state[this.lock.scroller].position;
-	          var newPosition = oldPosition + delta;
-	          if (this.isOutOfTheBox(newPosition)) {
-	            newPosition = oldPosition + delta * Config.OUT_OF_THE_BOX_ACCELERATION;
-	          }
-	
-	          this.lock.coordinateValue = coordinateValue;
-	          this.lock.swiped = true;
-	          this.moveScroller(newPosition, this.lock.scroller);
+	      if (this.lock && Scroller.Locks[orientation] === this.lock.scroller) {
+	        var coordinates = (0, _coordinatesFromEvent.eventCoordinates)(e, this.props.scale, Scroller.windowWidth);
+	        var coordinateValue = coordinates[_OrientationHelpers.orientationProp[orientation]];
+	        var delta = coordinateValue - this.lock.coordinateValue;
+	        var oldPosition = this.state[this.lock.scroller].position;
+	        var newPosition = oldPosition + delta;
+	        if (this.isOutOfTheBox(newPosition)) {
+	          newPosition = oldPosition + delta * Config.OUT_OF_THE_BOX_ACCELERATION;
 	        }
+	        this.lock.coordinateValue = coordinateValue;
+	        this.lock.swiped = true;
+	        this.moveScroller(newPosition, this.lock.scroller);
 	      }
 	    }
 	  }, {
@@ -20711,7 +20705,7 @@
 	          if (typeof _this2.props.children === 'function') {
 	            var pos = style[_this2.props.id];
 	            if (_this2.props.loop) {
-	              pos = _this2.correctLoopPosition(pos);
+	              pos = _this2.correctLoopPosition(pos, _this2.props.size.content, _this2.contentAutoSize);
 	            }
 	            children = _this2.props.children(pos);
 	          } else {
@@ -23242,6 +23236,74 @@
 	  width: '100%',
 	  height: '100%'
 	};
+
+/***/ },
+/* 198 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.getVelocityProp = getVelocityProp;
+	exports.getDeltaProp = getDeltaProp;
+	
+	var _OrientationHelpers = __webpack_require__(192);
+	
+	function getVelocityProp(orientation) {
+	  return 'velocity' + _OrientationHelpers.orientationProp[orientation].toUpperCase();
+	}
+	
+	function getDeltaProp(orientation) {
+	  return 'delta' + _OrientationHelpers.orientationProp[orientation].toUpperCase();
+	}
+
+/***/ },
+/* 199 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.getSpringStyleForScroller = getSpringStyleForScroller;
+	exports.getPositionAndSpring = getPositionAndSpring;
+	exports.getEmptyVelocity = getEmptyVelocity;
+	exports.correctLoopPosition = correctLoopPosition;
+	
+	var _reactMotion = __webpack_require__(173);
+	
+	function getSpringStyleForScroller(scrollerState) {
+	  if (scrollerState.spring !== null) {
+	    return (0, _reactMotion.spring)(scrollerState.position, scrollerState.spring);
+	  }
+	  return scrollerState.position;
+	}
+	
+	function getPositionAndSpring(newPosition, springValue) {
+	  return {
+	    position: newPosition,
+	    spring: springValue
+	  };
+	}
+	
+	function getEmptyVelocity() {
+	  return {
+	    velocityX: 0,
+	    velocityY: 0
+	  };
+	}
+	
+	function correctLoopPosition(position, contentSize, contentAutoSize) {
+	  var contentSize2 = contentSize === undefined ? contentAutoSize : contentSize;
+	  var pos = position % contentSize2;
+	  if (pos > 0) {
+	    pos -= contentSize2;
+	  }
+	  return pos;
+	}
 
 /***/ }
 /******/ ]);
