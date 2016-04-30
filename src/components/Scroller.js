@@ -27,6 +27,7 @@ import { getVelocityProp, getDeltaProp, getTranslate3D } from '../utils/properti
 import {
   getEmptyVelocity,
   setOrientationPos,
+  getCoordinatesByOrientation,
 } from '../utils/logic';
 import {
   getInitialState,
@@ -65,12 +66,101 @@ export class Scroller extends React.Component {
 
   componentWillReceiveProps(props) {
     this.updateContentSize();
-    if (!this.lock) {
+    if (!this.getLock()) {
       this.correctPagination(props, null);
       if (!this.props.loop) {
         this.correctOutOfTheBox(props);
       }
     }
+  }
+
+  @autobind
+  onEventBegin(e) {
+    const { orientation } = this.props;
+    if (!this.getLock() && !Scroller.Locks[orientation]) {
+      const coordinates = eventCoordinates(e, this.props.scale, Scroller.windowWidth);
+      const coordinateValue = getCoordinatesByOrientation(coordinates, orientation);
+      const scroller = scrollerOnPoint(coordinates, this.props);
+      if (scroller) {
+        this.setLocker(orientation, scroller, coordinateValue);
+        this.lockPage();
+        this.stopLockedScroller();
+      }
+    }
+  }
+
+  @autobind
+  onEventEnd(e) {
+    const { orientation } = this.props;
+    if (!this.getLock() || !this.getLockedSwiped()) {
+      this.setLockerEmpty(orientation);
+      return;
+    }
+    const signedVelocity = this.getSignedVelocity(e);
+    const scrollerId = this.getLockedScroller();
+    let newPosition = getScrollerPosition(this.state, scrollerId);
+    const pagination = getPropValueForScroller(
+      scrollerId,
+      this.props.id,
+      this.props.pagination
+    );
+    if (pagination === Pagination.Single) {
+      newPosition = paginationCorrection(
+        newPosition,
+        scrollerId,
+        this.props,
+        Math.sign(signedVelocity),
+        this.getLockedPage()
+      );
+    } else {
+      newPosition = velocityPositionCorrection(
+        newPosition,
+        scrollerId,
+        signedVelocity
+      );
+      if (pagination === Pagination.Multiple || pagination === Pagination.First) {
+        newPosition = paginationCorrection(
+          newPosition,
+          scrollerId,
+          this.props,
+          0,
+          undefined, // prevSinglePage
+          pagination === Pagination.First
+        );
+      }
+    }
+    const finalPosition = this.getFinalPosition(newPosition);
+    const paginationSpring = getSpringByPagination(pagination);
+    const adjustedSpring = getAdjustedSpring(paginationSpring);
+    this.moveScroller(finalPosition, scrollerId, adjustedSpring);
+    this.setLockerEmpty(orientation);
+  }
+
+  @autobind
+  onSwipe(e) {
+    if (!this.isSwipeInRightDirection(e)) {
+      return;
+    }
+    const { orientation } = this.props;
+    if (this.getLock() && Scroller.Locks[orientation] === this.getLockedScroller()) {
+      const scrollerId = this.getLockedScroller();
+      const coordinates = eventCoordinates(e, this.props.scale, Scroller.windowWidth);
+      const coordinateValue = getCoordinatesByOrientation(coordinates, orientation);
+      const delta = coordinateValue - this.getLockedCoordinateValue();
+      const oldPosition = getScrollerPosition(this.state, scrollerId);
+      let newPosition = oldPosition + delta;
+      if (this.isOutOfTheBox(newPosition)) {
+        newPosition = oldPosition + delta * Config.OUT_OF_THE_BOX_ACCELERATION;
+      }
+      this.setLockedCoordinateValue(coordinateValue);
+      this.setLockedSwiped(true);
+      this.moveScroller(newPosition, scrollerId);
+    }
+  }
+
+  @autobind
+  onSetContentDom(ref) {
+    this.contentDom = ref;
   }
 
   getSignedVelocity(e) {
@@ -97,10 +187,46 @@ export class Scroller extends React.Component {
     }
     return outOfTheBoxCorrection(
       newPosition,
-      this.lock.scroller,
+      this.getLockedScroller(),
       this.props,
       this.contentAutoSize
     );
+  }
+
+  getLock() {
+    return this.lock;
+  }
+
+  getLockedScroller() {
+    return this.lock.scroller;
+  }
+
+  getLockedSwiped() {
+    return this.lock.swiped;
+  }
+
+  getLockedPage() {
+    return this.lock.page;
+  }
+
+  getLockedCoordinateValue() {
+    return this.lock.coordinateValue;
+  }
+
+  setLock(lock) {
+    this.lock = lock;
+  }
+
+  setLockedCoordinateValue(coordinateValue) {
+    this.lock.coordinateValue = coordinateValue;
+  }
+
+  setLockedPageLocked() {
+    this.lock.page = this.currentPage(this.getLock());
+  }
+
+  setLockedSwiped(swiped) {
+    this.lock.swiped = swiped;
   }
 
   setLockerEmpty(orientation) {
@@ -114,6 +240,14 @@ export class Scroller extends React.Component {
       coordinateValue,
     };
     Scroller.Locks[orientation] = scroller;
+  }
+
+  getLastRenderedStyleForLocked() {
+    return this.lastRenderedStyle[this.getLock()];
+  }
+
+  setLastRenderedStyle(style) {
+    this.lastRenderedStyle = style;
   }
 
   moveScroller(newPosition, id = this.props.id, springValue = Springs.Normal) {
@@ -163,11 +297,11 @@ export class Scroller extends React.Component {
   }
 
   isScrolling() {
-    return this.lock !== undefined && this.lock.swiped;
+    return this.getLock() !== undefined && this.getLockedSwiped();
   }
 
   releaseScroller() {
-    this.handleEventEnd({
+    this.onEventEnd({
       gesture: getEmptyVelocity(),
     });
   }
@@ -224,18 +358,18 @@ export class Scroller extends React.Component {
   }
 
   lockPage() {
-    const { scroller } = this.lock;
+    const { scroller } = this.getLock();
     const { id, pagination } = this.props;
     if (getPropValueForScroller(scroller, id, pagination) === Pagination.Single) {
-      this.lock.page = this.currentPage(scroller);
+      this.setLockedPageLocked();
     }
   }
 
   stopLockedScroller() {
-    const { scroller } = this.lock;
+    const { scroller } = this.getLock();
     if (this.lastRenderedStyle[scroller] !== getScrollerPosition(this.state, scroller)) {
       this.moveScroller(this.lastRenderedStyle[scroller], scroller, null);
-      this.lock.swiped = true;
+      this.setLockedSwiped(true);
     }
   }
 
@@ -251,95 +385,11 @@ export class Scroller extends React.Component {
     }
     const outOfTheBoxCorrectionPos = outOfTheBoxCorrection(
       position,
-      this.lock.scroller,
+      this.getLockedScroller(),
       this.props,
       this.contentAutoSize
     );
     return outOfTheBoxCorrectionPos !== position;
-  }
-
-  @autobind
-  handleEventBegin(e) {
-    const { orientation } = this.props;
-    if (!this.lock && !Scroller.Locks[orientation]) {
-      const coordinates = eventCoordinates(e, this.props.scale, Scroller.windowWidth);
-      const coordinateValue = coordinates[orientationProp[orientation]];
-      const scroller = scrollerOnPoint(coordinates, this.props);
-      if (scroller) {
-        this.setLocker(orientation, scroller, coordinateValue);
-        this.lockPage();
-        this.stopLockedScroller();
-      }
-    }
-  }
-
-  @autobind
-  handleEventEnd(e) {
-    const { orientation } = this.props;
-    if (!this.lock || !this.lock.swiped) {
-      this.setLockerEmpty(orientation);
-      return;
-    }
-    const signedVelocity = this.getSignedVelocity(e);
-    const scrollerId = this.lock.scroller;
-    let newPosition = getScrollerPosition(this.state, scrollerId);
-    const pagination = getPropValueForScroller(
-      scrollerId,
-      this.props.id,
-      this.props.pagination
-    );
-    if (pagination === Pagination.Single) {
-      newPosition = paginationCorrection(
-        newPosition,
-        scrollerId,
-        this.props,
-        Math.sign(signedVelocity),
-        this.lock.page
-      );
-    } else {
-      newPosition = velocityPositionCorrection(
-        newPosition,
-        scrollerId,
-        signedVelocity
-      );
-      if (pagination === Pagination.Multiple || pagination === Pagination.First) {
-        newPosition = paginationCorrection(
-          newPosition,
-          scrollerId,
-          this.props,
-          0,
-          undefined, // prevSinglePage
-          pagination === Pagination.First
-        );
-      }
-    }
-    const finalPosition = this.getFinalPosition(newPosition);
-    const paginationSpring = getSpringByPagination(pagination);
-    const adjustedSpring = getAdjustedSpring(paginationSpring);
-    this.moveScroller(finalPosition, scrollerId, adjustedSpring);
-    this.setLockerEmpty(orientation);
-  }
-
-  @autobind
-  handleSwipe(e) {
-    if (!this.isSwipeInRightDirection(e)) {
-      return;
-    }
-    const { orientation } = this.props;
-    if (this.lock && Scroller.Locks[orientation] === this.lock.scroller) {
-      const scrollerId = this.lock.scroller;
-      const coordinates = eventCoordinates(e, this.props.scale, Scroller.windowWidth);
-      const coordinateValue = coordinates[orientationProp[orientation]];
-      const delta = coordinateValue - this.lock.coordinateValue;
-      const oldPosition = getScrollerPosition(this.state, scrollerId);
-      let newPosition = oldPosition + delta;
-      if (this.isOutOfTheBox(newPosition)) {
-        newPosition = oldPosition + delta * Config.OUT_OF_THE_BOX_ACCELERATION;
-      }
-      this.lock.coordinateValue = coordinateValue;
-      this.lock.swiped = true;
-      this.moveScroller(newPosition, scrollerId);
-    }
   }
 
   updateContentSize() {
@@ -351,9 +401,40 @@ export class Scroller extends React.Component {
     this.contentAutoSize = this.contentDom[`client${capitalSizeProp}`];
   }
 
-  @autobind
-  initContentDom(ref) {
-    this.contentDom = ref;
+  renderChildren(style) {
+    if (typeof this.props.id === 'string') {
+      if (typeof this.props.children === 'function') {
+        let pos = style[this.props.id];
+        if (this.props.loop) {
+          pos = this.correctLoopPosition(
+            pos,
+            this.props.size.content,
+            this.contentAutoSize
+          );
+        }
+        return this.props.children(pos);
+      }
+      const { orientation, size } = this.props;
+      const containerStyle = getContainerWithOrientationStyle(orientation, size);
+      const containerItemStyle = {
+        transform: this.getTransformString(style[this.props.id]),
+      };
+      return (
+        <div style={containerStyle} >
+          <div style={containerItemStyle} ref={this.onSetContentDom} >
+            {this.props.children}
+          </div>
+        </div>
+      );
+    }
+    return this.props.children(style);
+  }
+
+  renderWrappedIfArray(children) {
+    if (children instanceof Array) {
+      return <div>{children}</div>;
+    }
+    return children;
   }
 
   render() {
@@ -361,51 +442,20 @@ export class Scroller extends React.Component {
     return (
       <Motion style={springStyle} >
         {style => {
-          this.lastRenderedStyle = style;
-          let children = null;
-          if (typeof this.props.id === 'string') {
-            if (typeof this.props.children === 'function') {
-              let pos = style[this.props.id];
-              if (this.props.loop) {
-                pos = this.correctLoopPosition(
-                  pos,
-                  this.props.size.content,
-                  this.contentAutoSize
-                );
-              }
-              children = this.props.children(pos);
-            } else {
-              const { orientation, size } = this.props;
-              const containerStyle = getContainerWithOrientationStyle(orientation, size);
-              const containerItemStyle = {
-                transform: this.getTransformString(style[this.props.id]),
-              };
-              children = (
-                <div style={containerStyle} >
-                  <div style={containerItemStyle} ref={this.initContentDom} >
-                    {this.props.children}
-                  </div>
-                </div>
-              );
-            }
-          } else {
-            children = this.props.children(style);
-          }
-          if (children instanceof Array) {
-            children = <div>{children}</div>;
-          }
+          this.setLastRenderedStyle(style);
+          const children = this.renderChildren(style);
           return (
             <ReactGesture
-              onTouchStart={this.handleEventBegin}
-              onMouseDown={this.handleEventBegin}
-              onTouchEnd={this.handleEventEnd}
-              onMouseUp={this.handleEventEnd}
-              onSwipeLeft={this.handleSwipe}
-              onSwipeRight={this.handleSwipe}
-              onSwipeUp={this.handleSwipe}
-              onSwipeDown={this.handleSwipe}
+              onTouchStart={this.onEventBegin}
+              onMouseDown={this.onEventBegin}
+              onTouchEnd={this.onEventEnd}
+              onMouseUp={this.onEventEnd}
+              onSwipeLeft={this.onSwipe}
+              onSwipeRight={this.onSwipe}
+              onSwipeUp={this.onSwipe}
+              onSwipeDown={this.onSwipe}
             >
-              {children}
+              {this.renderWrappedIfArray(children)}
             </ReactGesture>
           );
         }}
@@ -416,17 +466,17 @@ export class Scroller extends React.Component {
 
 Scroller.Locks = {};
 Scroller.windowWidth = window.innerWidth;
-
-Scroller.valueOrArray = (ReactType) =>
+Scroller.valueOrArray = (ReactType) => (
   React.PropTypes.oneOfType([
     ReactType,
     React.PropTypes.arrayOf(ReactType),
-  ]);
-
-Scroller.enumType = (Enum) =>
+  ])
+);
+Scroller.enumType = (Enum) => (
   React.PropTypes.oneOf(
     Object.keys(Enum).map(key => Enum[key])
-  );
+  )
+);
 
 const propTypes = {
   id: Scroller.valueOrArray(React.PropTypes.string).isRequired,

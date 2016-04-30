@@ -39,3 +39,7 @@ export function setOrientationPos(translate, orientation, position) {
     [orientationProp[orientation]]: position,
   });
 }
+
+export function getCoordinatesByOrientation(coordinates, orientation) {
+  return coordinates[orientationProp[orientation]];
+}

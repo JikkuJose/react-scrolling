@@ -48,8 +48,9 @@ export const getSpringStyle = (state) => {
   return springStyle;
 };
 
-export const scrollerExists = (state, scrollerId) =>
-  scrollerId in state.scrollers;
+export const scrollerExists = (state, scrollerId) => (
+  scrollerId in state.scrollers
+);
 
 export const moveScrollerNewState = (oldState, scrollerId, newPosition, springValue) => ({
   scrollers: Object.assign({}, oldState.scrollers, {

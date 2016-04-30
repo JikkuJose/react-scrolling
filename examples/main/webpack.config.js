@@ -9,7 +9,7 @@ module.exports = {
 	resolve: {
 		extensions: ['', '.js'],
 		alias: {
-			'react-scrolling': path.join(__dirname, '..', '..', 'lib')
+			'react-scrolling': path.join(__dirname, '..', '..', 'src')
 		}
 	},
 	module: {
