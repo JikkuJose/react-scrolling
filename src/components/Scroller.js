@@ -17,7 +17,6 @@ import {
 } from '../helpers/PositionCorrectors';
 import { getPropValueForScroller } from '../helpers/ArrayPropValue';
 import {
-  orientationProp,
   orientationDirection,
   orientationSize,
 } from '../helpers/OrientationHelpers';
@@ -33,11 +32,17 @@ import {
   getInitialState,
   getSpringStyle,
   scrollerExists,
-  moveScrollerNewState,
+  moveScrollerNewPartialState,
   getScrollerPosition,
   getAllScrollerPositions,
   foreachScroller,
 } from '../helpers/StateHelpers';
+import {
+  setScrollerLock,
+  getScrollerLock,
+  emptyScrollerLock,
+  isScrollerLocked,
+} from '../helpers/ScrollerLocks';
 
 const defaultProps = {
   scale: 1,
@@ -46,6 +51,8 @@ const defaultProps = {
   center: false,
   loop: false,
 };
+
+const windowWidth = window.innerWidth;
 
 export class Scroller extends React.Component {
 
@@ -77,8 +84,8 @@ export class Scroller extends React.Component {
   @autobind
   onEventBegin(e) {
     const { orientation } = this.props;
-    if (!this.getLock() && !Scroller.Locks[orientation]) {
-      const coordinates = eventCoordinates(e, this.props.scale, Scroller.windowWidth);
+    if (!this.getLock() && !isScrollerLocked(orientation)) {
+      const coordinates = eventCoordinates(e, this.props.scale, windowWidth);
       const coordinateValue = getCoordinatesByOrientation(coordinates, orientation);
       const scroller = scrollerOnPoint(coordinates, this.props);
       if (scroller) {
@@ -142,9 +149,9 @@ export class Scroller extends React.Component {
       return;
     }
     const { orientation } = this.props;
-    if (this.getLock() && Scroller.Locks[orientation] === this.getLockedScroller()) {
+    if (this.getLock() && getScrollerLock(orientation) === this.getLockedScroller()) {
       const scrollerId = this.getLockedScroller();
-      const coordinates = eventCoordinates(e, this.props.scale, Scroller.windowWidth);
+      const coordinates = eventCoordinates(e, this.props.scale, windowWidth);
       const coordinateValue = getCoordinatesByOrientation(coordinates, orientation);
       const delta = coordinateValue - this.getLockedCoordinateValue();
       const oldPosition = getScrollerPosition(this.state, scrollerId);
@@ -231,7 +238,7 @@ export class Scroller extends React.Component {
 
   setLockerEmpty(orientation) {
     this.lock = undefined;
-    Scroller.Locks[orientation] = undefined;
+    emptyScrollerLock(orientation);
   }
 
   setLocker(orientation, scroller, coordinateValue) {
@@ -239,7 +246,7 @@ export class Scroller extends React.Component {
       scroller,
       coordinateValue,
     };
-    Scroller.Locks[orientation] = scroller;
+    setScrollerLock(orientation, scroller);
   }
 
   getLastRenderedStyleForLocked() {
@@ -253,7 +260,7 @@ export class Scroller extends React.Component {
   moveScroller(newPosition, id = this.props.id, springValue = Springs.Normal) {
     const state = this.state;
     if (scrollerExists(state, id)) {
-      this.setState(moveScrollerNewState(state, id, newPosition, springValue));
+      this.setState(moveScrollerNewPartialState(state, id, newPosition, springValue));
     }
   }
 
@@ -464,33 +471,31 @@ export class Scroller extends React.Component {
   }
 }
 
-Scroller.Locks = {};
-Scroller.windowWidth = window.innerWidth;
-Scroller.valueOrArray = (ReactType) => (
+const valueOrArray = (ReactType) => (
   React.PropTypes.oneOfType([
     ReactType,
     React.PropTypes.arrayOf(ReactType),
   ])
 );
-Scroller.enumType = (Enum) => (
+const enumType = (Enum) => (
   React.PropTypes.oneOf(
     Object.keys(Enum).map(key => Enum[key])
   )
 );
 
 const propTypes = {
-  id: Scroller.valueOrArray(React.PropTypes.string).isRequired,
-  orientation: Scroller.enumType(Orientation),
-  pagination: Scroller.valueOrArray(Scroller.enumType(Pagination)),
-  center: Scroller.valueOrArray(React.PropTypes.bool),
-  loop: Scroller.valueOrArray(React.PropTypes.bool),
+  id: valueOrArray(React.PropTypes.string).isRequired,
+  orientation: enumType(Orientation),
+  pagination: valueOrArray(enumType(Pagination)),
+  center: valueOrArray(React.PropTypes.bool),
+  loop: valueOrArray(React.PropTypes.bool),
   size: React.PropTypes.shape({
-    container: Scroller.valueOrArray(React.PropTypes.number).isRequired,
-    content: Scroller.valueOrArray(React.PropTypes.number),
+    container: valueOrArray(React.PropTypes.number).isRequired,
+    content: valueOrArray(React.PropTypes.number),
   }).isRequired,
   page: React.PropTypes.shape({
-    size: Scroller.valueOrArray(React.PropTypes.number),
-    margin: Scroller.valueOrArray(React.PropTypes.number),
+    size: valueOrArray(React.PropTypes.number),
+    margin: valueOrArray(React.PropTypes.number),
   }),
   multiple: React.PropTypes.shape({
     before: React.PropTypes.number,

@@ -19,55 +19,67 @@ export const getInitialScrollerState = (scrollerId, props) => ({
 });
 
 export const getInitialState = (props) => {
-  const scrollers = {};
+  const scrollerIds = [];
+  const scrollers = [];
   if (typeof props.id === 'string') {
-    scrollers[props.id] = getInitialScrollerState(props.id, props);
+    scrollerIds.push(props.id);
+    scrollers.push(getInitialScrollerState(props.id, props));
   } else {
     for (const id of props.id) {
-      scrollers[id] = getInitialScrollerState(id, props);
+      scrollerIds.push(id);
+      scrollers.push(getInitialScrollerState(id, props));
     }
   }
-  return { scrollers };
+  return { scrollerIds, scrollers };
 };
 
 export const foreachScroller = (state, callback) => {
-  const { scrollers } = state;
-  for (const scrollerId in scrollers) {
-    if (scrollers.hasOwnProperty(scrollerId)) {
-      callback(scrollerId);
-    }
+  const { scrollerIds, scrollers } = state;
+  for (let i = 0; i < scrollerIds.length; ++i) {
+    callback(scrollerIds[i], scrollers[i]);
   }
 };
 
 export const getSpringStyle = (state) => {
   const springStyle = {};
-  const { scrollers } = state;
-  foreachScroller(state, (scrollerId) => {
-    springStyle[scrollerId] = getSpringStyleForScroller(scrollers[scrollerId]);
+  foreachScroller(state, (scrollerId, scroller) => {
+    springStyle[scrollerId] = getSpringStyleForScroller(scroller);
   });
   return springStyle;
 };
 
 export const scrollerExists = (state, scrollerId) => (
-  scrollerId in state.scrollers
+  state.scrollerIds.indexOf(scrollerId) >= 0
 );
 
-export const moveScrollerNewState = (oldState, scrollerId, newPosition, springValue) => ({
-  scrollers: Object.assign({}, oldState.scrollers, {
-    [scrollerId]: getPositionAndSpring(newPosition, springValue),
-  }),
-});
+export const moveScrollerNewPartialState = (oldState, scrollerId, newPosition, springValue) => {
+  const { scrollerIds, scrollers } = oldState;
+  const newScrollers = [...scrollers];
+  const index = scrollerIds.indexOf(scrollerId);
+  newScrollers[index] = getPositionAndSpring(newPosition, springValue);
+  return {
+    scrollers: newScrollers,
+  };
+};
 
-export const getScrollerPosition = (state, scrollerId) =>
-  state.scrollers[scrollerId].position;
+export const getScroller = (state, scrollerId) => {
+  const { scrollerIds, scrollers } = state;
+  const index = scrollerIds.indexOf(scrollerId);
+  return scrollers[index];
+};
 
-export const getScrollerSpring = (state, scrollerId) =>
-  state.scrollers[scrollerId].spring;
+export const getScrollerPosition = (state, scrollerId) => (
+  getScroller(state, scrollerId).position
+);
+
+export const getScrollerSpring = (state, scrollerId) => (
+  getScroller(state, scrollerId).spring
+);
 
 export const getAllScrollerPositions = (state) => {
   const positions = {};
-  foreachScroller(state, (scrollerId) => {
-    positions[scrollerId] = getScrollerPosition(state, scrollerId);
+  foreachScroller(state, (scrollerId, scroller) => {
+    positions[scrollerId] = scroller.position;
   });
   return positions;
 };
