@@ -6,6 +6,14 @@
 
 Smooth scrolling for the web on React.
 
+### Installation
+
+Using [npm](https://www.npmjs.com/):
+
+```
+npm install --save react-scrolling
+```
+
 ### License
 
 MIT
