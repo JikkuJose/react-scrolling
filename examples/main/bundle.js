@@ -20452,14 +20452,12 @@
 	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Scroller).call(this, props));
 
 	    _this.state = (0, _StateHelpers.getInitialState)(props);
-	    _this.autosize = props.size.content === undefined;
 	    return _this;
 	  }
 
 	  _createClass(Scroller, [{
-	    key: 'componentDidMount',
-	    value: function componentDidMount() {
-	      this.updateContentSize();
+	    key: 'componentWillMount',
+	    value: function componentWillMount() {
 	      this.correctOutOfTheBox(this.props, null);
 	      if (this.props.loop) {
 	        this.correctPagination(this.props, null);
@@ -20728,8 +20726,12 @@
 	      (0, _StateHelpers.foreachScroller)(state, function (scrollerId) {
 	        var oldPosition = (0, _StateHelpers.getScrollerPosition)(state, scrollerId);
 	        var newPosition = (0, _PositionCorrectors.outOfTheBoxCorrection)(oldPosition, scrollerId, props, _this2.contentAutoSize);
+	        var newSpringValue = springValue;
+	        if (_this2.lastRenderedStyle && newPosition !== _this2.lastRenderedStyle[scrollerId]) {
+	          newSpringValue = (0, _StateHelpers.getScrollerSpring)(state, scrollerId);
+	        }
 	        if (newPosition !== oldPosition) {
-	          _this2.moveScroller(newPosition, scrollerId, springValue);
+	          _this2.moveScroller(newPosition, scrollerId, newSpringValue);
 	        }
 	      });
 	    }
@@ -20808,12 +20810,25 @@
 	  }, {
 	    key: 'updateContentSize',
 	    value: function updateContentSize() {
-	      if (!this.autosize || this.contentDom === undefined) {
-	        return;
+	      var _props2 = this.props;
+	      var size = _props2.size;
+	      var page = _props2.page;
+	      var orientation = _props2.orientation;
+	      var pagination = _props2.pagination;
+
+	      if (size.content === undefined && this.contentDom !== undefined) {
+	        var sizeProp = _OrientationHelpers.orientationSize[orientation];
+	        var capitalSizeProp = sizeProp.charAt(0).toUpperCase() + sizeProp.slice(1);
+	        this.contentAutoSize = this.contentDom['client' + capitalSizeProp];
 	      }
-	      var sizeProp = _OrientationHelpers.orientationSize[this.props.orientation];
-	      var capitalSizeProp = sizeProp.charAt(0).toUpperCase() + sizeProp.slice(1);
-	      this.contentAutoSize = this.contentDom['client' + capitalSizeProp];
+	      var contentSize = this.contentAutoSize || size.content;
+	      if (pagination === Pagination.First) {
+	        var minSize = size.container + page.size + page.margin;
+	        if (contentSize < minSize) {
+	          contentSize = minSize;
+	        }
+	        this.contentAutoSize = contentSize;
+	      }
 	    }
 	  }, {
 	    key: 'callOnScroll',
@@ -20836,9 +20851,9 @@
 	        if (typeof this.props.children === 'function') {
 	          return this.props.children(pos);
 	        }
-	        var _props2 = this.props;
-	        var orientation = _props2.orientation;
-	        var size = _props2.size;
+	        var _props3 = this.props;
+	        var orientation = _props3.orientation;
+	        var size = _props3.size;
 
 	        var containerStyle = (0, _styleApi.getContainerWithOrientationStyle)(orientation, size);
 	        var containerItemStyle = {
@@ -23677,10 +23692,6 @@
 
 	var Pagination = _interopRequireWildcard(_Pagination);
 
-	var _Springs = __webpack_require__(195);
-
-	var Springs = _interopRequireWildcard(_Springs);
-
 	var _logic = __webpack_require__(204);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -23700,7 +23711,7 @@
 	var getInitialScrollerState = exports.getInitialScrollerState = function getInitialScrollerState(scrollerId, props) {
 	  return {
 	    position: getInitialPosition(scrollerId, props),
-	    spring: Springs.Normal
+	    spring: null
 	  };
 	};
 

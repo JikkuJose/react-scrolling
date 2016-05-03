@@ -34,6 +34,7 @@ import {
   scrollerExists,
   moveScrollerNewPartialState,
   getScrollerPosition,
+  getScrollerSpring,
   getAllScrollerPositions,
   foreachScroller,
 } from '../helpers/StateHelpers';
@@ -60,11 +61,9 @@ export class Scroller extends React.Component {
     super(props);
 
     this.state = getInitialState(props);
-    this.autosize = props.size.content === undefined;
   }
 
-  componentDidMount() {
-    this.updateContentSize();
+  componentWillMount() {
     this.correctOutOfTheBox(this.props, null);
     if (this.props.loop) {
       this.correctPagination(this.props, null);
@@ -330,8 +329,12 @@ export class Scroller extends React.Component {
         scrollerId,
         props,
         this.contentAutoSize);
+      let newSpringValue = springValue;
+      if (this.lastRenderedStyle && newPosition !== this.lastRenderedStyle[scrollerId]) {
+        newSpringValue = getScrollerSpring(state, scrollerId);
+      }
       if (newPosition !== oldPosition) {
-        this.moveScroller(newPosition, scrollerId, springValue);
+        this.moveScroller(newPosition, scrollerId, newSpringValue);
       }
     });
   }
@@ -400,12 +403,20 @@ export class Scroller extends React.Component {
   }
 
   updateContentSize() {
-    if (!this.autosize || this.contentDom === undefined) {
-      return;
+    const { size, page, orientation, pagination } = this.props;
+    if (size.content === undefined && this.contentDom !== undefined) {
+      const sizeProp = orientationSize[orientation];
+      const capitalSizeProp = sizeProp.charAt(0).toUpperCase() + sizeProp.slice(1);
+      this.contentAutoSize = this.contentDom[`client${capitalSizeProp}`];
     }
-    const sizeProp = orientationSize[this.props.orientation];
-    const capitalSizeProp = sizeProp.charAt(0).toUpperCase() + sizeProp.slice(1);
-    this.contentAutoSize = this.contentDom[`client${capitalSizeProp}`];
+    let contentSize = this.contentAutoSize || size.content;
+    if (pagination === Pagination.First) {
+      const minSize = size.container + page.size + page.margin;
+      if (contentSize < minSize) {
+        contentSize = minSize;
+      }
+      this.contentAutoSize = contentSize;
+    }
   }
 
   callOnScroll(scrollerPosition) {

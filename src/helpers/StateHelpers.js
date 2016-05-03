@@ -1,6 +1,5 @@
 import { getPropValueForScroller } from './ArrayPropValue';
 import * as Pagination from '../consts/Pagination';
-import * as Springs from '../consts/Springs';
 import { getSpringStyleForScroller, getPositionAndSpring } from '../utils/logic';
 
 export const getInitialPosition = (scrollerId, props) => {
@@ -15,7 +14,7 @@ export const getInitialPosition = (scrollerId, props) => {
 
 export const getInitialScrollerState = (scrollerId, props) => ({
   position: getInitialPosition(scrollerId, props),
-  spring: Springs.Normal,
+  spring: null,
 });
 
 export const getInitialState = (props) => {
