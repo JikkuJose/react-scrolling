@@ -38,46 +38,53 @@ class Example extends React.Component {
     return (
       <div>
         <div onClick={this.onChangeState} >Change State</div>
-        <Scroller
-          id="scroller-p"
-          orientation={ Orientation.Vertiacal }
-          size={ Object.assign({}, sizeProps) }
-          pagination={ Pagination.First } page={{ size: 40, margin: 0 }}
-          onScroll={(pos) => { console.log(pos); }}
-        >
-          <div style={ searchStyle }>Search...</div>
-          <p style={ style } >
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            Curabitur nec risus vel sapien mattis aliquam vel ullamcorper
-            enim. Nulla fermentum euismod elit quis vulputate. Donec
-            efficitur est justo, et sollicitudin dolor tincidunt non.
-            Maecenas eget mattis nisi, nec vestibulum dui. Suspendisse
-            potenti. Quisque malesuada tortor sit amet metus tempus, nec
-            ullamcorper arcu dignissim. Phasellus dignissim leo vitae tellus
-            molestie maximus. Integer eget orci nec ipsum faucibus rhoncus.
-            Aliquam consectetur tempor pellentesque. Proin sit amet enim
-            sem. Phasellus consequat consequat nisi sit amet vehicula. Duis
-            placerat justo felis, vel tristique erat interdum eget. Maecenas
-            scelerisque dolor mauris.
-          </p>
-          <p style={ style } >
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            Curabitur nec risus vel sapien mattis aliquam vel ullamcorper
-            enim. Nulla fermentum euismod elit quis vulputate. Donec
-            efficitur est justo, et sollicitudin dolor tincidunt non.
-            Maecenas eget mattis nisi, nec vestibulum dui. Suspendisse
-            potenti. Quisque malesuada tortor sit amet metus tempus, nec
-            ullamcorper arcu dignissim. Phasellus dignissim leo vitae tellus
-            molestie maximus. Integer eget orci nec ipsum faucibus rhoncus.
-            Aliquam consectetur tempor pellentesque. Proin sit amet enim
-            sem. Phasellus consequat consequat nisi sit amet vehicula. Duis
-            placerat justo felis, vel tristique erat interdum eget. Maecenas
-            scelerisque dolor mauris.
-          </p>
-        </Scroller>
         <div style={{
           position: 'absolute',
-          top: '10px',
+          top: '25px',
+          left: '0px',
+        }}
+        >
+          <Scroller
+            id="scroller-p"
+            orientation={ Orientation.Vertiacal }
+            size={ Object.assign({}, sizeProps) }
+            pagination={ Pagination.First } page={{ size: 40, margin: 0 }}
+            onScroll={(pos) => { console.log(pos); }}
+          >
+            <div style={ searchStyle }>Search...</div>
+            <p style={ style } >
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+              Curabitur nec risus vel sapien mattis aliquam vel ullamcorper
+              enim. Nulla fermentum euismod elit quis vulputate. Donec
+              efficitur est justo, et sollicitudin dolor tincidunt non.
+              Maecenas eget mattis nisi, nec vestibulum dui. Suspendisse
+              potenti. Quisque malesuada tortor sit amet metus tempus, nec
+              ullamcorper arcu dignissim. Phasellus dignissim leo vitae tellus
+              molestie maximus. Integer eget orci nec ipsum faucibus rhoncus.
+              Aliquam consectetur tempor pellentesque. Proin sit amet enim
+              sem. Phasellus consequat consequat nisi sit amet vehicula. Duis
+              placerat justo felis, vel tristique erat interdum eget. Maecenas
+              scelerisque dolor mauris.
+            </p>
+            <p style={ style } >
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+              Curabitur nec risus vel sapien mattis aliquam vel ullamcorper
+              enim. Nulla fermentum euismod elit quis vulputate. Donec
+              efficitur est justo, et sollicitudin dolor tincidunt non.
+              Maecenas eget mattis nisi, nec vestibulum dui. Suspendisse
+              potenti. Quisque malesuada tortor sit amet metus tempus, nec
+              ullamcorper arcu dignissim. Phasellus dignissim leo vitae tellus
+              molestie maximus. Integer eget orci nec ipsum faucibus rhoncus.
+              Aliquam consectetur tempor pellentesque. Proin sit amet enim
+              sem. Phasellus consequat consequat nisi sit amet vehicula. Duis
+              placerat justo felis, vel tristique erat interdum eget. Maecenas
+              scelerisque dolor mauris.
+            </p>
+          </Scroller>
+        </div>
+        <div style={{
+          position: 'absolute',
+          top: '25px',
           left: '325px',
         }}
         >
