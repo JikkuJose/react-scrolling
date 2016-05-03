@@ -260,7 +260,12 @@ export class Scroller extends React.Component {
   moveScroller(newPosition, id = this.props.id, springValue = Springs.Normal) {
     const state = this.state;
     if (scrollerExists(state, id)) {
+      const scrollerPosition = 0; // TODO: set proper
       this.setState(moveScrollerNewPartialState(state, id, newPosition, springValue));
+      const { onScroll } = this.props;
+      if (onScroll) {
+        onScroll(scrollerPosition);
+      }
     }
   }
 
@@ -507,6 +512,7 @@ const propTypes = {
     React.PropTypes.func,
     React.PropTypes.node,
   ]),
+  onScroll: React.PropTypes.func,
 };
 
 Scroller.propTypes = propTypes;

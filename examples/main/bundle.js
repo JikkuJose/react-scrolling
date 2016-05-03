@@ -67,106 +67,113 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var sizeProps = {
-		container: 400
+	  container: 400
 	};
 	var style = {
-		width: '300px'
+	  width: '300px'
 	};
 	var searchStyle = {
-		width: '300px',
-		padding: '5px',
-		backgroundColor: '#eee',
-		borderRadius: '5px',
-		color: '#888'
+	  width: '300px',
+	  padding: '5px',
+	  backgroundColor: '#eee',
+	  borderRadius: '5px',
+	  color: '#888'
 	};
 	
 	var Example = function (_React$Component) {
-		_inherits(Example, _React$Component);
+	  _inherits(Example, _React$Component);
 	
-		function Example(props) {
-			_classCallCheck(this, Example);
+	  function Example(props) {
+	    _classCallCheck(this, Example);
 	
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Example).call(this, props));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Example).call(this, props));
 	
-			_this.state = {
-				test: 0
-			};
+	    _this.state = {
+	      test: 0
+	    };
 	
-			_this.onChangeState = _this.onChangeState.bind(_this);
-			return _this;
-		}
+	    _this.onChangeState = _this.onChangeState.bind(_this);
+	    return _this;
+	  }
 	
-		_createClass(Example, [{
-			key: 'onChangeState',
-			value: function onChangeState() {
-				this.setState({
-					test: this.state.test + 1
-				});
-			}
-		}, {
-			key: 'render',
-			value: function render() {
-				return React.createElement(
-					'div',
-					null,
-					React.createElement(
-						'div',
-						{ onClick: this.onChangeState },
-						'Change State'
-					),
-					React.createElement(
-						_reactScrolling.Scroller,
-						{ id: 'scroller-p', orientation: _reactScrolling.Orientation.Vertiacal,
-							size: Object.assign({}, sizeProps),
-							pagination: _reactScrolling.Pagination.First, page: { size: 40, margin: 0 }
-						},
-						React.createElement(
-							'div',
-							{ style: searchStyle },
-							'Search...'
-						),
-						React.createElement(
-							'p',
-							{ style: style },
-							'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur nec risus vel sapien mattis aliquam vel ullamcorper enim. Nulla fermentum euismod elit quis vulputate. Donec efficitur est justo, et sollicitudin dolor tincidunt non. Maecenas eget mattis nisi, nec vestibulum dui. Suspendisse potenti. Quisque malesuada tortor sit amet metus tempus, nec ullamcorper arcu dignissim. Phasellus dignissim leo vitae tellus molestie maximus. Integer eget orci nec ipsum faucibus rhoncus. Aliquam consectetur tempor pellentesque. Proin sit amet enim sem. Phasellus consequat consequat nisi sit amet vehicula. Duis placerat justo felis, vel tristique erat interdum eget. Maecenas scelerisque dolor mauris.'
-						),
-						React.createElement(
-							'p',
-							{ style: style },
-							'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur nec risus vel sapien mattis aliquam vel ullamcorper enim. Nulla fermentum euismod elit quis vulputate. Donec efficitur est justo, et sollicitudin dolor tincidunt non. Maecenas eget mattis nisi, nec vestibulum dui. Suspendisse potenti. Quisque malesuada tortor sit amet metus tempus, nec ullamcorper arcu dignissim. Phasellus dignissim leo vitae tellus molestie maximus. Integer eget orci nec ipsum faucibus rhoncus. Aliquam consectetur tempor pellentesque. Proin sit amet enim sem. Phasellus consequat consequat nisi sit amet vehicula. Duis placerat justo felis, vel tristique erat interdum eget. Maecenas scelerisque dolor mauris.'
-						)
-					),
-					React.createElement(
-						'div',
-						{ style: {
-								position: 'absolute',
-								top: '10px',
-								left: '325px'
-							}
-						},
-						React.createElement(
-							_reactScrolling.Scroller,
-							{ id: 'scroller-2', orientation: _reactScrolling.Orientation.Vertiacal,
-								size: Object.assign({}, sizeProps),
-								pagination: _reactScrolling.Pagination.First, page: { size: 40, margin: 0 }
-							},
-							React.createElement(
-								'div',
-								{ style: searchStyle },
-								'Search...'
-							),
-							React.createElement(
-								'p',
-								{ style: style },
-								'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur nec risus vel sapien mattis aliquam vel ullamcorper enim. Nulla fermentum euismod elit quis vulputate. Donec efficitur est justo, et sollicitudin dolor tincidunt non. Maecenas eget mattis nisi, nec vestibulum dui. Suspendisse potenti. Quisque malesuada tortor sit amet metus tempus, nec ullamcorper arcu dignissim. Phasellus dignissim leo vitae tellus molestie maximus. Integer eget orci nec ipsum faucibus rhoncus. Aliquam consectetur tempor pellentesque. Proin sit amet enim sem. Phasellus consequat consequat nisi sit amet vehicula. Duis placerat justo felis, vel tristique erat interdum eget. Maecenas scelerisque dolor mauris.'
-							)
-						)
-					)
-				);
-			}
-		}]);
+	  _createClass(Example, [{
+	    key: 'onChangeState',
+	    value: function onChangeState() {
+	      this.setState({
+	        test: this.state.test + 1
+	      });
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      return React.createElement(
+	        'div',
+	        null,
+	        React.createElement(
+	          'div',
+	          { onClick: this.onChangeState },
+	          'Change State'
+	        ),
+	        React.createElement(
+	          _reactScrolling.Scroller,
+	          {
+	            id: 'scroller-p',
+	            orientation: _reactScrolling.Orientation.Vertiacal,
+	            size: Object.assign({}, sizeProps),
+	            pagination: _reactScrolling.Pagination.First, page: { size: 40, margin: 0 },
+	            onScroll: function onScroll(pos) {
+	              console.log(pos);
+	            }
+	          },
+	          React.createElement(
+	            'div',
+	            { style: searchStyle },
+	            'Search...'
+	          ),
+	          React.createElement(
+	            'p',
+	            { style: style },
+	            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur nec risus vel sapien mattis aliquam vel ullamcorper enim. Nulla fermentum euismod elit quis vulputate. Donec efficitur est justo, et sollicitudin dolor tincidunt non. Maecenas eget mattis nisi, nec vestibulum dui. Suspendisse potenti. Quisque malesuada tortor sit amet metus tempus, nec ullamcorper arcu dignissim. Phasellus dignissim leo vitae tellus molestie maximus. Integer eget orci nec ipsum faucibus rhoncus. Aliquam consectetur tempor pellentesque. Proin sit amet enim sem. Phasellus consequat consequat nisi sit amet vehicula. Duis placerat justo felis, vel tristique erat interdum eget. Maecenas scelerisque dolor mauris.'
+	          ),
+	          React.createElement(
+	            'p',
+	            { style: style },
+	            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur nec risus vel sapien mattis aliquam vel ullamcorper enim. Nulla fermentum euismod elit quis vulputate. Donec efficitur est justo, et sollicitudin dolor tincidunt non. Maecenas eget mattis nisi, nec vestibulum dui. Suspendisse potenti. Quisque malesuada tortor sit amet metus tempus, nec ullamcorper arcu dignissim. Phasellus dignissim leo vitae tellus molestie maximus. Integer eget orci nec ipsum faucibus rhoncus. Aliquam consectetur tempor pellentesque. Proin sit amet enim sem. Phasellus consequat consequat nisi sit amet vehicula. Duis placerat justo felis, vel tristique erat interdum eget. Maecenas scelerisque dolor mauris.'
+	          )
+	        ),
+	        React.createElement(
+	          'div',
+	          { style: {
+	              position: 'absolute',
+	              top: '10px',
+	              left: '325px'
+	            }
+	          },
+	          React.createElement(
+	            _reactScrolling.Scroller,
+	            {
+	              id: 'scroller-2',
+	              orientation: _reactScrolling.Orientation.Vertiacal,
+	              size: Object.assign({}, sizeProps),
+	              pagination: _reactScrolling.Pagination.First, page: { size: 40, margin: 0 }
+	            },
+	            React.createElement(
+	              'div',
+	              { style: searchStyle },
+	              'Search...'
+	            ),
+	            React.createElement(
+	              'p',
+	              { style: style },
+	              'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur nec risus vel sapien mattis aliquam vel ullamcorper enim. Nulla fermentum euismod elit quis vulputate. Donec efficitur est justo, et sollicitudin dolor tincidunt non. Maecenas eget mattis nisi, nec vestibulum dui. Suspendisse potenti. Quisque malesuada tortor sit amet metus tempus, nec ullamcorper arcu dignissim. Phasellus dignissim leo vitae tellus molestie maximus. Integer eget orci nec ipsum faucibus rhoncus. Aliquam consectetur tempor pellentesque. Proin sit amet enim sem. Phasellus consequat consequat nisi sit amet vehicula. Duis placerat justo felis, vel tristique erat interdum eget. Maecenas scelerisque dolor mauris.'
+	            )
+	          )
+	        )
+	      );
+	    }
+	  }]);
 	
-		return Example;
+	  return Example;
 	}(React.Component);
 	
 	ReactDOM.render(React.createElement(Example, null), document.getElementById('ReactScrolling'));
@@ -20571,7 +20578,13 @@
 	
 	      var state = this.state;
 	      if ((0, _StateHelpers.scrollerExists)(state, id)) {
+	        var scrollerPosition = 0; // TODO: set proper
 	        this.setState((0, _StateHelpers.moveScrollerNewPartialState)(state, id, newPosition, springValue));
+	        var onScroll = this.props.onScroll;
+	
+	        if (onScroll) {
+	          onScroll(scrollerPosition);
+	        }
 	      }
 	    }
 	  }, {
@@ -20837,7 +20850,8 @@
 	    size: _react2.default.PropTypes.number
 	  }),
 	  scale: _react2.default.PropTypes.number,
-	  children: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.func, _react2.default.PropTypes.node])
+	  children: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.func, _react2.default.PropTypes.node]),
+	  onScroll: _react2.default.PropTypes.func
 	};
 	
 	Scroller.propTypes = propTypes;
