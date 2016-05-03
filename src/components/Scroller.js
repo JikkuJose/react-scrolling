@@ -71,12 +71,12 @@ export class Scroller extends React.Component {
     }
   }
 
-  componentWillReceiveProps(props) {
+  componentDidUpdate() {
     this.updateContentSize();
     if (!this.getLock()) {
-      this.correctPagination(props, null);
+      this.correctPagination(this.props, null);
       if (!this.props.loop) {
-        this.correctOutOfTheBox(props);
+        this.correctOutOfTheBox(this.props);
       }
     }
   }
@@ -260,12 +260,7 @@ export class Scroller extends React.Component {
   moveScroller(newPosition, id = this.props.id, springValue = Springs.Normal) {
     const state = this.state;
     if (scrollerExists(state, id)) {
-      const scrollerPosition = 0; // TODO: set proper
       this.setState(moveScrollerNewPartialState(state, id, newPosition, springValue));
-      const { onScroll } = this.props;
-      if (onScroll) {
-        onScroll(scrollerPosition);
-      }
     }
   }
 
@@ -413,23 +408,31 @@ export class Scroller extends React.Component {
     this.contentAutoSize = this.contentDom[`client${capitalSizeProp}`];
   }
 
+  callOnScroll(scrollerPosition) {
+    const { onScroll } = this.props;
+    if (onScroll) {
+      onScroll(scrollerPosition);
+    }
+  }
+
   renderChildren(style) {
     if (typeof this.props.id === 'string') {
+      let pos = style[this.props.id];
+      if (this.props.loop) {
+        pos = this.correctLoopPosition(
+          pos,
+          this.props.size.content,
+          this.contentAutoSize
+        );
+      }
+      this.callOnScroll(pos);
       if (typeof this.props.children === 'function') {
-        let pos = style[this.props.id];
-        if (this.props.loop) {
-          pos = this.correctLoopPosition(
-            pos,
-            this.props.size.content,
-            this.contentAutoSize
-          );
-        }
         return this.props.children(pos);
       }
       const { orientation, size } = this.props;
       const containerStyle = getContainerWithOrientationStyle(orientation, size);
       const containerItemStyle = {
-        transform: this.getTransformString(style[this.props.id]),
+        transform: this.getTransformString(pos),
       };
       return (
         <div style={containerStyle} >
@@ -439,14 +442,8 @@ export class Scroller extends React.Component {
         </div>
       );
     }
+    this.callOnScroll(style);
     return this.props.children(style);
-  }
-
-  renderWrappedIfArray(children) {
-    if (children instanceof Array) {
-      return <div>{children}</div>;
-    }
-    return children;
   }
 
   render() {
@@ -467,7 +464,7 @@ export class Scroller extends React.Component {
               onSwipeUp={this.onSwipe}
               onSwipeDown={this.onSwipe}
             >
-              {this.renderWrappedIfArray(children)}
+              {children}
             </ReactGesture>
           );
         }}

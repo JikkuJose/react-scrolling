@@ -70,7 +70,8 @@
 	  container: 400
 	};
 	var style = {
-	  width: '300px'
+	  width: '300px',
+	  overflow: 'hidden'
 	};
 	var searchStyle = {
 	  width: '300px',
@@ -91,8 +92,10 @@
 	    _this.state = {
 	      test: 0
 	    };
+	    _this.autoHeight = true;
 
 	    _this.onChangeState = _this.onChangeState.bind(_this);
+	    _this.onToggleHeight = _this.onToggleHeight.bind(_this);
 	    return _this;
 	  }
 
@@ -104,15 +107,37 @@
 	      });
 	    }
 	  }, {
+	    key: 'onToggleHeight',
+	    value: function onToggleHeight() {
+	      var _this2 = this;
+
+	      setTimeout(function () {
+	        _this2.autoHeight = !_this2.autoHeight;
+	        var height = '100px';
+	        if (_this2.autoHeight) {
+	          height = 'auto';
+	        }
+	        var elements = document.getElementsByClassName('pToggle');
+	        for (var i = 0; i < elements.length; ++i) {
+	          elements.item(i).style.height = height;
+	        }
+	      }, 100);
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
 	      return React.createElement(
 	        'div',
 	        null,
 	        React.createElement(
-	          'div',
+	          'span',
 	          { onClick: this.onChangeState },
-	          'Change State'
+	          'Change State '
+	        ),
+	        React.createElement(
+	          'span',
+	          { onClick: this.onToggleHeight },
+	          'Toggle height (async) '
 	        ),
 	        React.createElement(
 	          'div',
@@ -140,12 +165,12 @@
 	            ),
 	            React.createElement(
 	              'p',
-	              { style: style },
+	              { style: style, className: 'pToggle' },
 	              'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur nec risus vel sapien mattis aliquam vel ullamcorper enim. Nulla fermentum euismod elit quis vulputate. Donec efficitur est justo, et sollicitudin dolor tincidunt non. Maecenas eget mattis nisi, nec vestibulum dui. Suspendisse potenti. Quisque malesuada tortor sit amet metus tempus, nec ullamcorper arcu dignissim. Phasellus dignissim leo vitae tellus molestie maximus. Integer eget orci nec ipsum faucibus rhoncus. Aliquam consectetur tempor pellentesque. Proin sit amet enim sem. Phasellus consequat consequat nisi sit amet vehicula. Duis placerat justo felis, vel tristique erat interdum eget. Maecenas scelerisque dolor mauris.'
 	            ),
 	            React.createElement(
 	              'p',
-	              { style: style },
+	              { style: style, className: 'pToggle' },
 	              'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur nec risus vel sapien mattis aliquam vel ullamcorper enim. Nulla fermentum euismod elit quis vulputate. Donec efficitur est justo, et sollicitudin dolor tincidunt non. Maecenas eget mattis nisi, nec vestibulum dui. Suspendisse potenti. Quisque malesuada tortor sit amet metus tempus, nec ullamcorper arcu dignissim. Phasellus dignissim leo vitae tellus molestie maximus. Integer eget orci nec ipsum faucibus rhoncus. Aliquam consectetur tempor pellentesque. Proin sit amet enim sem. Phasellus consequat consequat nisi sit amet vehicula. Duis placerat justo felis, vel tristique erat interdum eget. Maecenas scelerisque dolor mauris.'
 	            )
 	          )
@@ -390,8 +415,8 @@
 /* 4 */
 /***/ function(module, exports) {
 
-	/* eslint-disable no-unused-vars */
 	'use strict';
+	/* eslint-disable no-unused-vars */
 	var hasOwnProperty = Object.prototype.hasOwnProperty;
 	var propIsEnumerable = Object.prototype.propertyIsEnumerable;
 
@@ -403,7 +428,51 @@
 		return Object(val);
 	}
 
-	module.exports = Object.assign || function (target, source) {
+	function shouldUseNative() {
+		try {
+			if (!Object.assign) {
+				return false;
+			}
+
+			// Detect buggy property enumeration order in older V8 versions.
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=4118
+			var test1 = new String('abc');  // eslint-disable-line
+			test1[5] = 'de';
+			if (Object.getOwnPropertyNames(test1)[0] === '5') {
+				return false;
+			}
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+			var test2 = {};
+			for (var i = 0; i < 10; i++) {
+				test2['_' + String.fromCharCode(i)] = i;
+			}
+			var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
+				return test2[n];
+			});
+			if (order2.join('') !== '0123456789') {
+				return false;
+			}
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+			var test3 = {};
+			'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
+				test3[letter] = letter;
+			});
+			if (Object.keys(Object.assign({}, test3)).join('') !==
+					'abcdefghijklmnopqrst') {
+				return false;
+			}
+
+			return true;
+		} catch (e) {
+			// We don't expect any of the above to throw, but better to be safe.
+			return false;
+		}
+	}
+
+	module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 		var from;
 		var to = toObject(target);
 		var symbols;
@@ -20397,13 +20466,13 @@
 	      }
 	    }
 	  }, {
-	    key: 'componentWillReceiveProps',
-	    value: function componentWillReceiveProps(props) {
+	    key: 'componentDidUpdate',
+	    value: function componentDidUpdate() {
 	      this.updateContentSize();
 	      if (!this.getLock()) {
-	        this.correctPagination(props, null);
+	        this.correctPagination(this.props, null);
 	        if (!this.props.loop) {
-	          this.correctOutOfTheBox(props);
+	          this.correctOutOfTheBox(this.props);
 	        }
 	      }
 	    }
@@ -20587,13 +20656,7 @@
 
 	      var state = this.state;
 	      if ((0, _StateHelpers.scrollerExists)(state, id)) {
-	        var scrollerPosition = 0; // TODO: set proper
 	        this.setState((0, _StateHelpers.moveScrollerNewPartialState)(state, id, newPosition, springValue));
-	        var onScroll = this.props.onScroll;
-
-	        if (onScroll) {
-	          onScroll(scrollerPosition);
-	        }
 	      }
 	    }
 	  }, {
@@ -20753,14 +20816,24 @@
 	      this.contentAutoSize = this.contentDom['client' + capitalSizeProp];
 	    }
 	  }, {
+	    key: 'callOnScroll',
+	    value: function callOnScroll(scrollerPosition) {
+	      var onScroll = this.props.onScroll;
+
+	      if (onScroll) {
+	        onScroll(scrollerPosition);
+	      }
+	    }
+	  }, {
 	    key: 'renderChildren',
 	    value: function renderChildren(style) {
 	      if (typeof this.props.id === 'string') {
+	        var pos = style[this.props.id];
+	        if (this.props.loop) {
+	          pos = this.correctLoopPosition(pos, this.props.size.content, this.contentAutoSize);
+	        }
+	        this.callOnScroll(pos);
 	        if (typeof this.props.children === 'function') {
-	          var pos = style[this.props.id];
-	          if (this.props.loop) {
-	            pos = this.correctLoopPosition(pos, this.props.size.content, this.contentAutoSize);
-	          }
 	          return this.props.children(pos);
 	        }
 	        var _props2 = this.props;
@@ -20769,7 +20842,7 @@
 
 	        var containerStyle = (0, _styleApi.getContainerWithOrientationStyle)(orientation, size);
 	        var containerItemStyle = {
-	          transform: this.getTransformString(style[this.props.id])
+	          transform: this.getTransformString(pos)
 	        };
 	        return _react2.default.createElement(
 	          'div',
@@ -20781,19 +20854,8 @@
 	          )
 	        );
 	      }
+	      this.callOnScroll(style);
 	      return this.props.children(style);
-	    }
-	  }, {
-	    key: 'renderWrappedIfArray',
-	    value: function renderWrappedIfArray(children) {
-	      if (children instanceof Array) {
-	        return _react2.default.createElement(
-	          'div',
-	          null,
-	          children
-	        );
-	      }
-	      return children;
 	    }
 	  }, {
 	    key: 'render',
@@ -20819,7 +20881,7 @@
 	              onSwipeUp: _this4.onSwipe,
 	              onSwipeDown: _this4.onSwipe
 	            },
-	            _this4.renderWrappedIfArray(children)
+	            children
 	          );
 	        }
 	      );

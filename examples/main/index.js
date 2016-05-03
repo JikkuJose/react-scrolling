@@ -7,6 +7,7 @@ const sizeProps = {
 };
 const style = {
   width: '300px',
+  overflow: 'hidden',
 };
 const searchStyle = {
   width: '300px',
@@ -24,8 +25,10 @@ class Example extends React.Component {
     this.state = {
       test: 0,
     };
+    this.autoHeight = true;
 
     this.onChangeState = this.onChangeState.bind(this);
+    this.onToggleHeight = this.onToggleHeight.bind(this);
   }
 
   onChangeState() {
@@ -34,10 +37,25 @@ class Example extends React.Component {
     });
   }
 
+  onToggleHeight() {
+    setTimeout(() => {
+      this.autoHeight = !this.autoHeight;
+      let height = '100px';
+      if (this.autoHeight) {
+        height = 'auto';
+      }
+      const elements = document.getElementsByClassName('pToggle');
+      for (let i = 0; i < elements.length; ++i) {
+        elements.item(i).style.height = height;
+      }
+    }, 100);
+  }
+
   render() {
     return (
       <div>
-        <div onClick={this.onChangeState} >Change State</div>
+        <span onClick={this.onChangeState} >Change State </span>
+        <span onClick={this.onToggleHeight} >Toggle height (async) </span>
         <div style={{
           position: 'absolute',
           top: '25px',
@@ -52,7 +70,7 @@ class Example extends React.Component {
             onScroll={(pos) => { console.log(pos); }}
           >
             <div style={ searchStyle }>Search...</div>
-            <p style={ style } >
+            <p style={ style } className="pToggle">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit.
               Curabitur nec risus vel sapien mattis aliquam vel ullamcorper
               enim. Nulla fermentum euismod elit quis vulputate. Donec
@@ -66,7 +84,7 @@ class Example extends React.Component {
               placerat justo felis, vel tristique erat interdum eget. Maecenas
               scelerisque dolor mauris.
             </p>
-            <p style={ style } >
+            <p style={ style } className="pToggle">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit.
               Curabitur nec risus vel sapien mattis aliquam vel ullamcorper
               enim. Nulla fermentum euismod elit quis vulputate. Donec
