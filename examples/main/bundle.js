@@ -20801,7 +20801,7 @@
 	      if (typeof this.props.id === 'string') {
 	        var pos = style[this.props.id];
 	        if (this.props.loop) {
-	          pos = this.correctLoopPosition(pos, this.props.size.content, this.contentAutoSize);
+	          pos = (0, _logic.correctLoopPosition)(pos, this.props.size.content, this.contentAutoSize);
 	        }
 	        this.callOnScroll(pos);
 	        if (typeof this.props.children === 'function') {

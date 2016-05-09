@@ -27,6 +27,7 @@ import {
   getEmptyVelocity,
   setOrientationPos,
   getCoordinatesByOrientation,
+  correctLoopPosition,
 } from '../utils/logic';
 import {
   getInitialState,
@@ -430,7 +431,7 @@ export class Scroller extends React.Component {
     if (typeof this.props.id === 'string') {
       let pos = style[this.props.id];
       if (this.props.loop) {
-        pos = this.correctLoopPosition(
+        pos = correctLoopPosition(
           pos,
           this.props.size.content,
           this.contentAutoSize
