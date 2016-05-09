@@ -20829,6 +20829,18 @@
 	      return this.props.children(style);
 	    }
 	  }, {
+	    key: 'renderWrappedIfArray',
+	    value: function renderWrappedIfArray(children) {
+	      if (children instanceof Array) {
+	        return _react2.default.createElement(
+	          'div',
+	          null,
+	          children
+	        );
+	      }
+	      return children;
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
 	      var _this4 = this;
@@ -20852,7 +20864,7 @@
 	              onSwipeUp: _this4.onSwipe,
 	              onSwipeDown: _this4.onSwipe
 	            },
-	            children
+	            _this4.renderWrappedIfArray(children)
 	          );
 	        }
 	      );

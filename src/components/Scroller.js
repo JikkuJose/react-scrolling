@@ -458,6 +458,13 @@ export class Scroller extends React.Component {
     return this.props.children(style);
   }
 
+  renderWrappedIfArray(children) {
+    if (children instanceof Array) {
+      return <div>{children}</div>;
+    }
+    return children;
+  }
+
   render() {
     const springStyle = getSpringStyle(this.state);
     return (
@@ -476,7 +483,7 @@ export class Scroller extends React.Component {
               onSwipeUp={this.onSwipe}
               onSwipeDown={this.onSwipe}
             >
-              {children}
+              {this.renderWrappedIfArray(children)}
             </ReactGesture>
           );
         }}
