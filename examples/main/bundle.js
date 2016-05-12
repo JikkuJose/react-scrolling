@@ -415,8 +415,8 @@
 /* 4 */
 /***/ function(module, exports) {
 
-	/* eslint-disable no-unused-vars */
 	'use strict';
+	/* eslint-disable no-unused-vars */
 	var hasOwnProperty = Object.prototype.hasOwnProperty;
 	var propIsEnumerable = Object.prototype.propertyIsEnumerable;
 
@@ -428,7 +428,51 @@
 		return Object(val);
 	}
 
-	module.exports = Object.assign || function (target, source) {
+	function shouldUseNative() {
+		try {
+			if (!Object.assign) {
+				return false;
+			}
+
+			// Detect buggy property enumeration order in older V8 versions.
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=4118
+			var test1 = new String('abc');  // eslint-disable-line
+			test1[5] = 'de';
+			if (Object.getOwnPropertyNames(test1)[0] === '5') {
+				return false;
+			}
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+			var test2 = {};
+			for (var i = 0; i < 10; i++) {
+				test2['_' + String.fromCharCode(i)] = i;
+			}
+			var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
+				return test2[n];
+			});
+			if (order2.join('') !== '0123456789') {
+				return false;
+			}
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+			var test3 = {};
+			'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
+				test3[letter] = letter;
+			});
+			if (Object.keys(Object.assign({}, test3)).join('') !==
+					'abcdefghijklmnopqrst') {
+				return false;
+			}
+
+			return true;
+		} catch (e) {
+			// We don't expect any of the above to throw, but better to be safe.
+			return false;
+		}
+	}
+
+	module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 		var from;
 		var to = toObject(target);
 		var symbols;
@@ -20394,7 +20438,8 @@
 	  orientation: Orientation.Vertiacal,
 	  pagination: Pagination.None,
 	  center: false,
-	  loop: false
+	  loop: false,
+	  multipleMotion: 1
 	};
 
 	var windowWidth = window.innerWidth;
@@ -20471,7 +20516,10 @@
 	      var finalPosition = this.getFinalPosition(newPosition);
 	      var paginationSpring = (0, _effects.getSpringByPagination)(pagination);
 	      var adjustedSpring = (0, _effects.getAdjustedSpring)(paginationSpring);
-	      this.moveScroller(finalPosition, scrollerId, adjustedSpring);
+	      if ((0, _StateHelpers.getScrollerPosition)(this.state, scrollerId) !== finalPosition) {
+	        this.moveScroller(finalPosition, scrollerId, adjustedSpring);
+	        this.autoScrolling = true;
+	      }
 	      this.setLockerEmpty(orientation);
 	    }
 	  }, {
@@ -20593,9 +20641,14 @@
 	      (0, _ScrollerLocks.setScrollerLock)(orientation, scroller);
 	    }
 	  }, {
+	    key: 'getLastRenderedStyle',
+	    value: function getLastRenderedStyle(scrollerId) {
+	      return this.lastRenderedStyle[scrollerId];
+	    }
+	  }, {
 	    key: 'getLastRenderedStyleForLocked',
 	    value: function getLastRenderedStyleForLocked() {
-	      return this.lastRenderedStyle[this.getLock()];
+	      return this.lastRenderedStyle[this.getLock().scroller];
 	    }
 	  }, {
 	    key: 'setLastRenderedStyle',
@@ -20649,7 +20702,7 @@
 	  }, {
 	    key: 'isScrolling',
 	    value: function isScrolling() {
-	      return this.getLock() !== undefined && this.getLockedSwiped();
+	      return this.getLock() !== undefined && this.getLockedSwiped() || this.autoScrolling;
 	    }
 	  }, {
 	    key: 'releaseScroller',
@@ -20679,17 +20732,20 @@
 	      var springValue = arguments.length <= 1 || arguments[1] === undefined ? Springs.Normal : arguments[1];
 
 	      var state = this.state;
+	      var moved = false;
 	      (0, _StateHelpers.foreachScroller)(state, function (scrollerId) {
 	        var oldPosition = (0, _StateHelpers.getScrollerPosition)(state, scrollerId);
 	        var newPosition = (0, _PositionCorrectors.outOfTheBoxCorrection)(oldPosition, scrollerId, props, _this2.contentAutoSize);
 	        var newSpringValue = springValue;
-	        if (_this2.lastRenderedStyle && newPosition !== _this2.lastRenderedStyle[scrollerId]) {
-	          newSpringValue = (0, _StateHelpers.getScrollerSpring)(state, scrollerId);
+	        if (_this2.lastRenderedStyle && newPosition !== _this2.getLastRenderedStyle(scrollerId) && (0, _StateHelpers.getScrollerSpring)(state, scrollerId) === null) {
+	          newSpringValue = null;
 	        }
 	        if (newPosition !== oldPosition) {
 	          _this2.moveScroller(newPosition, scrollerId, newSpringValue);
+	          moved = true;
 	        }
 	      });
+	      return moved;
 	    }
 	  }, {
 	    key: 'correctPagination',
@@ -20700,6 +20756,7 @@
 	      var springValue = arguments.length <= 1 || arguments[1] === undefined ? Springs.Normal : arguments[1];
 
 	      var state = this.state;
+	      var moved = false;
 	      (0, _StateHelpers.foreachScroller)(state, function (scrollerId) {
 	        if ((0, _ArrayPropValue.getPropValueForScroller)(scrollerId, props.id, props.pagination) !== Pagination.None) {
 	          var oldPosition = (0, _StateHelpers.getScrollerPosition)(state, scrollerId);
@@ -20709,10 +20766,12 @@
 	            props.pagination === Pagination.First);
 	            if (newPosition !== oldPosition) {
 	              _this3.moveScroller(newPosition, scrollerId, springValue);
+	              moved = true;
 	            }
 	          }
 	        }
 	      });
+	      return moved;
 	    }
 	  }, {
 	    key: 'correctPosition',
@@ -20741,8 +20800,8 @@
 
 	      var scroller = _getLock2.scroller;
 
-	      if (this.lastRenderedStyle[scroller] !== (0, _StateHelpers.getScrollerPosition)(this.state, scroller)) {
-	        this.moveScroller(this.lastRenderedStyle[scroller], scroller, null);
+	      if (this.getLastRenderedStyleForLocked() !== (0, _StateHelpers.getScrollerPosition)(this.state, scroller)) {
+	        this.moveScroller(this.getLastRenderedStyleForLocked(), scroller, null);
 	        this.setLockedSwiped(true);
 	      }
 	    }
@@ -20794,6 +20853,11 @@
 	      if (onScroll) {
 	        onScroll(scrollerPosition);
 	      }
+	    }
+	  }, {
+	    key: 'motionRest',
+	    value: function motionRest() {
+	      this.autoScrolling = false;
 	    }
 	  }, {
 	    key: 'renderChildren',
@@ -20848,7 +20912,7 @@
 	      var springStyle = (0, _StateHelpers.getSpringStyle)(this.state);
 	      return _react2.default.createElement(
 	        _reactMotion.Motion,
-	        { style: springStyle },
+	        { style: springStyle, onRest: this.motionRest },
 	        function (style) {
 	          _this4.setLastRenderedStyle(style);
 	          var children = _this4.renderChildren(style);
@@ -20872,7 +20936,7 @@
 	  }]);
 
 	  return Scroller;
-	}(_react2.default.Component), (_applyDecoratedDescriptor(_class.prototype, 'onEventBegin', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onEventBegin'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onEventEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onEventEnd'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onSwipe', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onSwipe'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onSetContentDom', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onSetContentDom'), _class.prototype)), _class);
+	}(_react2.default.Component), (_applyDecoratedDescriptor(_class.prototype, 'onEventBegin', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onEventBegin'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onEventEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onEventEnd'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onSwipe', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onSwipe'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onSetContentDom', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onSetContentDom'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'motionRest', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'motionRest'), _class.prototype)), _class);
 
 
 	var valueOrArray = function valueOrArray(ReactType) {
@@ -20905,7 +20969,8 @@
 	  }),
 	  scale: _react2.default.PropTypes.number,
 	  children: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.func, _react2.default.PropTypes.node]),
-	  onScroll: _react2.default.PropTypes.func
+	  onScroll: _react2.default.PropTypes.func,
+	  multipleMotion: _react2.default.PropTypes.number
 	};
 
 	Scroller.propTypes = propTypes;

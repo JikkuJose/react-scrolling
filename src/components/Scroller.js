@@ -139,7 +139,10 @@ export class Scroller extends React.Component {
     const finalPosition = this.getFinalPosition(newPosition);
     const paginationSpring = getSpringByPagination(pagination);
     const adjustedSpring = getAdjustedSpring(paginationSpring);
-    this.moveScroller(finalPosition, scrollerId, adjustedSpring);
+    if (getScrollerPosition(this.state, scrollerId) !== finalPosition) {
+      this.moveScroller(finalPosition, scrollerId, adjustedSpring);
+      this.autoScrolling = true;
+    }
     this.setLockerEmpty(orientation);
   }
 
@@ -249,8 +252,12 @@ export class Scroller extends React.Component {
     setScrollerLock(orientation, scroller);
   }
 
+  getLastRenderedStyle(scrollerId) {
+    return this.lastRenderedStyle[scrollerId];
+  }
+
   getLastRenderedStyleForLocked() {
-    return this.lastRenderedStyle[this.getLock()];
+    return this.lastRenderedStyle[this.getLock().scroller];
   }
 
   setLastRenderedStyle(style) {
@@ -304,7 +311,7 @@ export class Scroller extends React.Component {
   }
 
   isScrolling() {
-    return this.getLock() !== undefined && this.getLockedSwiped();
+    return (this.getLock() !== undefined && this.getLockedSwiped()) || this.autoScrolling;
   }
 
   releaseScroller() {
@@ -323,6 +330,7 @@ export class Scroller extends React.Component {
 
   correctOutOfTheBox(props = this.props, springValue = Springs.Normal) {
     const state = this.state;
+    let moved = false;
     foreachScroller(state, (scrollerId) => {
       const oldPosition = getScrollerPosition(state, scrollerId);
       const newPosition = outOfTheBoxCorrection(
@@ -331,17 +339,22 @@ export class Scroller extends React.Component {
         props,
         this.contentAutoSize);
       let newSpringValue = springValue;
-      if (this.lastRenderedStyle && newPosition !== this.lastRenderedStyle[scrollerId]) {
-        newSpringValue = getScrollerSpring(state, scrollerId);
+      if (this.lastRenderedStyle &&
+        newPosition !== this.getLastRenderedStyle(scrollerId) &&
+        getScrollerSpring(state, scrollerId) === null) {
+        newSpringValue = null;
       }
       if (newPosition !== oldPosition) {
         this.moveScroller(newPosition, scrollerId, newSpringValue);
+        moved = true;
       }
     });
+    return moved;
   }
 
   correctPagination(props = this.props, springValue = Springs.Normal) {
     const state = this.state;
+    let moved = false;
     foreachScroller(state, (scrollerId) => {
       if (getPropValueForScroller(scrollerId, props.id, props.pagination) !== Pagination.None) {
         const oldPosition = getScrollerPosition(state, scrollerId);
@@ -357,10 +370,12 @@ export class Scroller extends React.Component {
           );
           if (newPosition !== oldPosition) {
             this.moveScroller(newPosition, scrollerId, springValue);
+            moved = true;
           }
         }
       }
     });
+    return moved;
   }
 
   correctPosition() {
@@ -378,8 +393,8 @@ export class Scroller extends React.Component {
 
   stopLockedScroller() {
     const { scroller } = this.getLock();
-    if (this.lastRenderedStyle[scroller] !== getScrollerPosition(this.state, scroller)) {
-      this.moveScroller(this.lastRenderedStyle[scroller], scroller, null);
+    if (this.getLastRenderedStyleForLocked() !== getScrollerPosition(this.state, scroller)) {
+      this.moveScroller(this.getLastRenderedStyleForLocked(), scroller, null);
       this.setLockedSwiped(true);
     }
   }
@@ -427,6 +442,11 @@ export class Scroller extends React.Component {
     }
   }
 
+  @autobind
+  motionRest() {
+    this.autoScrolling = false;
+  }
+
   renderChildren(style) {
     if (typeof this.props.id === 'string') {
       let pos = style[this.props.id];
@@ -468,7 +488,7 @@ export class Scroller extends React.Component {
   render() {
     const springStyle = getSpringStyle(this.state);
     return (
-      <Motion style={springStyle} >
+      <Motion style={springStyle} onRest={this.motionRest}>
         {style => {
           this.setLastRenderedStyle(style);
           const children = this.renderChildren(style);
