@@ -415,8 +415,8 @@
 /* 4 */
 /***/ function(module, exports) {
 
-	/* eslint-disable no-unused-vars */
 	'use strict';
+	/* eslint-disable no-unused-vars */
 	var hasOwnProperty = Object.prototype.hasOwnProperty;
 	var propIsEnumerable = Object.prototype.propertyIsEnumerable;
 
@@ -428,7 +428,51 @@
 		return Object(val);
 	}
 
-	module.exports = Object.assign || function (target, source) {
+	function shouldUseNative() {
+		try {
+			if (!Object.assign) {
+				return false;
+			}
+
+			// Detect buggy property enumeration order in older V8 versions.
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=4118
+			var test1 = new String('abc');  // eslint-disable-line
+			test1[5] = 'de';
+			if (Object.getOwnPropertyNames(test1)[0] === '5') {
+				return false;
+			}
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+			var test2 = {};
+			for (var i = 0; i < 10; i++) {
+				test2['_' + String.fromCharCode(i)] = i;
+			}
+			var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
+				return test2[n];
+			});
+			if (order2.join('') !== '0123456789') {
+				return false;
+			}
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+			var test3 = {};
+			'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
+				test3[letter] = letter;
+			});
+			if (Object.keys(Object.assign({}, test3)).join('') !==
+					'abcdefghijklmnopqrst') {
+				return false;
+			}
+
+			return true;
+		} catch (e) {
+			// We don't expect any of the above to throw, but better to be safe.
+			return false;
+		}
+	}
+
+	module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 		var from;
 		var to = toObject(target);
 		var symbols;
@@ -20457,22 +20501,24 @@
 	      }
 	      var signedVelocity = this.getSignedVelocity(e);
 	      var scrollerId = this.getLockedScroller();
-	      var newPosition = (0, _StateHelpers.getScrollerPosition)(this.state, scrollerId);
+	      var oldPosition = (0, _StateHelpers.getScrollerPosition)(this.state, scrollerId);
+	      var newPosition = oldPosition;
 	      var pagination = (0, _ArrayPropValue.getPropValueForScroller)(scrollerId, this.props.id, this.props.pagination);
 	      if (pagination === Pagination.Single) {
-	        newPosition = (0, _PositionCorrectors.paginationCorrection)(newPosition, scrollerId, this.props, Math.sign(signedVelocity), this.getLockedPage());
+	        newPosition = (0, _PositionCorrectors.paginationCorrection)(oldPosition, scrollerId, this.props, Math.sign(signedVelocity), this.getLockedPage());
 	      } else {
-	        newPosition = (0, _PositionCorrectors.velocityPositionCorrection)(newPosition, scrollerId, signedVelocity);
+	        oldPosition = (0, _PositionCorrectors.velocityPositionCorrection)(oldPosition, scrollerId, signedVelocity);
+	        newPosition = oldPosition;
 	        if (pagination === Pagination.Multiple || pagination === Pagination.First) {
-	          newPosition = (0, _PositionCorrectors.paginationCorrection)(newPosition, scrollerId, this.props, 0, undefined, // prevSinglePage
+	          newPosition = (0, _PositionCorrectors.paginationCorrection)(oldPosition, scrollerId, this.props, 0, undefined, // prevSinglePage
 	          pagination === Pagination.First);
 	        }
 	      }
-	      var finalPosition = this.getFinalPosition(newPosition);
+	      newPosition = this.getFinalPosition(newPosition);
 	      var paginationSpring = (0, _effects.getSpringByPagination)(pagination);
-	      var adjustedSpring = (0, _effects.getAdjustedSpring)(paginationSpring);
-	      if ((0, _StateHelpers.getScrollerPosition)(this.state, scrollerId) !== finalPosition) {
-	        this.moveScroller(finalPosition, scrollerId, adjustedSpring);
+	      var adjustedSpring = (0, _effects.getAdjustedSpring)(oldPosition, newPosition, paginationSpring);
+	      if ((0, _StateHelpers.getScrollerPosition)(this.state, scrollerId) !== newPosition) {
+	        this.moveScroller(newPosition, scrollerId, adjustedSpring);
 	        this.autoScrolling = true;
 	      }
 	      this.setLockerEmpty(orientation);
@@ -23523,8 +23569,8 @@
 	function getSpringByPagination(pagination) {
 	  switch (pagination) {
 	    case Pagination.Single:
-	      return Springs.Move;
 	    case Pagination.First:
+	      return Springs.Move;
 	    case Pagination.Multiple:
 	      return Springs.Bounce;
 	    default:
@@ -23532,8 +23578,8 @@
 	  }
 	}
 
-	function getAdjustedSpring(newPosition, finalPosition, spring) {
-	  if (newPosition !== finalPosition) {
+	function getAdjustedSpring(oldPosition, newPosition, spring) {
+	  if (oldPosition !== newPosition) {
 	    return Springs.Bounce;
 	  }
 	  return spring;

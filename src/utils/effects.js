@@ -4,8 +4,8 @@ import * as Springs from '../consts/Springs';
 export function getSpringByPagination(pagination) {
   switch (pagination) {
     case Pagination.Single:
-      return Springs.Move;
     case Pagination.First:
+      return Springs.Move;
     case Pagination.Multiple:
       return Springs.Bounce;
     default:
@@ -13,8 +13,8 @@ export function getSpringByPagination(pagination) {
   }
 }
 
-export function getAdjustedSpring(newPosition, finalPosition, spring) {
-  if (newPosition !== finalPosition) {
+export function getAdjustedSpring(oldPosition, newPosition, spring) {
+  if (oldPosition !== newPosition) {
     return Springs.Bounce;
   }
   return spring;

@@ -105,7 +105,8 @@ export class Scroller extends React.Component {
     }
     const signedVelocity = this.getSignedVelocity(e);
     const scrollerId = this.getLockedScroller();
-    let newPosition = getScrollerPosition(this.state, scrollerId);
+    let oldPosition = getScrollerPosition(this.state, scrollerId);
+    let newPosition = oldPosition;
     const pagination = getPropValueForScroller(
       scrollerId,
       this.props.id,
@@ -113,21 +114,22 @@ export class Scroller extends React.Component {
     );
     if (pagination === Pagination.Single) {
       newPosition = paginationCorrection(
-        newPosition,
+        oldPosition,
         scrollerId,
         this.props,
         Math.sign(signedVelocity),
         this.getLockedPage()
       );
     } else {
-      newPosition = velocityPositionCorrection(
-        newPosition,
+      oldPosition = velocityPositionCorrection(
+        oldPosition,
         scrollerId,
         signedVelocity
       );
+      newPosition = oldPosition;
       if (pagination === Pagination.Multiple || pagination === Pagination.First) {
         newPosition = paginationCorrection(
-          newPosition,
+          oldPosition,
           scrollerId,
           this.props,
           0,
@@ -136,11 +138,11 @@ export class Scroller extends React.Component {
         );
       }
     }
-    const finalPosition = this.getFinalPosition(newPosition);
+    newPosition = this.getFinalPosition(newPosition);
     const paginationSpring = getSpringByPagination(pagination);
-    const adjustedSpring = getAdjustedSpring(paginationSpring);
-    if (getScrollerPosition(this.state, scrollerId) !== finalPosition) {
-      this.moveScroller(finalPosition, scrollerId, adjustedSpring);
+    const adjustedSpring = getAdjustedSpring(oldPosition, newPosition, paginationSpring);
+    if (getScrollerPosition(this.state, scrollerId) !== newPosition) {
+      this.moveScroller(newPosition, scrollerId, adjustedSpring);
       this.autoScrolling = true;
     }
     this.setLockerEmpty(orientation);
