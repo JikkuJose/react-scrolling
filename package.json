@@ -33,7 +33,7 @@
     "autobind-decorator": "^1.3.3",
     "react": "^15.1.0",
     "react-gesture": "^0.0.2-rc.3",
-    "react-motion": "^0.4.3"
+    "react-motion": "^0.4.4"
   },
   "devDependencies": {
     "babel": "^6.3.26",
