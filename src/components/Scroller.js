@@ -71,6 +71,49 @@ export class Scroller extends React.Component {
     }
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    for (let i = 0; i < nextState.scrollers.length; ++i) {
+      if (nextState.scrollers[i].position !== this.state.scrollers[i].position) {
+        return true;
+      }
+    }
+    if (nextProps.size !== this.props.size) {
+      return true;
+    }
+    if (nextProps.size.container !== this.props.size.container) {
+      return true;
+    }
+    if (nextProps.size.content !== this.props.size.content) {
+      return true;
+    }
+    if (nextProps.page !== this.props.page) {
+      return true;
+    }
+    if (nextProps.page !== undefined) {
+      if (nextProps.page.size !== this.props.page.size) {
+        return true;
+      }
+      if (nextProps.page.margin !== this.props.page.margin) {
+        return true;
+      }
+    }
+    if (nextProps.multiple !== this.props.multiple) {
+      return true;
+    }
+    if (nextProps.multiple !== undefined) {
+      if (nextProps.multiple.before !== this.props.multiple.before) {
+        return true;
+      }
+      if (nextProps.multiple.between !== this.props.multiple.between) {
+        return true;
+      }
+      if (nextProps.multiple.size !== this.props.multiple.size) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   componentDidUpdate() {
     this.updateContentSize();
     if (!this.getLock()) {
@@ -234,7 +277,8 @@ export class Scroller extends React.Component {
   }
 
   setLockedPageLocked() {
-    this.lock.page = this.currentPage(this.getLock());
+    const { scroller } = this.getLock();
+    this.lock.page = this.currentPage(scroller);
   }
 
   setLockedSwiped(swiped) {

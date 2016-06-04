@@ -20464,6 +20464,50 @@
 	      }
 	    }
 	  }, {
+	    key: 'shouldComponentUpdate',
+	    value: function shouldComponentUpdate(nextProps, nextState) {
+	      for (var i = 0; i < nextState.scrollers.length; ++i) {
+	        if (nextState.scrollers[i].position !== this.state.scrollers[i].position) {
+	          return true;
+	        }
+	      }
+	      if (nextProps.size !== this.props.size) {
+	        return true;
+	      }
+	      if (nextProps.size.container !== this.props.size.container) {
+	        return true;
+	      }
+	      if (nextProps.size.content !== this.props.size.content) {
+	        return true;
+	      }
+	      if (nextProps.page !== this.props.page) {
+	        return true;
+	      }
+	      if (nextProps.page !== undefined) {
+	        if (nextProps.page.size !== this.props.page.size) {
+	          return true;
+	        }
+	        if (nextProps.page.margin !== this.props.page.margin) {
+	          return true;
+	        }
+	      }
+	      if (nextProps.multiple !== this.props.multiple) {
+	        return true;
+	      }
+	      if (nextProps.multiple !== undefined) {
+	        if (nextProps.multiple.before !== this.props.multiple.before) {
+	          return true;
+	        }
+	        if (nextProps.multiple.between !== this.props.multiple.between) {
+	          return true;
+	        }
+	        if (nextProps.multiple.size !== this.props.multiple.size) {
+	          return true;
+	        }
+	      }
+	      return false;
+	    }
+	  }, {
 	    key: 'componentDidUpdate',
 	    value: function componentDidUpdate() {
 	      this.updateContentSize();
@@ -20619,7 +20663,11 @@
 	  }, {
 	    key: 'setLockedPageLocked',
 	    value: function setLockedPageLocked() {
-	      this.lock.page = this.currentPage(this.getLock());
+	      var _getLock = this.getLock();
+
+	      var scroller = _getLock.scroller;
+
+	      this.lock.page = this.currentPage(scroller);
 	    }
 	  }, {
 	    key: 'setLockedSwiped',
@@ -20783,9 +20831,9 @@
 	  }, {
 	    key: 'lockPage',
 	    value: function lockPage() {
-	      var _getLock = this.getLock();
+	      var _getLock2 = this.getLock();
 
-	      var scroller = _getLock.scroller;
+	      var scroller = _getLock2.scroller;
 	      var _props = this.props;
 	      var id = _props.id;
 	      var pagination = _props.pagination;
@@ -20797,9 +20845,9 @@
 	  }, {
 	    key: 'stopLockedScroller',
 	    value: function stopLockedScroller() {
-	      var _getLock2 = this.getLock();
+	      var _getLock3 = this.getLock();
 
-	      var scroller = _getLock2.scroller;
+	      var scroller = _getLock3.scroller;
 
 	      if (this.getLastRenderedStyleForLocked() !== (0, _StateHelpers.getScrollerPosition)(this.state, scroller)) {
 	        this.moveScroller(this.getLastRenderedStyleForLocked(), scroller, null);
