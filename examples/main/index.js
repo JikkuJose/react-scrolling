@@ -17,6 +17,10 @@ const searchStyle = {
   color: '#888',
 };
 
+function logClick() {
+  console.log('click');
+}
+
 class Example extends React.Component {
 
   constructor(props) {
@@ -70,8 +74,12 @@ class Example extends React.Component {
             onScroll={(pos) => { console.log(pos); }}
           >
             <div style={ searchStyle }>Search...</div>
-            <p style={ style } className="pToggle">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            <p
+              style={ style }
+              className="pToggle"
+              onClick={logClick}
+            >
+              1. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
               Curabitur nec risus vel sapien mattis aliquam vel ullamcorper
               enim. Nulla fermentum euismod elit quis vulputate. Donec
               efficitur est justo, et sollicitudin dolor tincidunt non.
@@ -85,7 +93,7 @@ class Example extends React.Component {
               scelerisque dolor mauris.
             </p>
             <p style={ style } className="pToggle">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+              2. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
               Curabitur nec risus vel sapien mattis aliquam vel ullamcorper
               enim. Nulla fermentum euismod elit quis vulputate. Donec
               efficitur est justo, et sollicitudin dolor tincidunt non.
