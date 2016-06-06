@@ -21493,7 +21493,6 @@
 	  }, {
 	    key: 'onTouchStart',
 	    value: function onTouchStart(e) {
-	      e.preventDefault();
 	      this.setPSEmpty();
 	      this.emitEvent('onTouchStart', e);
 	      this.setPSStartDateNow();
@@ -21506,7 +21505,6 @@
 	  }, {
 	    key: 'onTouchMove',
 	    value: function onTouchMove(e) {
-	      e.preventDefault();
 	      var eventWithGesture = this.getEventWithGesture(e);
 	      this.emitEvent('onTouchMove', eventWithGesture);
 	      var pseudoState = this.pseudoState;
