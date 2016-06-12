@@ -439,7 +439,9 @@ export class Scroller extends React.Component {
 
   stopLockedScroller() {
     const { scroller } = this.getLock();
-    if (this.getLastRenderedStyleForLocked() !== getScrollerPosition(this.state, scroller)) {
+    const diff = this.getLastRenderedStyleForLocked() - getScrollerPosition(this.state, scroller);
+    const minDiff = Springs.Normal.precision / this.props.scale;
+    if (Math.abs(diff) > minDiff) {
       this.moveScroller(this.getLastRenderedStyleForLocked(), scroller, null);
       this.setLockedSwiped(true);
     }
