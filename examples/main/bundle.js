@@ -20653,8 +20653,10 @@
 	    }
 	  }, {
 	    key: 'shouldComponentUpdate',
-	    value: function shouldComponentUpdate(nextProps, nextState) {
-	      for (var i = 0; i < nextState.scrollers.length; ++i) {
+	    value: function shouldComponentUpdate() /* nextProps, nextState */{
+	      return true;
+	      /*
+	      for (let i = 0; i < nextState.scrollers.length; ++i) {
 	        if (nextState.scrollers[i].position !== this.state.scrollers[i].position) {
 	          return true;
 	        }
@@ -20694,6 +20696,7 @@
 	        }
 	      }
 	      return false;
+	      */
 	    }
 	  }, {
 	    key: 'componentDidUpdate',

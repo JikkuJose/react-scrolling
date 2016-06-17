@@ -71,7 +71,9 @@ export class Scroller extends React.Component {
     }
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(/* nextProps, nextState */) {
+    return true;
+    /*
     for (let i = 0; i < nextState.scrollers.length; ++i) {
       if (nextState.scrollers[i].position !== this.state.scrollers[i].position) {
         return true;
@@ -112,6 +114,7 @@ export class Scroller extends React.Component {
       }
     }
     return false;
+    */
   }
 
   componentDidUpdate() {
