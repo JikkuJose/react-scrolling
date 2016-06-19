@@ -188,6 +188,7 @@ export class Scroller extends React.Component {
     const paginationSpring = getSpringByPagination(pagination);
     const adjustedSpring = getAdjustedSpring(oldPosition, newPosition, paginationSpring);
     if (getScrollerPosition(this.state, scrollerId) !== newPosition) {
+      this.checkPageChanged(scrollerId, newPosition);
       this.moveScroller(newPosition, scrollerId, adjustedSpring);
       this.autoScrolling = true;
     }
@@ -435,7 +436,9 @@ export class Scroller extends React.Component {
   lockPage() {
     const { scroller } = this.getLock();
     const { id, pagination } = this.props;
-    if (getPropValueForScroller(scroller, id, pagination) === Pagination.Single) {
+    const paginationType = getPropValueForScroller(scroller, id, pagination);
+    if (paginationType === Pagination.Single ||
+      paginationType === Pagination.Multiple) {
       this.setLockedPageLocked();
     }
   }
@@ -447,6 +450,18 @@ export class Scroller extends React.Component {
     if (Math.abs(diff) > minDiff) {
       this.moveScroller(this.getLastRenderedStyleForLocked(), scroller, null);
       this.setLockedSwiped(true);
+    }
+  }
+
+  checkPageChanged(scrollerId, position) {
+    const oldPage = this.getLockedPage();
+    const newPage = pageNumberForPosition(
+      position,
+      scrollerId,
+      this.props
+    );
+    if (oldPage !== newPage) {
+      this.callOnPageChanged(newPage);
     }
   }
 
@@ -490,6 +505,13 @@ export class Scroller extends React.Component {
     const { onScroll } = this.props;
     if (onScroll) {
       onScroll(scrollerPosition);
+    }
+  }
+
+  callOnPageChanged(page) {
+    const { onPageChanged } = this.props;
+    if (onPageChanged) {
+      onPageChanged(page);
     }
   }
 
@@ -600,6 +622,7 @@ const propTypes = {
     React.PropTypes.node,
   ]),
   onScroll: React.PropTypes.func,
+  onPageChanged: React.PropTypes.func,
 };
 
 Scroller.propTypes = propTypes;

@@ -20753,6 +20753,7 @@
 	      var paginationSpring = (0, _effects.getSpringByPagination)(pagination);
 	      var adjustedSpring = (0, _effects.getAdjustedSpring)(oldPosition, newPosition, paginationSpring);
 	      if ((0, _StateHelpers.getScrollerPosition)(this.state, scrollerId) !== newPosition) {
+	        this.checkPageChanged(scrollerId, newPosition);
 	        this.moveScroller(newPosition, scrollerId, adjustedSpring);
 	        this.autoScrolling = true;
 	      }
@@ -21029,7 +21030,8 @@
 	      var id = _props.id;
 	      var pagination = _props.pagination;
 
-	      if ((0, _ArrayPropValue.getPropValueForScroller)(scroller, id, pagination) === Pagination.Single) {
+	      var paginationType = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, pagination);
+	      if (paginationType === Pagination.Single || paginationType === Pagination.Multiple) {
 	        this.setLockedPageLocked();
 	      }
 	    }
@@ -21045,6 +21047,15 @@
 	      if (Math.abs(diff) > minDiff) {
 	        this.moveScroller(this.getLastRenderedStyleForLocked(), scroller, null);
 	        this.setLockedSwiped(true);
+	      }
+	    }
+	  }, {
+	    key: 'checkPageChanged',
+	    value: function checkPageChanged(scrollerId, position) {
+	      var oldPage = this.getLockedPage();
+	      var newPage = (0, _PositionCorrectors.pageNumberForPosition)(position, scrollerId, this.props);
+	      if (oldPage !== newPage) {
+	        this.callOnPageChanged(newPage);
 	      }
 	    }
 	  }, {
@@ -21094,6 +21105,15 @@
 
 	      if (onScroll) {
 	        onScroll(scrollerPosition);
+	      }
+	    }
+	  }, {
+	    key: 'callOnPageChanged',
+	    value: function callOnPageChanged(page) {
+	      var onPageChanged = this.props.onPageChanged;
+
+	      if (onPageChanged) {
+	        onPageChanged(page);
 	      }
 	    }
 	  }, {
@@ -21211,7 +21231,8 @@
 	  }),
 	  scale: _react2.default.PropTypes.number,
 	  children: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.func, _react2.default.PropTypes.node]),
-	  onScroll: _react2.default.PropTypes.func
+	  onScroll: _react2.default.PropTypes.func,
+	  onPageChanged: _react2.default.PropTypes.func
 	};
 
 	Scroller.propTypes = propTypes;
