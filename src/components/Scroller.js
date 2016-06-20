@@ -455,6 +455,9 @@ export class Scroller extends React.Component {
 
   checkPageChanged(scrollerId, position) {
     const oldPage = this.getLockedPage();
+    if (oldPage === undefined) {
+      return;
+    }
     const newPage = pageNumberForPosition(
       position,
       scrollerId,

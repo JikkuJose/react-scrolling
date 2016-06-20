@@ -21053,6 +21053,9 @@
 	    key: 'checkPageChanged',
 	    value: function checkPageChanged(scrollerId, position) {
 	      var oldPage = this.getLockedPage();
+	      if (oldPage === undefined) {
+	        return;
+	      }
 	      var newPage = (0, _PositionCorrectors.pageNumberForPosition)(position, scrollerId, this.props);
 	      if (oldPage !== newPage) {
 	        this.callOnPageChanged(newPage);
