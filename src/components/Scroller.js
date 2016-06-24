@@ -65,9 +65,20 @@ export class Scroller extends React.Component {
   }
 
   componentWillMount() {
+    this.updateContentSize();
     this.correctOutOfTheBox(this.props, null);
     if (this.props.loop) {
       this.correctPagination(this.props, null);
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.updateContentSize(nextProps);
+    if (!this.getLock()) {
+      this.correctPagination(nextProps, null);
+      if (!nextProps.loop) {
+        this.correctOutOfTheBox(nextProps, null);
+      }
     }
   }
 
@@ -487,14 +498,14 @@ export class Scroller extends React.Component {
     return outOfTheBoxCorrectionPos !== position;
   }
 
-  updateContentSize() {
-    const { size, page, orientation, pagination } = this.props;
+  updateContentSize(props = this.props) {
+    const { size, page, orientation, pagination } = props;
     if (size.content === undefined && this.contentDom !== undefined) {
       const sizeProp = orientationSize[orientation];
       const capitalSizeProp = sizeProp.charAt(0).toUpperCase() + sizeProp.slice(1);
       this.contentAutoSize = this.contentDom[`client${capitalSizeProp}`];
     }
-    let contentSize = this.contentAutoSize || size.content;
+    let contentSize = size.content || this.contentAutoSize;
     if (pagination === Pagination.First) {
       const minSize = size.container + page.size + page.margin;
       if (contentSize < minSize) {

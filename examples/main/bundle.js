@@ -20646,9 +20646,21 @@
 	  _createClass(Scroller, [{
 	    key: 'componentWillMount',
 	    value: function componentWillMount() {
+	      this.updateContentSize();
 	      this.correctOutOfTheBox(this.props, null);
 	      if (this.props.loop) {
 	        this.correctPagination(this.props, null);
+	      }
+	    }
+	  }, {
+	    key: 'componentWillReceiveProps',
+	    value: function componentWillReceiveProps(nextProps) {
+	      this.updateContentSize(nextProps);
+	      if (!this.getLock()) {
+	        this.correctPagination(nextProps, null);
+	        if (!nextProps.loop) {
+	          this.correctOutOfTheBox(nextProps, null);
+	        }
 	      }
 	    }
 	  }, {
@@ -21081,18 +21093,18 @@
 	  }, {
 	    key: 'updateContentSize',
 	    value: function updateContentSize() {
-	      var _props2 = this.props;
-	      var size = _props2.size;
-	      var page = _props2.page;
-	      var orientation = _props2.orientation;
-	      var pagination = _props2.pagination;
+	      var props = arguments.length <= 0 || arguments[0] === undefined ? this.props : arguments[0];
+	      var size = props.size;
+	      var page = props.page;
+	      var orientation = props.orientation;
+	      var pagination = props.pagination;
 
 	      if (size.content === undefined && this.contentDom !== undefined) {
 	        var sizeProp = _OrientationHelpers.orientationSize[orientation];
 	        var capitalSizeProp = sizeProp.charAt(0).toUpperCase() + sizeProp.slice(1);
 	        this.contentAutoSize = this.contentDom['client' + capitalSizeProp];
 	      }
-	      var contentSize = this.contentAutoSize || size.content;
+	      var contentSize = size.content || this.contentAutoSize;
 	      if (pagination === Pagination.First) {
 	        var minSize = size.container + page.size + page.margin;
 	        if (contentSize < minSize) {
@@ -21136,9 +21148,9 @@
 	        if (typeof this.props.children === 'function') {
 	          return this.props.children(pos);
 	        }
-	        var _props3 = this.props;
-	        var orientation = _props3.orientation;
-	        var size = _props3.size;
+	        var _props2 = this.props;
+	        var orientation = _props2.orientation;
+	        var size = _props2.size;
 
 	        var containerStyle = (0, _styleApi.getContainerWithOrientationStyle)(orientation, size);
 	        var containerItemStyle = {
@@ -23694,9 +23706,9 @@
 	  var center = _ref.center;
 
 	  var container = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, size.container);
-	  var content = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, size.content);
+	  var content = contentAutoSize;
 	  if (content === undefined) {
-	    content = contentAutoSize;
+	    content = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, size.content);
 	  }
 	  var containerOrContent = container < content ? container : content;
 

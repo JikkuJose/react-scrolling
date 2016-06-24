@@ -7,9 +7,9 @@ export const outOfTheBoxCorrection = (
     { id, size, center },
     contentAutoSize) => {
   const container = getPropValueForScroller(scroller, id, size.container);
-  let content = getPropValueForScroller(scroller, id, size.content);
+  let content = contentAutoSize;
   if (content === undefined) {
-    content = contentAutoSize;
+    content = getPropValueForScroller(scroller, id, size.content);
   }
   const containerOrContent = container < content ? container : content;
 
