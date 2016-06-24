@@ -158,9 +158,7 @@
 	              orientation: _reactScrolling.Orientation.Vertiacal,
 	              size: Object.assign({}, sizeProps),
 	              pagination: _reactScrolling.Pagination.First, page: { size: 40, margin: 0 },
-	              onScroll: function onScroll(pos) {
-	                console.log(pos);
-	              }
+	              onScroll: function onScroll(pos) {/* console.log(pos); */}
 	            },
 	            React.createElement(
 	              'div',
@@ -20582,6 +20580,8 @@
 
 	var _ScrollerLocks = __webpack_require__(206);
 
+	var _ScrollingIndicator = __webpack_require__(207);
+
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -20651,6 +20651,8 @@
 	      if (this.props.loop) {
 	        this.correctPagination(this.props, null);
 	      }
+
+	      document.addEventListener('click', this.disableClick, true);
 	    }
 	  }, {
 	    key: 'componentWillReceiveProps',
@@ -20722,6 +20724,11 @@
 	      }
 	    }
 	  }, {
+	    key: 'componentWillUnmount',
+	    value: function componentWillUnmount() {
+	      document.removeEventListener('click', this.disableClick, true);
+	    }
+	  }, {
 	    key: 'onEventBegin',
 	    value: function onEventBegin(e) {
 	      var orientation = this.props.orientation;
@@ -20734,6 +20741,7 @@
 	          this.setLocker(orientation, scroller, coordinateValue);
 	          this.lockPage();
 	          this.stopLockedScroller();
+	          (0, _ScrollingIndicator.resetScrolling)();
 	        }
 	      }
 	    }
@@ -20791,6 +20799,7 @@
 	        }
 	        this.setLockedCoordinateValue(coordinateValue);
 	        this.setLockedSwiped(true);
+	        (0, _ScrollingIndicator.startScrolling)();
 	        this.moveScroller(newPosition, scrollerId);
 	      }
 	    }
@@ -21132,6 +21141,13 @@
 	      }
 	    }
 	  }, {
+	    key: 'disableClick',
+	    value: function disableClick(e) {
+	      if ((0, _ScrollingIndicator.isScrolling)()) {
+	        e.stopPropagation();
+	      }
+	    }
+	  }, {
 	    key: 'motionRest',
 	    value: function motionRest() {
 	      this.autoScrolling = false;
@@ -21213,7 +21229,7 @@
 	  }]);
 
 	  return Scroller;
-	}(_react2.default.Component), (_applyDecoratedDescriptor(_class.prototype, 'onEventBegin', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onEventBegin'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onEventEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onEventEnd'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onSwipe', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onSwipe'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onSetContentDom', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onSetContentDom'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'motionRest', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'motionRest'), _class.prototype)), _class);
+	}(_react2.default.Component), (_applyDecoratedDescriptor(_class.prototype, 'onEventBegin', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onEventBegin'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onEventEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onEventEnd'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onSwipe', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onSwipe'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onSetContentDom', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onSetContentDom'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'disableClick', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'disableClick'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'motionRest', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'motionRest'), _class.prototype)), _class);
 
 
 	var valueOrArray = function valueOrArray(ReactType) {
@@ -24155,6 +24171,32 @@
 
 	var isScrollerLocked = exports.isScrollerLocked = function isScrollerLocked(orientation) {
 	  return scrollerLocks[orientation] !== undefined;
+	};
+
+/***/ },
+/* 207 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var scrolling = false;
+
+	// should be true even after scrolling is finished
+	// to check inside click event
+	var isScrolling = exports.isScrolling = function isScrolling() {
+	  return scrolling;
+	};
+
+	var startScrolling = exports.startScrolling = function startScrolling() {
+	  scrolling = true;
+	};
+
+	var resetScrolling = exports.resetScrolling = function resetScrolling() {
+	  scrolling = false;
 	};
 
 /***/ }

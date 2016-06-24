@@ -71,7 +71,7 @@ class Example extends React.Component {
             orientation={ Orientation.Vertiacal }
             size={ Object.assign({}, sizeProps) }
             pagination={ Pagination.First } page={{ size: 40, margin: 0 }}
-            onScroll={(pos) => { console.log(pos); }}
+            onScroll={(pos) => { /* console.log(pos); */ }}
           >
             <div style={ searchStyle }>Search...</div>
             <p

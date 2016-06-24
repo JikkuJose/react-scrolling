@@ -45,6 +45,11 @@ import {
   emptyScrollerLock,
   isScrollerLocked,
 } from '../helpers/ScrollerLocks';
+import {
+  isScrolling,
+  startScrolling,
+  resetScrolling,
+} from '../helpers/ScrollingIndicator';
 
 const defaultProps = {
   scale: 1,
@@ -70,6 +75,8 @@ export class Scroller extends React.Component {
     if (this.props.loop) {
       this.correctPagination(this.props, null);
     }
+
+    document.addEventListener('click', this.disableClick, true);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -138,6 +145,10 @@ export class Scroller extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    document.removeEventListener('click', this.disableClick, true);
+  }
+
   @autobind
   onEventBegin(e) {
     const { orientation } = this.props;
@@ -149,6 +160,7 @@ export class Scroller extends React.Component {
         this.setLocker(orientation, scroller, coordinateValue);
         this.lockPage();
         this.stopLockedScroller();
+        resetScrolling();
       }
     }
   }
@@ -224,6 +236,7 @@ export class Scroller extends React.Component {
       }
       this.setLockedCoordinateValue(coordinateValue);
       this.setLockedSwiped(true);
+      startScrolling();
       this.moveScroller(newPosition, scrollerId);
     }
   }
@@ -526,6 +539,13 @@ export class Scroller extends React.Component {
     const { onPageChanged } = this.props;
     if (onPageChanged) {
       onPageChanged(page);
+    }
+  }
+
+  @autobind
+  disableClick(e) {
+    if (isScrolling()) {
+      e.stopPropagation();
     }
   }
 
