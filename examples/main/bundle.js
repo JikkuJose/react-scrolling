@@ -20800,6 +20800,7 @@
 	        this.setLockedCoordinateValue(coordinateValue);
 	        this.setLockedSwiped(true);
 	        (0, _ScrollingIndicator.startScrolling)();
+	        this.callOnScrollStarted();
 	        this.moveScroller(newPosition, scrollerId);
 	      }
 	    }
@@ -21141,6 +21142,24 @@
 	      }
 	    }
 	  }, {
+	    key: 'callOnScrollStarted',
+	    value: function callOnScrollStarted() {
+	      var onScrollStarted = this.props.onScrollStarted;
+
+	      if (onScrollStarted) {
+	        onScrollStarted();
+	      }
+	    }
+	  }, {
+	    key: 'callOnScrollFinished',
+	    value: function callOnScrollFinished() {
+	      var onScrollFinished = this.props.onScrollFinished;
+
+	      if (onScrollFinished) {
+	        onScrollFinished();
+	      }
+	    }
+	  }, {
 	    key: 'disableClick',
 	    value: function disableClick(e) {
 	      if ((0, _ScrollingIndicator.isScrolling)()) {
@@ -21151,6 +21170,7 @@
 	    key: 'motionRest',
 	    value: function motionRest() {
 	      this.autoScrolling = false;
+	      this.callOnScrollFinished();
 	    }
 	  }, {
 	    key: 'renderChildren',
@@ -21263,6 +21283,8 @@
 	  scale: _react2.default.PropTypes.number,
 	  children: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.func, _react2.default.PropTypes.node]),
 	  onScroll: _react2.default.PropTypes.func,
+	  onScrollStarted: _react2.default.PropTypes.func,
+	  onScrollFinished: _react2.default.PropTypes.func,
 	  onPageChanged: _react2.default.PropTypes.func
 	};
 

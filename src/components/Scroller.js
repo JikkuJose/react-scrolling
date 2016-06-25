@@ -237,6 +237,7 @@ export class Scroller extends React.Component {
       this.setLockedCoordinateValue(coordinateValue);
       this.setLockedSwiped(true);
       startScrolling();
+      this.callOnScrollStarted();
       this.moveScroller(newPosition, scrollerId);
     }
   }
@@ -542,6 +543,20 @@ export class Scroller extends React.Component {
     }
   }
 
+  callOnScrollStarted() {
+    const { onScrollStarted } = this.props;
+    if (onScrollStarted) {
+      onScrollStarted();
+    }
+  }
+
+  callOnScrollFinished() {
+    const { onScrollFinished } = this.props;
+    if (onScrollFinished) {
+      onScrollFinished();
+    }
+  }
+
   @autobind
   disableClick(e) {
     if (isScrolling()) {
@@ -552,6 +567,7 @@ export class Scroller extends React.Component {
   @autobind
   motionRest() {
     this.autoScrolling = false;
+    this.callOnScrollFinished();
   }
 
   renderChildren(style) {
@@ -656,6 +672,8 @@ const propTypes = {
     React.PropTypes.node,
   ]),
   onScroll: React.PropTypes.func,
+  onScrollStarted: React.PropTypes.func,
+  onScrollFinished: React.PropTypes.func,
   onPageChanged: React.PropTypes.func,
 };
 
