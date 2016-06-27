@@ -81,7 +81,19 @@ export class Scroller extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     this.updateContentSize(nextProps);
-    if (!this.getLock()) {
+    let positionChanged = false;
+    foreachScroller(this.state, (scrollerId) => {
+      const oldPosition = this.getPropPositionObject(this.props, scrollerId);
+      const newPosition = this.getPropPositionObject(nextProps, scrollerId);
+      if (newPosition === undefined) {
+        return;
+      }
+      if (oldPosition === undefined || oldPosition.value !== newPosition.value) {
+        this.moveScroller(newPosition.value, scrollerId, newPosition.spring);
+        positionChanged = true;
+      }
+    });
+    if (!positionChanged && !this.getLock()) {
       this.correctPagination(nextProps, null);
       if (!nextProps.loop) {
         this.correctOutOfTheBox(nextProps, null);
@@ -136,11 +148,12 @@ export class Scroller extends React.Component {
   }
 
   componentDidUpdate() {
-    this.updateContentSize();
-    if (!this.getLock()) {
-      this.correctPagination(this.props, null);
-      if (!this.props.loop) {
-        this.correctOutOfTheBox(this.props);
+    if (this.updateContentSize()) {
+      if (!this.getLock()) {
+        this.correctPagination(this.props, null);
+        if (!this.props.loop) {
+          this.correctOutOfTheBox(this.props);
+        }
       }
     }
   }
@@ -275,6 +288,18 @@ export class Scroller extends React.Component {
       this.props,
       this.contentAutoSize
     );
+  }
+
+  getPropPositionObject(props, scroller) {
+    const positionProp = getPropValueForScroller(
+      scroller, props.id, props.position);
+    if (typeof positionProp === 'number') {
+      return {
+        value: positionProp,
+        spring: Springs.Normal,
+      };
+    }
+    return positionProp;
   }
 
   getLock() {
@@ -513,6 +538,7 @@ export class Scroller extends React.Component {
   }
 
   updateContentSize(props = this.props) {
+    const prevSize = this.contentAutoSize;
     const { size, page, orientation, pagination } = props;
     if (size.content === undefined && this.contentDom !== undefined) {
       const sizeProp = orientationSize[orientation];
@@ -527,6 +553,7 @@ export class Scroller extends React.Component {
       }
       this.contentAutoSize = contentSize;
     }
+    return this.contentAutoSize !== prevSize;
   }
 
   callOnScroll(scrollerPosition) {
@@ -667,6 +694,13 @@ const propTypes = {
     size: React.PropTypes.number,
   }),
   scale: React.PropTypes.number,
+  position: valueOrArray(React.PropTypes.oneOfType([
+    React.PropTypes.number,
+    React.PropTypes.shape({
+      value: React.PropTypes.number,
+      spring: React.PropTypes.any,
+    }),
+  ])),
   children: React.PropTypes.oneOfType([
     React.PropTypes.func,
     React.PropTypes.node,
