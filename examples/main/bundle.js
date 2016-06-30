@@ -20580,8 +20580,6 @@
 
 	var _ScrollerLocks = __webpack_require__(206);
 
-	var _ScrollingIndicator = __webpack_require__(207);
-
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -20644,15 +20642,17 @@
 	  }
 
 	  _createClass(Scroller, [{
-	    key: 'componentWillMount',
-	    value: function componentWillMount() {
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
 	      this.updateContentSize();
 	      this.correctOutOfTheBox(this.props, null);
 	      if (this.props.loop) {
 	        this.correctPagination(this.props, null);
 	      }
 
-	      document.addEventListener('click', this.disableClick, true);
+	      var stringId = this.getStringId();
+	      var wrapper = document.getElementById(stringId);
+	      wrapper.addEventListener('click', this.disableClick, true);
 	    }
 	  }, {
 	    key: 'componentWillReceiveProps',
@@ -20756,7 +20756,7 @@
 	          this.setLocker(orientation, scroller, coordinateValue);
 	          this.lockPage();
 	          this.stopLockedScroller();
-	          (0, _ScrollingIndicator.resetScrolling)();
+	          this.resetScrolling();
 	        }
 	      }
 	    }
@@ -20814,7 +20814,7 @@
 	        }
 	        this.setLockedCoordinateValue(coordinateValue);
 	        this.setLockedSwiped(true);
-	        (0, _ScrollingIndicator.startScrolling)();
+	        this.startScrolling();
 	        this.callOnScrollStarted();
 	        this.moveScroller(newPosition, scrollerId);
 	      }
@@ -20946,6 +20946,13 @@
 	      this.lastRenderedStyle = style;
 	    }
 	  }, {
+	    key: 'getStringId',
+	    value: function getStringId() {
+	      var id = this.props.id;
+
+	      return typeof id === 'string' ? id : id.join('+');
+	    }
+	  }, {
 	    key: 'moveScroller',
 	    value: function moveScroller(newPosition) {
 	      var id = arguments.length <= 1 || arguments[1] === undefined ? this.props.id : arguments[1];
@@ -20993,6 +21000,21 @@
 	    key: 'isScrolling',
 	    value: function isScrolling() {
 	      return this.getLock() !== undefined && this.getLockedSwiped() || this.autoScrolling;
+	    }
+	  }, {
+	    key: 'wasScrolling',
+	    value: function wasScrolling() {
+	      return this.wasScrollingValue;
+	    }
+	  }, {
+	    key: 'startScrolling',
+	    value: function startScrolling() {
+	      this.wasScrollingValue = true;
+	    }
+	  }, {
+	    key: 'resetScrolling',
+	    value: function resetScrolling() {
+	      this.wasScrollingValue = false;
 	    }
 	  }, {
 	    key: 'releaseScroller',
@@ -21192,7 +21214,7 @@
 	  }, {
 	    key: 'disableClick',
 	    value: function disableClick(e) {
-	      if ((0, _ScrollingIndicator.isScrolling)()) {
+	      if (this.isScrolling()) {
 	        e.stopPropagation();
 	      }
 	    }
@@ -21236,16 +21258,14 @@
 	      return this.props.children(style);
 	    }
 	  }, {
-	    key: 'renderWrappedIfArray',
-	    value: function renderWrappedIfArray(children) {
-	      if (children instanceof Array) {
-	        return _react2.default.createElement(
-	          'div',
-	          null,
-	          children
-	        );
-	      }
-	      return children;
+	    key: 'renderWrapped',
+	    value: function renderWrapped(children) {
+	      var stringId = this.getStringId();
+	      return _react2.default.createElement(
+	        'div',
+	        { id: stringId },
+	        children
+	      );
 	    }
 	  }, {
 	    key: 'render',
@@ -21271,7 +21291,7 @@
 	              onSwipeUp: _this5.onSwipe,
 	              onSwipeDown: _this5.onSwipe
 	            },
-	            _this5.renderWrappedIfArray(children)
+	            _this5.renderWrapped(children)
 	          );
 	        }
 	      );
@@ -24227,32 +24247,6 @@
 
 	var isScrollerLocked = exports.isScrollerLocked = function isScrollerLocked(orientation) {
 	  return scrollerLocks[orientation] !== undefined;
-	};
-
-/***/ },
-/* 207 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var scrolling = false;
-
-	// should be true even after scrolling is finished
-	// to check inside click event
-	var isScrolling = exports.isScrolling = function isScrolling() {
-	  return scrolling;
-	};
-
-	var startScrolling = exports.startScrolling = function startScrolling() {
-	  scrolling = true;
-	};
-
-	var resetScrolling = exports.resetScrolling = function resetScrolling() {
-	  scrolling = false;
 	};
 
 /***/ }

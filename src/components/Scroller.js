@@ -45,11 +45,6 @@ import {
   emptyScrollerLock,
   isScrollerLocked,
 } from '../helpers/ScrollerLocks';
-import {
-  isScrolling,
-  startScrolling,
-  resetScrolling,
-} from '../helpers/ScrollingIndicator';
 
 const defaultProps = {
   scale: 1,
@@ -69,14 +64,16 @@ export class Scroller extends React.Component {
     this.state = getInitialState(props);
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.updateContentSize();
     this.correctOutOfTheBox(this.props, null);
     if (this.props.loop) {
       this.correctPagination(this.props, null);
     }
 
-    document.addEventListener('click', this.disableClick, true);
+    const stringId = this.getStringId();
+    const wrapper = document.getElementById(stringId);
+    wrapper.addEventListener('click', this.disableClick, true);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -173,7 +170,7 @@ export class Scroller extends React.Component {
         this.setLocker(orientation, scroller, coordinateValue);
         this.lockPage();
         this.stopLockedScroller();
-        resetScrolling();
+        this.resetScrolling();
       }
     }
   }
@@ -249,7 +246,7 @@ export class Scroller extends React.Component {
       }
       this.setLockedCoordinateValue(coordinateValue);
       this.setLockedSwiped(true);
-      startScrolling();
+      this.startScrolling();
       this.callOnScrollStarted();
       this.moveScroller(newPosition, scrollerId);
     }
@@ -364,6 +361,11 @@ export class Scroller extends React.Component {
     this.lastRenderedStyle = style;
   }
 
+  getStringId() {
+    const { id } = this.props;
+    return (typeof id === 'string') ? id : id.join('+');
+  }
+
   moveScroller(newPosition, id = this.props.id, springValue = Springs.Normal) {
     const state = this.state;
     if (scrollerExists(state, id)) {
@@ -412,6 +414,18 @@ export class Scroller extends React.Component {
 
   isScrolling() {
     return (this.getLock() !== undefined && this.getLockedSwiped()) || this.autoScrolling;
+  }
+
+  wasScrolling() {
+    return this.wasScrollingValue;
+  }
+
+  startScrolling() {
+    this.wasScrollingValue = true;
+  }
+
+  resetScrolling() {
+    this.wasScrollingValue = false;
   }
 
   releaseScroller() {
@@ -586,7 +600,7 @@ export class Scroller extends React.Component {
 
   @autobind
   disableClick(e) {
-    if (isScrolling()) {
+    if (this.isScrolling()) {
       e.stopPropagation();
     }
   }
@@ -628,11 +642,9 @@ export class Scroller extends React.Component {
     return this.props.children(style);
   }
 
-  renderWrappedIfArray(children) {
-    if (children instanceof Array) {
-      return <div>{children}</div>;
-    }
-    return children;
+  renderWrapped(children) {
+    const stringId = this.getStringId();
+    return <div id={stringId}>{children}</div>;
   }
 
   render() {
@@ -653,7 +665,7 @@ export class Scroller extends React.Component {
               onSwipeUp={this.onSwipe}
               onSwipeDown={this.onSwipe}
             >
-              {this.renderWrappedIfArray(children)}
+              {this.renderWrapped(children)}
             </ReactGesture>
           );
         }}
