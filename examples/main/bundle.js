@@ -20642,12 +20642,18 @@
 	  }
 
 	  _createClass(Scroller, [{
+	    key: 'componentWillMount',
+	    value: function componentWillMount() {
+	      this.componentWillReceiveProps(this.props);
+	    }
+	  }, {
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
-	      this.updateContentSize();
-	      this.correctOutOfTheBox(this.props, null);
-	      if (this.props.loop) {
-	        this.correctPagination(this.props, null);
+	      if (this.updateContentSize()) {
+	        this.correctOutOfTheBox(this.props, null);
+	        if (this.props.loop) {
+	          this.correctPagination(this.props, null);
+	        }
 	      }
 
 	      var stringId = this.getStringId();
@@ -20981,10 +20987,10 @@
 	    }
 	  }, {
 	    key: 'moveScrollerToPage',
-	    value: function moveScrollerToPage(page, scrollerId, margin) {
+	    value: function moveScrollerToPage(page, scrollerId, margin, springValue) {
 	      if ((0, _StateHelpers.scrollerExists)(this.state, scrollerId)) {
 	        var position = (0, _PositionCorrectors.pagePositionForScroller)(page, scrollerId, this.props, margin);
-	        this.moveScroller(position, scrollerId);
+	        this.moveScroller(position, scrollerId, springValue);
 	      }
 	    }
 	  }, {

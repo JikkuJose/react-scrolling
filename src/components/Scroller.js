@@ -64,11 +64,16 @@ export class Scroller extends React.Component {
     this.state = getInitialState(props);
   }
 
+  componentWillMount() {
+    this.componentWillReceiveProps(this.props);
+  }
+
   componentDidMount() {
-    this.updateContentSize();
-    this.correctOutOfTheBox(this.props, null);
-    if (this.props.loop) {
-      this.correctPagination(this.props, null);
+    if (this.updateContentSize()) {
+      this.correctOutOfTheBox(this.props, null);
+      if (this.props.loop) {
+        this.correctPagination(this.props, null);
+      }
     }
 
     const stringId = this.getStringId();
@@ -393,10 +398,10 @@ export class Scroller extends React.Component {
     return false;
   }
 
-  moveScrollerToPage(page, scrollerId, margin) {
+  moveScrollerToPage(page, scrollerId, margin, springValue) {
     if (scrollerExists(this.state, scrollerId)) {
       const position = pagePositionForScroller(page, scrollerId, this.props, margin);
-      this.moveScroller(position, scrollerId);
+      this.moveScroller(position, scrollerId, springValue);
     }
   }
 
