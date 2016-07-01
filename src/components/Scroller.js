@@ -28,6 +28,7 @@ import {
   setOrientationPos,
   getCoordinatesByOrientation,
   correctLoopPosition,
+  closestLoopPosition,
 } from '../utils/logic';
 import {
   getInitialState,
@@ -65,7 +66,7 @@ export class Scroller extends React.Component {
   }
 
   componentWillMount() {
-    this.componentWillReceiveProps(this.props);
+    this.componentWillReceiveProps(this.props, undefined, true);
   }
 
   componentDidMount() {
@@ -81,7 +82,7 @@ export class Scroller extends React.Component {
     wrapper.addEventListener('click', this.disableClick, true);
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps, nextContext, noAnimation = false) {
     this.updateContentSize(nextProps);
     let positionChanged = false;
     foreachScroller(this.state, (scrollerId) => {
@@ -90,9 +91,26 @@ export class Scroller extends React.Component {
       if (newPosition === undefined) {
         return;
       }
-      if (oldPosition === undefined || oldPosition.value !== newPosition.value) {
-        this.moveScroller(newPosition.value, scrollerId, newPosition.spring);
+      if (newPosition.value !== undefined &&
+        (oldPosition === undefined ||
+        oldPosition.value !== newPosition.value)) {
+        this.moveScroller(
+          newPosition.value,
+          scrollerId,
+          noAnimation ? null : newPosition.spring
+        );
         positionChanged = true;
+        return;
+      }
+      if (newPosition.page !== undefined) {
+        this.moveScrollerToPage(
+          newPosition.page,
+          scrollerId,
+          undefined,
+          noAnimation ? null : newPosition.spring
+        );
+        positionChanged = true;
+        return;
       }
     });
     if (!positionChanged && !this.getLock()) {
@@ -161,7 +179,9 @@ export class Scroller extends React.Component {
   }
 
   componentWillUnmount() {
-    document.removeEventListener('click', this.disableClick, true);
+    const stringId = this.getStringId();
+    const wrapper = document.getElementById(stringId);
+    wrapper.removeEventListener('click', this.disableClick, true);
   }
 
   @autobind
@@ -400,7 +420,15 @@ export class Scroller extends React.Component {
 
   moveScrollerToPage(page, scrollerId, margin, springValue) {
     if (scrollerExists(this.state, scrollerId)) {
-      const position = pagePositionForScroller(page, scrollerId, this.props, margin);
+      let position = pagePositionForScroller(page, scrollerId, this.props, margin);
+      if (this.props.loop) {
+        position = closestLoopPosition(
+          getScrollerPosition(this.state, scrollerId),
+          position,
+          this.props.size.content,
+          this.contentAutoSize
+        );
+      }
       this.moveScroller(position, scrollerId, springValue);
     }
   }
@@ -605,7 +633,7 @@ export class Scroller extends React.Component {
 
   @autobind
   disableClick(e) {
-    if (this.isScrolling()) {
+    if (this.wasScrolling()) {
       e.stopPropagation();
     }
   }
@@ -715,6 +743,7 @@ const propTypes = {
     React.PropTypes.number,
     React.PropTypes.shape({
       value: React.PropTypes.number,
+      page: React.PropTypes.number,
       spring: React.PropTypes.any,
     }),
   ])),

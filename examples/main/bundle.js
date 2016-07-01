@@ -20644,7 +20644,7 @@
 	  _createClass(Scroller, [{
 	    key: 'componentWillMount',
 	    value: function componentWillMount() {
-	      this.componentWillReceiveProps(this.props);
+	      this.componentWillReceiveProps(this.props, undefined, true);
 	    }
 	  }, {
 	    key: 'componentDidMount',
@@ -20662,8 +20662,10 @@
 	    }
 	  }, {
 	    key: 'componentWillReceiveProps',
-	    value: function componentWillReceiveProps(nextProps) {
+	    value: function componentWillReceiveProps(nextProps, nextContext) {
 	      var _this2 = this;
+
+	      var noAnimation = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
 
 	      this.updateContentSize(nextProps);
 	      var positionChanged = false;
@@ -20673,9 +20675,15 @@
 	        if (newPosition === undefined) {
 	          return;
 	        }
-	        if (oldPosition === undefined || oldPosition.value !== newPosition.value) {
-	          _this2.moveScroller(newPosition.value, scrollerId, newPosition.spring);
+	        if (newPosition.value !== undefined && (oldPosition === undefined || oldPosition.value !== newPosition.value)) {
+	          _this2.moveScroller(newPosition.value, scrollerId, noAnimation ? null : newPosition.spring);
 	          positionChanged = true;
+	          return;
+	        }
+	        if (newPosition.page !== undefined) {
+	          _this2.moveScrollerToPage(newPosition.page, scrollerId, undefined, noAnimation ? null : newPosition.spring);
+	          positionChanged = true;
+	          return;
 	        }
 	      });
 	      if (!positionChanged && !this.getLock()) {
@@ -20747,7 +20755,9 @@
 	  }, {
 	    key: 'componentWillUnmount',
 	    value: function componentWillUnmount() {
-	      document.removeEventListener('click', this.disableClick, true);
+	      var stringId = this.getStringId();
+	      var wrapper = document.getElementById(stringId);
+	      wrapper.removeEventListener('click', this.disableClick, true);
 	    }
 	  }, {
 	    key: 'onEventBegin',
@@ -20990,6 +21000,9 @@
 	    value: function moveScrollerToPage(page, scrollerId, margin, springValue) {
 	      if ((0, _StateHelpers.scrollerExists)(this.state, scrollerId)) {
 	        var position = (0, _PositionCorrectors.pagePositionForScroller)(page, scrollerId, this.props, margin);
+	        if (this.props.loop) {
+	          position = (0, _logic.closestLoopPosition)((0, _StateHelpers.getScrollerPosition)(this.state, scrollerId), position, this.props.size.content, this.contentAutoSize);
+	        }
 	        this.moveScroller(position, scrollerId, springValue);
 	      }
 	    }
@@ -21220,7 +21233,7 @@
 	  }, {
 	    key: 'disableClick',
 	    value: function disableClick(e) {
-	      if (this.isScrolling()) {
+	      if (this.wasScrolling()) {
 	        e.stopPropagation();
 	      }
 	    }
@@ -21339,6 +21352,7 @@
 	  scale: _react2.default.PropTypes.number,
 	  position: valueOrArray(_react2.default.PropTypes.oneOfType([_react2.default.PropTypes.number, _react2.default.PropTypes.shape({
 	    value: _react2.default.PropTypes.number,
+	    page: _react2.default.PropTypes.number,
 	    spring: _react2.default.PropTypes.any
 	  })])),
 	  children: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.func, _react2.default.PropTypes.node]),
@@ -24047,6 +24061,7 @@
 	exports.getPositionAndSpring = getPositionAndSpring;
 	exports.getEmptyVelocity = getEmptyVelocity;
 	exports.correctLoopPosition = correctLoopPosition;
+	exports.closestLoopPosition = closestLoopPosition;
 	exports.setOrientationPos = setOrientationPos;
 	exports.getCoordinatesByOrientation = getCoordinatesByOrientation;
 
@@ -24078,12 +24093,29 @@
 	}
 
 	function correctLoopPosition(position, contentSize, contentAutoSize) {
-	  var contentSize2 = contentSize === undefined ? contentAutoSize : contentSize;
+	  var contentSize2 = contentAutoSize === undefined ? contentSize : contentAutoSize;
 	  var pos = position % contentSize2;
 	  if (pos > 0) {
 	    pos -= contentSize2;
 	  }
 	  return pos;
+	}
+
+	function closestLoopPosition(oldPosition, newPosition, contentSize, contentAutoSize) {
+	  var contentSize2 = contentAutoSize === undefined ? contentSize : contentAutoSize;
+	  var newPosition2 = correctLoopPosition(newPosition, contentSize, contentAutoSize);
+	  var oldFrame = Math.ceil(oldPosition / contentSize2);
+	  var prevFrame = (oldFrame - 1) * contentSize2 + newPosition2;
+	  var currFrame = oldFrame * contentSize2 + newPosition2;
+	  var nextFrame = (oldFrame + 1) * contentSize2 + newPosition2;
+	  var min = prevFrame;
+	  if (Math.abs(currFrame - oldPosition) < Math.abs(min - oldPosition)) {
+	    min = currFrame;
+	  }
+	  if (Math.abs(nextFrame - oldPosition) < Math.abs(min - oldPosition)) {
+	    min = nextFrame;
+	  }
+	  return min;
 	}
 
 	function setOrientationPos(translate, orientation, position) {

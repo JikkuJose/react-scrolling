@@ -26,12 +26,29 @@ export function getEmptyVelocity() {
 }
 
 export function correctLoopPosition(position, contentSize, contentAutoSize) {
-  const contentSize2 = (contentSize === undefined) ? contentAutoSize : contentSize;
+  const contentSize2 = (contentAutoSize === undefined) ? contentSize : contentAutoSize;
   let pos = position % contentSize2;
   if (pos > 0) {
     pos -= contentSize2;
   }
   return pos;
+}
+
+export function closestLoopPosition(oldPosition, newPosition, contentSize, contentAutoSize) {
+  const contentSize2 = (contentAutoSize === undefined) ? contentSize : contentAutoSize;
+  const newPosition2 = correctLoopPosition(newPosition, contentSize, contentAutoSize);
+  const oldFrame = Math.ceil(oldPosition / contentSize2);
+  const prevFrame = (oldFrame - 1) * contentSize2 + newPosition2;
+  const currFrame = oldFrame * contentSize2 + newPosition2;
+  const nextFrame = (oldFrame + 1) * contentSize2 + newPosition2;
+  let min = prevFrame;
+  if (Math.abs(currFrame - oldPosition) < Math.abs(min - oldPosition)) {
+    min = currFrame;
+  }
+  if (Math.abs(nextFrame - oldPosition) < Math.abs(min - oldPosition)) {
+    min = nextFrame;
+  }
+  return min;
 }
 
 export function setOrientationPos(translate, orientation, position) {
