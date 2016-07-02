@@ -20638,6 +20638,7 @@
 	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Scroller).call(this, props));
 
 	    _this.state = (0, _StateHelpers.getInitialState)(props);
+	    _this.randomId = Math.random();
 	    return _this;
 	  }
 
@@ -20966,7 +20967,8 @@
 	    value: function getStringId() {
 	      var id = this.props.id;
 
-	      return typeof id === 'string' ? id : id.join('+');
+	      var stringId = typeof id === 'string' ? id : id.join('+');
+	      return stringId + '-' + this.randomId;
 	    }
 	  }, {
 	    key: 'moveScroller',

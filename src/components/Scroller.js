@@ -63,6 +63,7 @@ export class Scroller extends React.Component {
     super(props);
 
     this.state = getInitialState(props);
+    this.randomId = Math.random();
   }
 
   componentWillMount() {
@@ -388,7 +389,8 @@ export class Scroller extends React.Component {
 
   getStringId() {
     const { id } = this.props;
-    return (typeof id === 'string') ? id : id.join('+');
+    const stringId = (typeof id === 'string') ? id : id.join('+');
+    return `${stringId}-${this.randomId}`;
   }
 
   moveScroller(newPosition, id = this.props.id, springValue = Springs.Normal) {
