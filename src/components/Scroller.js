@@ -63,7 +63,6 @@ export class Scroller extends React.Component {
     super(props);
 
     this.state = getInitialState(props);
-    this.randomId = Math.random();
   }
 
   componentWillMount() {
@@ -77,10 +76,6 @@ export class Scroller extends React.Component {
         this.correctPagination(this.props, null);
       }
     }
-
-    const stringId = this.getStringId();
-    const wrapper = document.getElementById(stringId);
-    wrapper.addEventListener('click', this.disableClick, true);
   }
 
   componentWillReceiveProps(nextProps, nextContext, noAnimation = false) {
@@ -115,9 +110,10 @@ export class Scroller extends React.Component {
       }
     });
     if (!positionChanged && !this.getLock()) {
-      this.correctPagination(nextProps, null);
+      const springStyle = this.autoScrolling ? undefined : null;
+      this.correctPagination(nextProps, springStyle);
       if (!nextProps.loop) {
-        this.correctOutOfTheBox(nextProps, null);
+        this.correctOutOfTheBox(nextProps, springStyle);
       }
     }
   }
@@ -177,12 +173,6 @@ export class Scroller extends React.Component {
         }
       }
     }
-  }
-
-  componentWillUnmount() {
-    const stringId = this.getStringId();
-    const wrapper = document.getElementById(stringId);
-    wrapper.removeEventListener('click', this.disableClick, true);
   }
 
   @autobind
@@ -385,12 +375,6 @@ export class Scroller extends React.Component {
 
   setLastRenderedStyle(style) {
     this.lastRenderedStyle = style;
-  }
-
-  getStringId() {
-    const { id } = this.props;
-    const stringId = (typeof id === 'string') ? id : id.join('+');
-    return `${stringId}-${this.randomId}`;
   }
 
   moveScroller(newPosition, id = this.props.id, springValue = Springs.Normal) {
@@ -634,13 +618,6 @@ export class Scroller extends React.Component {
   }
 
   @autobind
-  disableClick(e) {
-    if (this.wasScrolling()) {
-      e.stopPropagation();
-    }
-  }
-
-  @autobind
   motionRest() {
     this.autoScrolling = false;
     this.callOnScrollFinished();
@@ -678,8 +655,7 @@ export class Scroller extends React.Component {
   }
 
   renderWrapped(children) {
-    const stringId = this.getStringId();
-    return <div id={stringId}>{children}</div>;
+    return <div>{children}</div>;
   }
 
   render() {

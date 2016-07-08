@@ -20638,7 +20638,6 @@
 	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Scroller).call(this, props));
 
 	    _this.state = (0, _StateHelpers.getInitialState)(props);
-	    _this.randomId = Math.random();
 	    return _this;
 	  }
 
@@ -20656,10 +20655,6 @@
 	          this.correctPagination(this.props, null);
 	        }
 	      }
-
-	      var stringId = this.getStringId();
-	      var wrapper = document.getElementById(stringId);
-	      wrapper.addEventListener('click', this.disableClick, true);
 	    }
 	  }, {
 	    key: 'componentWillReceiveProps',
@@ -20688,9 +20683,10 @@
 	        }
 	      });
 	      if (!positionChanged && !this.getLock()) {
-	        this.correctPagination(nextProps, null);
+	        var springStyle = this.autoScrolling ? undefined : null;
+	        this.correctPagination(nextProps, springStyle);
 	        if (!nextProps.loop) {
-	          this.correctOutOfTheBox(nextProps, null);
+	          this.correctOutOfTheBox(nextProps, springStyle);
 	        }
 	      }
 	    }
@@ -20752,13 +20748,6 @@
 	          }
 	        }
 	      }
-	    }
-	  }, {
-	    key: 'componentWillUnmount',
-	    value: function componentWillUnmount() {
-	      var stringId = this.getStringId();
-	      var wrapper = document.getElementById(stringId);
-	      wrapper.removeEventListener('click', this.disableClick, true);
 	    }
 	  }, {
 	    key: 'onEventBegin',
@@ -20961,14 +20950,6 @@
 	    key: 'setLastRenderedStyle',
 	    value: function setLastRenderedStyle(style) {
 	      this.lastRenderedStyle = style;
-	    }
-	  }, {
-	    key: 'getStringId',
-	    value: function getStringId() {
-	      var id = this.props.id;
-
-	      var stringId = typeof id === 'string' ? id : id.join('+');
-	      return stringId + '-' + this.randomId;
 	    }
 	  }, {
 	    key: 'moveScroller',
@@ -21233,13 +21214,6 @@
 	      }
 	    }
 	  }, {
-	    key: 'disableClick',
-	    value: function disableClick(e) {
-	      if (this.wasScrolling()) {
-	        e.stopPropagation();
-	      }
-	    }
-	  }, {
 	    key: 'motionRest',
 	    value: function motionRest() {
 	      this.autoScrolling = false;
@@ -21281,10 +21255,9 @@
 	  }, {
 	    key: 'renderWrapped',
 	    value: function renderWrapped(children) {
-	      var stringId = this.getStringId();
 	      return _react2.default.createElement(
 	        'div',
-	        { id: stringId },
+	        null,
 	        children
 	      );
 	    }
@@ -21320,7 +21293,7 @@
 	  }]);
 
 	  return Scroller;
-	}(_react2.default.Component), (_applyDecoratedDescriptor(_class.prototype, 'onEventBegin', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onEventBegin'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onEventEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onEventEnd'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onSwipe', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onSwipe'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onSetContentDom', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onSetContentDom'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'disableClick', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'disableClick'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'motionRest', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'motionRest'), _class.prototype)), _class);
+	}(_react2.default.Component), (_applyDecoratedDescriptor(_class.prototype, 'onEventBegin', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onEventBegin'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onEventEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onEventEnd'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onSwipe', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onSwipe'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onSetContentDom', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onSetContentDom'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'motionRest', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'motionRest'), _class.prototype)), _class);
 
 
 	var valueOrArray = function valueOrArray(ReactType) {
@@ -21620,7 +21593,8 @@
 	      start: 0,
 	      holdTimer: null,
 	      wheelTimer: null,
-	      fingers: []
+	      fingers: [],
+	      isHold: false
 	    };
 	    return _this;
 	  }
@@ -21644,6 +21618,13 @@
 	      window.removeEventListener('touchend', this.onTouchEnd);
 	      window.removeEventListener('touchcancel', this.onTouchCancel);
 	      window.removeEventListener('wheel', this.onWheel);
+	      this.wrapper.removeEventListener('click', this.disableClick, true);
+	    }
+	  }, {
+	    key: 'onRef',
+	    value: function onRef(ref) {
+	      this.wrapper = ref;
+	      this.wrapper.addEventListener('click', this.disableClick, true);
 	    }
 	  }, {
 	    key: 'onTouchStart',
@@ -21656,6 +21637,7 @@
 	      this.setPSPinch(false);
 	      this.setPSSwiping(false);
 	      this.setPSFingers(e);
+	      this.setPSHold(false);
 	    }
 	  }, {
 	    key: 'onTouchMove',
@@ -21667,7 +21649,7 @@
 	        return;
 	      }
 	      var isPinch = e.touches.length === 2;
-	      var wasPinch = pseudoState.fingers.length === 2;
+	      var wasPinch = pseudoState.fingers !== undefined && pseudoState.fingers.length === 2;
 	      if (isPinch) {
 	        if (wasPinch) {
 	          this.handlePinch(e);
@@ -21714,6 +21696,7 @@
 	      this.setPSPosCurrentMouseDown(e);
 	      this.setPSPinch(false);
 	      this.setPSSwiping(false);
+	      this.setPSHold(false);
 	    }
 	  }, {
 	    key: 'onMouseMove',
@@ -21751,6 +21734,7 @@
 	      var fingers = pseudoState.fingers;
 	      if (!this.getPSSwiping() && (!fingers || fingers.length === 1)) {
 	        this.emitEvent('onHold', e);
+	        this.setPSHold(true);
 	      }
 	    }
 	  }, {
@@ -21925,6 +21909,16 @@
 	      }
 	    }
 	  }, {
+	    key: 'getPSHold',
+	    value: function getPSHold() {
+	      return this.pseudoState.isHold;
+	    }
+	  }, {
+	    key: 'setPSHold',
+	    value: function setPSHold(hold) {
+	      this.pseudoState.isHold = hold;
+	    }
+	  }, {
 	    key: 'setPSEmpty',
 	    value: function setPSEmpty() {
 	      this.pseudoState = {};
@@ -21995,8 +21989,17 @@
 	      return !this.pseudoState.pinch && duration > 0 && duration < this.props.holdTime;
 	    }
 	  }, {
+	    key: 'disableClick',
+	    value: function disableClick(e) {
+	      if (this.getPSSwiping() || this.getPSHold()) {
+	        e.stopPropagation();
+	      }
+	    }
+	  }, {
 	    key: 'resetState',
 	    value: function resetState() {
+	      var swipingBackup = this.getPSSwiping();
+	      var holdBackup = this.getPSHold();
 	      this.setPSEmpty();
 	      this.setPSHoldTimerClear();
 	      this.setPSStartInfinite();
@@ -22005,7 +22008,8 @@
 	      this.setPSFingersEmpty();
 	      this.setPSWheelTimerNull();
 	      this.setPSPinch(false);
-	      this.setPSSwiping(false);
+	      this.setPSSwiping(swipingBackup);
+	      this.setPSHold(holdBackup);
 	    }
 	  }, {
 	    key: 'emitEvent',
@@ -22020,6 +22024,7 @@
 	    value: function render() {
 	      var element = _react2.default.Children.only(this.props.children);
 	      return _react2.default.cloneElement(element, {
+	        ref: this.onRef,
 	        onTouchStart: this.onTouchStart,
 	        onMouseDown: this.onMouseDown
 	      });
@@ -22027,7 +22032,7 @@
 	  }]);
 
 	  return ReactGesture;
-	}(_react2.default.Component), (_applyDecoratedDescriptor(_class.prototype, 'onTouchStart', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onTouchStart'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onTouchMove', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onTouchMove'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onTouchCancel', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onTouchCancel'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onTouchEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onTouchEnd'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onMouseDown', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onMouseDown'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onMouseMove', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onMouseMove'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onMouseUp', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onMouseUp'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onHoldGesture', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onHoldGesture'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onWheel', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onWheel'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onScrollEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onScrollEnd'), _class.prototype)), _class);
+	}(_react2.default.Component), (_applyDecoratedDescriptor(_class.prototype, 'onRef', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onRef'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onTouchStart', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onTouchStart'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onTouchMove', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onTouchMove'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onTouchCancel', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onTouchCancel'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onTouchEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onTouchEnd'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onMouseDown', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onMouseDown'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onMouseMove', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onMouseMove'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onMouseUp', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onMouseUp'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onHoldGesture', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onHoldGesture'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onWheel', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onWheel'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onScrollEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onScrollEnd'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'disableClick', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'disableClick'), _class.prototype)), _class);
 
 
 	ReactGesture.propTypes = propTypes;
