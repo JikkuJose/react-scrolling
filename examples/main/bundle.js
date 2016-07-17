@@ -20624,7 +20624,8 @@
 	  orientation: Orientation.Vertiacal,
 	  pagination: Pagination.None,
 	  center: false,
-	  loop: false
+	  loop: false,
+	  clickThreshold: 10
 	};
 
 	var windowWidth = window.innerWidth;
@@ -20752,6 +20753,7 @@
 	  }, {
 	    key: 'onEventBegin',
 	    value: function onEventBegin(e) {
+	      this.stateBeforeEvents = this.state;
 	      var orientation = this.props.orientation;
 
 	      if (!this.getLock() && !(0, _ScrollerLocks.isScrollerLocked)(orientation)) {
@@ -21220,6 +21222,24 @@
 	      this.callOnScrollFinished();
 	    }
 	  }, {
+	    key: 'disableClick',
+	    value: function disableClick(e) {
+	      var clickThreshold = this.props.clickThreshold;
+
+	      var coordinates = (0, _coordinatesFromEvent.eventCoordinates)(e, this.props.scale, windowWidth);
+	      var scrollerId = (0, _ScrollerOnPoint.scrollerOnPoint)(coordinates, this.props);
+	      if (scrollerId === undefined) {
+	        return undefined;
+	      }
+	      var endPosition = (0, _StateHelpers.getScrollerPosition)(this.stateBeforeEvents, scrollerId);
+	      var currentPosition = this.getLastRenderedStyle(scrollerId);
+	      var leftToScroll = Math.abs(currentPosition - endPosition);
+	      if (leftToScroll < clickThreshold) {
+	        return undefined;
+	      }
+	      return true;
+	    }
+	  }, {
 	    key: 'renderChildren',
 	    value: function renderChildren(style) {
 	      if (typeof this.props.id === 'string') {
@@ -21276,6 +21296,7 @@
 	          return _react2.default.createElement(
 	            _reactGesture2.default,
 	            {
+	              disableClick: _this5.disableClick,
 	              onTouchStart: _this5.onEventBegin,
 	              onMouseDown: _this5.onEventBegin,
 	              onTouchEnd: _this5.onEventEnd,
@@ -21293,7 +21314,7 @@
 	  }]);
 
 	  return Scroller;
-	}(_react2.default.Component), (_applyDecoratedDescriptor(_class.prototype, 'onEventBegin', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onEventBegin'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onEventEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onEventEnd'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onSwipe', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onSwipe'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onSetContentDom', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onSetContentDom'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'motionRest', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'motionRest'), _class.prototype)), _class);
+	}(_react2.default.Component), (_applyDecoratedDescriptor(_class.prototype, 'onEventBegin', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onEventBegin'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onEventEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onEventEnd'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onSwipe', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onSwipe'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onSetContentDom', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onSetContentDom'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'motionRest', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'motionRest'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'disableClick', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'disableClick'), _class.prototype)), _class);
 
 
 	var valueOrArray = function valueOrArray(ReactType) {
@@ -21330,6 +21351,7 @@
 	    page: _react2.default.PropTypes.number,
 	    spring: _react2.default.PropTypes.any
 	  })])),
+	  clickThreshold: _react2.default.PropTypes.number,
 	  children: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.func, _react2.default.PropTypes.node]),
 	  onScroll: _react2.default.PropTypes.func,
 	  onScrollStarted: _react2.default.PropTypes.func,
@@ -21566,6 +21588,10 @@
 	  swipeThreshold: _react2.default.PropTypes.number,
 	  holdTime: _react2.default.PropTypes.number,
 	  scrollEndTimeout: _react2.default.PropTypes.number,
+	  disableClick: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.bool, _react2.default.PropTypes.func]), // (e) => bool
+	  // true: always disable
+	  // false: never disable
+	  // undefined: use internal logic
 	  children: _react2.default.PropTypes.element
 	};
 
@@ -21608,6 +21634,7 @@
 	      window.addEventListener('touchend', this.onTouchEnd);
 	      window.addEventListener('touchcancel', this.onTouchCancel);
 	      window.addEventListener('wheel', this.onWheel);
+	      this.wrapper.addEventListener('click', this.disableClick, true);
 	    }
 	  }, {
 	    key: 'componentWillUnmount',
@@ -21623,8 +21650,15 @@
 	  }, {
 	    key: 'onRef',
 	    value: function onRef(ref) {
+	      /* if we need to handle dom changes
+	      if (ref === null) {
+	        this.wrapper.removeEventListener('click', this.disableClick, true);
+	      } else {
+	        this.wrapper = ref;
+	        this.wrapper.addEventListener('click', this.disableClick, true);
+	      }
+	      */
 	      this.wrapper = ref;
-	      this.wrapper.addEventListener('click', this.disableClick, true);
 	    }
 	  }, {
 	    key: 'onTouchStart',
@@ -21638,6 +21672,9 @@
 	      this.setPSSwiping(false);
 	      this.setPSFingers(e);
 	      this.setPSHold(false);
+	      this.setPSTextSelection(false);
+	      this.setBeginHandled(true);
+	      this.touch = true;
 	    }
 	  }, {
 	    key: 'onTouchMove',
@@ -21657,8 +21694,7 @@
 	        this.setPSFingers(e);
 	        return;
 	      }
-	      var eventGesture = (0, _event.getEventGesture)(eventWithGesture);
-	      if (this.isSwipeGesture(eventGesture)) {
+	      if (this.isSwipeGesture(eventWithGesture)) {
 	        this.handleSwipeGesture(eventWithGesture);
 	        return;
 	      }
@@ -21674,13 +21710,9 @@
 	    value: function onTouchEnd(e) {
 	      var eventWithGesture = this.getEventWithGesture(e);
 	      this.emitEvent('onTouchEnd', eventWithGesture);
+	      this.setEndHandled(true);
 	      if (this.getPSSwiping()) {
 	        this.handleSwipeGesture(eventWithGesture);
-	        this.resetState();
-	        return;
-	      }
-	      if (this.isTapOrClickGesture(eventWithGesture)) {
-	        this.handleTapGesture(eventWithGesture);
 	        this.resetState();
 	        return;
 	      }
@@ -21689,6 +21721,10 @@
 	  }, {
 	    key: 'onMouseDown',
 	    value: function onMouseDown(e) {
+	      if (this.getBeginHandled()) {
+	        this.setBeginHandled(false);
+	        return;
+	      }
 	      this.setPSEmpty();
 	      this.emitEvent('onMouseDown', e);
 	      this.setPSHoldTimerInit(e);
@@ -21697,6 +21733,8 @@
 	      this.setPSPinch(false);
 	      this.setPSSwiping(false);
 	      this.setPSHold(false);
+	      this.setPSTextSelection(false);
+	      this.touch = false;
 	    }
 	  }, {
 	    key: 'onMouseMove',
@@ -21705,7 +21743,7 @@
 	      this.emitEvent('onMouseMove', eventWithGesture);
 	      var pseudoState = this.pseudoState;
 	      var canBeGesture = pseudoState.x !== null && pseudoState.y !== null;
-	      if (canBeGesture && this.isSwipeGesture((0, _event.getEventGesture)(eventWithGesture))) {
+	      if (canBeGesture && this.isSwipeGesture(eventWithGesture)) {
 	        this.handleSwipeGesture(eventWithGesture);
 	        return;
 	      }
@@ -21713,15 +21751,14 @@
 	  }, {
 	    key: 'onMouseUp',
 	    value: function onMouseUp(e) {
+	      if (this.getEndHandled()) {
+	        this.setEndHandled(false);
+	        return;
+	      }
 	      var eventWithGesture = this.getEventWithGesture(e);
 	      this.emitEvent('onMouseUp', eventWithGesture);
 	      if (this.getPSSwiping()) {
 	        this.handleSwipeGesture(eventWithGesture);
-	        this.resetState();
-	        return;
-	      }
-	      if (this.isTapOrClickGesture(eventWithGesture)) {
-	        this.handleClickGesture(eventWithGesture);
 	        this.resetState();
 	        return;
 	      }
@@ -21753,6 +21790,12 @@
 	      this.setPSWheelTimerClear();
 	    }
 	  }, {
+	    key: 'onClick',
+	    value: function onClick(e) {
+	      var type = this.touch ? 'onTap' : 'onClick';
+	      this.emitEvent(type, e);
+	    }
+	  }, {
 	    key: 'getEventWithGesture',
 	    value: function getEventWithGesture(e) {
 	      var changedTouches = e.changedTouches;
@@ -21771,7 +21814,7 @@
 	      var velocity = Math.sqrt(absX * absX + absY * absY) / duration;
 	      var velocityX = absX / duration;
 	      var velocityY = absY / duration;
-	      var done = e.type === 'touchend';
+	      var done = e.type === 'touchend' || e.type === 'mouseup';
 	      (0, _event.initGestureData)(e, deltaX, deltaY, absX, absY, velocity, velocityX, velocityY, duration, done);
 	      return e;
 	    }
@@ -21914,6 +21957,16 @@
 	      return this.pseudoState.isHold;
 	    }
 	  }, {
+	    key: 'setPSTextSelection',
+	    value: function setPSTextSelection(isSelection) {
+	      this.pseudoState.textSelection = isSelection;
+	    }
+	  }, {
+	    key: 'getPSTextSelection',
+	    value: function getPSTextSelection() {
+	      return this.pseudoState.textSelection;
+	    }
+	  }, {
 	    key: 'setPSHold',
 	    value: function setPSHold(hold) {
 	      this.pseudoState.isHold = hold;
@@ -21922,6 +21975,26 @@
 	    key: 'setPSEmpty',
 	    value: function setPSEmpty() {
 	      this.pseudoState = {};
+	    }
+	  }, {
+	    key: 'setBeginHandled',
+	    value: function setBeginHandled(handled) {
+	      this.beginHandled = handled;
+	    }
+	  }, {
+	    key: 'getBeginHandled',
+	    value: function getBeginHandled() {
+	      return this.beginHandled;
+	    }
+	  }, {
+	    key: 'setEndHandled',
+	    value: function setEndHandled(handled) {
+	      this.endHandled = handled;
+	    }
+	  }, {
+	    key: 'getEndHandled',
+	    value: function getEndHandled() {
+	      return this.endHandled;
 	    }
 	  }, {
 	    key: 'handlePinch',
@@ -21940,19 +22013,6 @@
 	      };
 	      (0, _event.setEventPinch)(e, scale, origin);
 	      this.emitEvent('onPinchToZoom', e);
-	    }
-	  }, {
-	    key: 'handleTapGesture',
-	    value: function handleTapGesture(eventWithGesture) {
-	      (0, _event.setGestureType)(eventWithGesture, 'tap');
-	      this.setGestureDetailsPos(eventWithGesture);
-	      this.emitEvent('onTap', eventWithGesture);
-	    }
-	  }, {
-	    key: 'handleClickGesture',
-	    value: function handleClickGesture(eventWithGesture) {
-	      (0, _event.setGestureType)(eventWithGesture, 'click');
-	      this.emitEvent('onClick', eventWithGesture);
 	    }
 	  }, {
 	    key: 'handleSwipeGesture',
@@ -21977,23 +22037,40 @@
 	      }
 	    }
 	  }, {
-	    key: 'isSwipeGesture',
-	    value: function isSwipeGesture(eventWithGestureGesture) {
-	      var swipeThreshold = this.props.swipeThreshold;
-	      return this.getPSSwiping() || eventWithGestureGesture.absX > swipeThreshold || eventWithGestureGesture.absY > swipeThreshold;
+	    key: 'isTextSelectionGesture',
+	    value: function isTextSelectionGesture(eventWithGesture) {
+	      if (this.getPSTextSelection()) {
+	        return true;
+	      }
+	      var target = eventWithGesture.target;
+
+	      var isSelectionGesture = (0, _validations.isFocused)(target) && (0, _validations.isTextSelected)(target);
+	      if (isSelectionGesture) {
+	        this.setPSTextSelection(true);
+	      }
+	      return isSelectionGesture;
 	    }
 	  }, {
-	    key: 'isTapOrClickGesture',
-	    value: function isTapOrClickGesture(eventWithGesture) {
-	      var duration = (0, _event.getEventGesture)(eventWithGesture).duration;
-	      return !this.pseudoState.pinch && duration > 0 && duration < this.props.holdTime;
+	    key: 'isSwipeGesture',
+	    value: function isSwipeGesture(eventWithGesture) {
+	      var eventGesture = (0, _event.getEventGesture)(eventWithGesture);
+	      var swipeThreshold = this.props.swipeThreshold;
+	      return (this.getPSSwiping() || eventGesture.absX > swipeThreshold || eventGesture.absY > swipeThreshold) && !this.isTextSelectionGesture(eventWithGesture);
 	    }
 	  }, {
 	    key: 'disableClick',
 	    value: function disableClick(e) {
-	      if (this.getPSSwiping() || this.getPSHold()) {
-	        e.stopPropagation();
+	      var disableClick = this.props.disableClick;
+
+	      var disable = typeof disableClick === 'function' ? disableClick(e) : disableClick;
+
+	      if (disable === false) {
+	        return;
 	      }
+	      if (disable === undefined && !this.getPSSwiping() && !this.getPSHold()) {
+	        return;
+	      }
+	      e.stopImmediatePropagation();
 	    }
 	  }, {
 	    key: 'resetState',
@@ -22010,6 +22087,7 @@
 	      this.setPSPinch(false);
 	      this.setPSSwiping(swipingBackup);
 	      this.setPSHold(holdBackup);
+	      this.setPSTextSelection(false);
 	    }
 	  }, {
 	    key: 'emitEvent',
@@ -22026,13 +22104,14 @@
 	      return _react2.default.cloneElement(element, {
 	        ref: this.onRef,
 	        onTouchStart: this.onTouchStart,
-	        onMouseDown: this.onMouseDown
+	        onMouseDown: this.onMouseDown,
+	        onClick: this.onClick
 	      });
 	    }
 	  }]);
 
 	  return ReactGesture;
-	}(_react2.default.Component), (_applyDecoratedDescriptor(_class.prototype, 'onRef', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onRef'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onTouchStart', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onTouchStart'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onTouchMove', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onTouchMove'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onTouchCancel', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onTouchCancel'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onTouchEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onTouchEnd'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onMouseDown', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onMouseDown'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onMouseMove', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onMouseMove'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onMouseUp', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onMouseUp'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onHoldGesture', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onHoldGesture'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onWheel', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onWheel'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onScrollEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onScrollEnd'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'disableClick', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'disableClick'), _class.prototype)), _class);
+	}(_react2.default.Component), (_applyDecoratedDescriptor(_class.prototype, 'onRef', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onRef'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onTouchStart', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onTouchStart'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onTouchMove', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onTouchMove'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onTouchCancel', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onTouchCancel'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onTouchEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onTouchEnd'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onMouseDown', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onMouseDown'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onMouseMove', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onMouseMove'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onMouseUp', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onMouseUp'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onHoldGesture', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onHoldGesture'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onWheel', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onWheel'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onScrollEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onScrollEnd'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onClick', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onClick'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'disableClick', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'disableClick'), _class.prototype)), _class);
 
 
 	ReactGesture.propTypes = propTypes;
@@ -22116,8 +22195,21 @@
 	  value: true
 	});
 	exports.isCorrectSwipe = isCorrectSwipe;
+	exports.isFocused = isFocused;
+	exports.isTextSelected = isTextSelected;
 	function isCorrectSwipe(swipingDirection, absX, absY) {
 	  return swipingDirection === 'x' && absX > absY || swipingDirection === 'y' && absY > absX;
+	}
+
+	function isFocused(element) {
+	  return document.activeElement === element;
+	}
+
+	function isTextSelected(element) {
+	  if (element.selectionStart === undefined) {
+	    return false;
+	  }
+	  return element.selectionStart !== element.selectionEnd;
 	}
 
 /***/ },

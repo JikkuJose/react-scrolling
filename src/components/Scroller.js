@@ -53,6 +53,7 @@ const defaultProps = {
   pagination: Pagination.None,
   center: false,
   loop: false,
+  clickThreshold: 10,
 };
 
 const windowWidth = window.innerWidth;
@@ -177,6 +178,7 @@ export class Scroller extends React.Component {
 
   @autobind
   onEventBegin(e) {
+    this.stateBeforeEvents = this.state;
     const { orientation } = this.props;
     if (!this.getLock() && !isScrollerLocked(orientation)) {
       const coordinates = eventCoordinates(e, this.props.scale, windowWidth);
@@ -623,6 +625,23 @@ export class Scroller extends React.Component {
     this.callOnScrollFinished();
   }
 
+  @autobind
+  disableClick(e) {
+    const { clickThreshold } = this.props;
+    const coordinates = eventCoordinates(e, this.props.scale, windowWidth);
+    const scrollerId = scrollerOnPoint(coordinates, this.props);
+    if (scrollerId === undefined) {
+      return undefined;
+    }
+    const endPosition = getScrollerPosition(this.stateBeforeEvents, scrollerId);
+    const currentPosition = this.getLastRenderedStyle(scrollerId);
+    const leftToScroll = Math.abs(currentPosition - endPosition);
+    if (leftToScroll < clickThreshold) {
+      return undefined;
+    }
+    return true;
+  }
+
   renderChildren(style) {
     if (typeof this.props.id === 'string') {
       let pos = style[this.props.id];
@@ -667,6 +686,7 @@ export class Scroller extends React.Component {
           const children = this.renderChildren(style);
           return (
             <ReactGesture
+              disableClick={this.disableClick}
               onTouchStart={this.onEventBegin}
               onMouseDown={this.onEventBegin}
               onTouchEnd={this.onEventEnd}
@@ -725,6 +745,7 @@ const propTypes = {
       spring: React.PropTypes.any,
     }),
   ])),
+  clickThreshold: React.PropTypes.number,
   children: React.PropTypes.oneOfType([
     React.PropTypes.func,
     React.PropTypes.node,
