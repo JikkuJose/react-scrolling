@@ -15,7 +15,11 @@ import {
   pagePositionForScroller,
   pageNumberForPosition,
 } from '../helpers/PositionCorrectors';
-import { getPropValueForScroller } from '../helpers/ArrayPropValue';
+import {
+  getPropValueForScroller,
+  propValuesSome,
+  propValuesEvery,
+} from '../helpers/ArrayPropValue';
 import {
   orientationDirection,
   orientationSize,
@@ -73,7 +77,7 @@ export class Scroller extends React.Component {
   componentDidMount() {
     if (this.updateContentSize()) {
       this.correctOutOfTheBox(this.props, null);
-      if (this.props.loop) {
+      if (propValuesSome(this.props.loop)) {
         this.correctPagination(this.props, null);
       }
     }
@@ -113,7 +117,7 @@ export class Scroller extends React.Component {
     if (!positionChanged && !this.getLock()) {
       const springStyle = this.autoScrolling ? undefined : null;
       this.correctPagination(nextProps, springStyle);
-      if (!nextProps.loop) {
+      if (!propValuesEvery(nextProps.loop)) {
         this.correctOutOfTheBox(nextProps, springStyle);
       }
     }
@@ -169,7 +173,7 @@ export class Scroller extends React.Component {
     if (this.updateContentSize()) {
       if (!this.getLock()) {
         this.correctPagination(this.props, null);
-        if (!this.props.loop) {
+        if (!propValuesEvery(this.props.loop)) {
           this.correctOutOfTheBox(this.props);
         }
       }
@@ -235,11 +239,12 @@ export class Scroller extends React.Component {
         );
       }
     }
-    newPosition = this.getFinalPosition(newPosition);
+    newPosition = this.getFinalPosition(newPosition, scrollerId);
     const paginationSpring = getSpringByPagination(pagination);
     const adjustedSpring = getAdjustedSpring(oldPosition, newPosition, paginationSpring);
     if (getScrollerPosition(this.state, scrollerId) !== newPosition) {
       this.checkPageChanged(scrollerId, newPosition);
+      this.setLockerEmpty(orientation);
       this.moveScroller(newPosition, scrollerId, adjustedSpring);
       this.autoScrolling = true;
     }
@@ -293,8 +298,10 @@ export class Scroller extends React.Component {
     return getTranslate3D(translate);
   }
 
-  getFinalPosition(newPosition) {
-    if (this.props.loop) {
+  getFinalPosition(newPosition, scrollerId) {
+    const { id, loop } = this.props;
+    const loopValue = getPropValueForScroller(scrollerId, id, loop);
+    if (loopValue) {
       return newPosition;
     }
     return outOfTheBoxCorrection(
@@ -382,6 +389,7 @@ export class Scroller extends React.Component {
   moveScroller(newPosition, id = this.props.id, springValue = Springs.Normal) {
     const state = this.state;
     if (scrollerExists(state, id)) {
+      this.callOnSetToScroll(newPosition);
       this.setState(moveScrollerNewPartialState(state, id, newPosition, springValue));
     }
   }
@@ -408,12 +416,13 @@ export class Scroller extends React.Component {
 
   moveScrollerToPage(page, scrollerId, margin, springValue) {
     if (scrollerExists(this.state, scrollerId)) {
+      const { id, loop, size } = this.props;
       let position = pagePositionForScroller(page, scrollerId, this.props, margin);
-      if (this.props.loop) {
+      if (getPropValueForScroller(scrollerId, id, loop)) {
         position = closestLoopPosition(
           getScrollerPosition(this.state, scrollerId),
           position,
-          this.props.size.content,
+          size.content,
           this.contentAutoSize
         );
       }
@@ -488,12 +497,14 @@ export class Scroller extends React.Component {
   }
 
   correctPagination(props = this.props, springValue = Springs.Normal) {
+    const { id, loop, pagination } = props;
     const state = this.state;
     let moved = false;
     foreachScroller(state, (scrollerId) => {
-      if (getPropValueForScroller(scrollerId, props.id, props.pagination) !== Pagination.None) {
+      if (getPropValueForScroller(scrollerId, id, pagination) !== Pagination.None) {
+        const loopValue = getPropValueForScroller(scrollerId, id, loop);
         const oldPosition = getScrollerPosition(state, scrollerId);
-        const ignorePagination = oldPosition === 0 && !props.loop;
+        const ignorePagination = oldPosition === 0 && !loopValue;
         if (!ignorePagination) {
           const newPosition = paginationCorrection(
             oldPosition,
@@ -559,13 +570,15 @@ export class Scroller extends React.Component {
     return orientationDirection[orientation].indexOf(direction) >= 0;
   }
 
-  isOutOfTheBox(position) {
-    if (this.props.loop) {
+  isOutOfTheBox(position, scrollerId = this.getLockedScroller()) {
+    const { id, loop } = this.props;
+    const loopValue = getPropValueForScroller(scrollerId, id, loop);
+    if (loopValue) {
       return false;
     }
     const outOfTheBoxCorrectionPos = outOfTheBoxCorrection(
       position,
-      this.getLockedScroller(),
+      scrollerId,
       this.props,
       this.contentAutoSize
     );
@@ -597,6 +610,14 @@ export class Scroller extends React.Component {
       onScroll(scrollerPosition);
     }
   }
+
+  callOnSetToScroll(scrollerPosition) {
+    const { onSetToScroll } = this.props;
+    if (onSetToScroll) {
+      onSetToScroll(scrollerPosition);
+    }
+  }
+
 
   callOnPageChanged(page) {
     const { onPageChanged } = this.props;
@@ -751,6 +772,7 @@ const propTypes = {
     React.PropTypes.node,
   ]),
   onScroll: React.PropTypes.func,
+  onSetToScroll: React.PropTypes.func,
   onScrollStarted: React.PropTypes.func,
   onScrollFinished: React.PropTypes.func,
   onPageChanged: React.PropTypes.func,

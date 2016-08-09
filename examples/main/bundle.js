@@ -20652,7 +20652,7 @@
 	    value: function componentDidMount() {
 	      if (this.updateContentSize()) {
 	        this.correctOutOfTheBox(this.props, null);
-	        if (this.props.loop) {
+	        if ((0, _ArrayPropValue.propValuesSome)(this.props.loop)) {
 	          this.correctPagination(this.props, null);
 	        }
 	      }
@@ -20686,7 +20686,7 @@
 	      if (!positionChanged && !this.getLock()) {
 	        var springStyle = this.autoScrolling ? undefined : null;
 	        this.correctPagination(nextProps, springStyle);
-	        if (!nextProps.loop) {
+	        if (!(0, _ArrayPropValue.propValuesEvery)(nextProps.loop)) {
 	          this.correctOutOfTheBox(nextProps, springStyle);
 	        }
 	      }
@@ -20744,7 +20744,7 @@
 	      if (this.updateContentSize()) {
 	        if (!this.getLock()) {
 	          this.correctPagination(this.props, null);
-	          if (!this.props.loop) {
+	          if (!(0, _ArrayPropValue.propValuesEvery)(this.props.loop)) {
 	            this.correctOutOfTheBox(this.props);
 	          }
 	        }
@@ -20792,11 +20792,12 @@
 	          pagination === Pagination.First);
 	        }
 	      }
-	      newPosition = this.getFinalPosition(newPosition);
+	      newPosition = this.getFinalPosition(newPosition, scrollerId);
 	      var paginationSpring = (0, _effects.getSpringByPagination)(pagination);
 	      var adjustedSpring = (0, _effects.getAdjustedSpring)(oldPosition, newPosition, paginationSpring);
 	      if ((0, _StateHelpers.getScrollerPosition)(this.state, scrollerId) !== newPosition) {
 	        this.checkPageChanged(scrollerId, newPosition);
+	        this.setLockerEmpty(orientation);
 	        this.moveScroller(newPosition, scrollerId, adjustedSpring);
 	        this.autoScrolling = true;
 	      }
@@ -20856,8 +20857,13 @@
 	    }
 	  }, {
 	    key: 'getFinalPosition',
-	    value: function getFinalPosition(newPosition) {
-	      if (this.props.loop) {
+	    value: function getFinalPosition(newPosition, scrollerId) {
+	      var _props = this.props;
+	      var id = _props.id;
+	      var loop = _props.loop;
+
+	      var loopValue = (0, _ArrayPropValue.getPropValueForScroller)(scrollerId, id, loop);
+	      if (loopValue) {
 	        return newPosition;
 	      }
 	      return (0, _PositionCorrectors.outOfTheBoxCorrection)(newPosition, this.getLockedScroller(), this.props, this.contentAutoSize);
@@ -20961,6 +20967,7 @@
 
 	      var state = this.state;
 	      if ((0, _StateHelpers.scrollerExists)(state, id)) {
+	        this.callOnSetToScroll(newPosition);
 	        this.setState((0, _StateHelpers.moveScrollerNewPartialState)(state, id, newPosition, springValue));
 	      }
 	    }
@@ -20984,9 +20991,14 @@
 	    key: 'moveScrollerToPage',
 	    value: function moveScrollerToPage(page, scrollerId, margin, springValue) {
 	      if ((0, _StateHelpers.scrollerExists)(this.state, scrollerId)) {
+	        var _props2 = this.props;
+	        var id = _props2.id;
+	        var loop = _props2.loop;
+	        var size = _props2.size;
+
 	        var position = (0, _PositionCorrectors.pagePositionForScroller)(page, scrollerId, this.props, margin);
-	        if (this.props.loop) {
-	          position = (0, _logic.closestLoopPosition)((0, _StateHelpers.getScrollerPosition)(this.state, scrollerId), position, this.props.size.content, this.contentAutoSize);
+	        if ((0, _ArrayPropValue.getPropValueForScroller)(scrollerId, id, loop)) {
+	          position = (0, _logic.closestLoopPosition)((0, _StateHelpers.getScrollerPosition)(this.state, scrollerId), position, size.content, this.contentAutoSize);
 	        }
 	        this.moveScroller(position, scrollerId, springValue);
 	      }
@@ -21070,13 +21082,17 @@
 
 	      var props = arguments.length <= 0 || arguments[0] === undefined ? this.props : arguments[0];
 	      var springValue = arguments.length <= 1 || arguments[1] === undefined ? Springs.Normal : arguments[1];
+	      var id = props.id;
+	      var loop = props.loop;
+	      var pagination = props.pagination;
 
 	      var state = this.state;
 	      var moved = false;
 	      (0, _StateHelpers.foreachScroller)(state, function (scrollerId) {
-	        if ((0, _ArrayPropValue.getPropValueForScroller)(scrollerId, props.id, props.pagination) !== Pagination.None) {
+	        if ((0, _ArrayPropValue.getPropValueForScroller)(scrollerId, id, pagination) !== Pagination.None) {
+	          var loopValue = (0, _ArrayPropValue.getPropValueForScroller)(scrollerId, id, loop);
 	          var oldPosition = (0, _StateHelpers.getScrollerPosition)(state, scrollerId);
-	          var ignorePagination = oldPosition === 0 && !props.loop;
+	          var ignorePagination = oldPosition === 0 && !loopValue;
 	          if (!ignorePagination) {
 	            var newPosition = (0, _PositionCorrectors.paginationCorrection)(oldPosition, scrollerId, props, 0, undefined, // prevSinglePage
 	            props.pagination === Pagination.First);
@@ -21101,9 +21117,9 @@
 	      var _getLock2 = this.getLock();
 
 	      var scroller = _getLock2.scroller;
-	      var _props = this.props;
-	      var id = _props.id;
-	      var pagination = _props.pagination;
+	      var _props3 = this.props;
+	      var id = _props3.id;
+	      var pagination = _props3.pagination;
 
 	      var paginationType = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, pagination);
 	      if (paginationType === Pagination.Single || paginationType === Pagination.Multiple) {
@@ -21147,10 +21163,16 @@
 	  }, {
 	    key: 'isOutOfTheBox',
 	    value: function isOutOfTheBox(position) {
-	      if (this.props.loop) {
+	      var scrollerId = arguments.length <= 1 || arguments[1] === undefined ? this.getLockedScroller() : arguments[1];
+	      var _props4 = this.props;
+	      var id = _props4.id;
+	      var loop = _props4.loop;
+
+	      var loopValue = (0, _ArrayPropValue.getPropValueForScroller)(scrollerId, id, loop);
+	      if (loopValue) {
 	        return false;
 	      }
-	      var outOfTheBoxCorrectionPos = (0, _PositionCorrectors.outOfTheBoxCorrection)(position, this.getLockedScroller(), this.props, this.contentAutoSize);
+	      var outOfTheBoxCorrectionPos = (0, _PositionCorrectors.outOfTheBoxCorrection)(position, scrollerId, this.props, this.contentAutoSize);
 	      return outOfTheBoxCorrectionPos !== position;
 	    }
 	  }, {
@@ -21186,6 +21208,15 @@
 
 	      if (onScroll) {
 	        onScroll(scrollerPosition);
+	      }
+	    }
+	  }, {
+	    key: 'callOnSetToScroll',
+	    value: function callOnSetToScroll(scrollerPosition) {
+	      var onSetToScroll = this.props.onSetToScroll;
+
+	      if (onSetToScroll) {
+	        onSetToScroll(scrollerPosition);
 	      }
 	    }
 	  }, {
@@ -21251,9 +21282,9 @@
 	        if (typeof this.props.children === 'function') {
 	          return this.props.children(pos);
 	        }
-	        var _props2 = this.props;
-	        var orientation = _props2.orientation;
-	        var size = _props2.size;
+	        var _props5 = this.props;
+	        var orientation = _props5.orientation;
+	        var size = _props5.size;
 
 	        var containerStyle = (0, _styleApi.getContainerWithOrientationStyle)(orientation, size);
 	        var containerItemStyle = {
@@ -21354,6 +21385,7 @@
 	  clickThreshold: _react2.default.PropTypes.number,
 	  children: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.func, _react2.default.PropTypes.node]),
 	  onScroll: _react2.default.PropTypes.func,
+	  onSetToScroll: _react2.default.PropTypes.func,
 	  onScrollStarted: _react2.default.PropTypes.func,
 	  onScrollFinished: _react2.default.PropTypes.func,
 	  onPageChanged: _react2.default.PropTypes.func
@@ -24041,6 +24073,28 @@
 	    return prop;
 	  }
 	  return undefined;
+	};
+
+	var propValuesSome = exports.propValuesSome = function propValuesSome(prop) {
+	  var condition = arguments.length <= 1 || arguments[1] === undefined ? function (x) {
+	    return x;
+	  } : arguments[1];
+
+	  if (prop instanceof Array) {
+	    return prop.some(condition);
+	  }
+	  return condition(prop);
+	};
+
+	var propValuesEvery = exports.propValuesEvery = function propValuesEvery(prop) {
+	  var condition = arguments.length <= 1 || arguments[1] === undefined ? function (x) {
+	    return x;
+	  } : arguments[1];
+
+	  if (prop instanceof Array) {
+	    return prop.every(condition);
+	  }
+	  return condition(prop);
 	};
 
 /***/ },

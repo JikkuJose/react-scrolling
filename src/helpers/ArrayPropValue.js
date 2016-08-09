@@ -14,3 +14,17 @@ export const getPropValueForScroller = (scroller, id, prop) => {
   }
   return undefined;
 };
+
+export const propValuesSome = (prop, condition = (x) => x) => {
+  if (prop instanceof Array) {
+    return prop.some(condition);
+  }
+  return condition(prop);
+};
+
+export const propValuesEvery = (prop, condition = (x) => x) => {
+  if (prop instanceof Array) {
+    return prop.every(condition);
+  }
+  return condition(prop);
+};
