@@ -20683,8 +20683,8 @@
 	          return;
 	        }
 	      });
-	      if (!positionChanged && !this.getLock()) {
-	        var springStyle = this.autoScrolling ? undefined : null;
+	      if (!positionChanged && !this.getLock() && !this.updating) {
+	        var springStyle = noAnimation ? null : undefined;
 	        this.correctPagination(nextProps, springStyle);
 	        if (!(0, _ArrayPropValue.propValuesEvery)(nextProps.loop)) {
 	          this.correctOutOfTheBox(nextProps, springStyle);
@@ -20741,6 +20741,7 @@
 	  }, {
 	    key: 'componentDidUpdate',
 	    value: function componentDidUpdate() {
+	      this.updating = false;
 	      if (this.updateContentSize()) {
 	        if (!this.getLock()) {
 	          this.correctPagination(this.props, null);
@@ -20967,7 +20968,8 @@
 
 	      var state = this.state;
 	      if ((0, _StateHelpers.scrollerExists)(state, id)) {
-	        this.callOnSetToScroll(newPosition);
+	        this.updating = true;
+	        this.callOnSetToScroll(newPosition, id);
 	        this.setState((0, _StateHelpers.moveScrollerNewPartialState)(state, id, newPosition, springValue));
 	      }
 	    }
@@ -20996,11 +20998,16 @@
 	        var loop = _props2.loop;
 	        var size = _props2.size;
 
-	        var position = (0, _PositionCorrectors.pagePositionForScroller)(page, scrollerId, this.props, margin);
-	        if ((0, _ArrayPropValue.getPropValueForScroller)(scrollerId, id, loop)) {
-	          position = (0, _logic.closestLoopPosition)((0, _StateHelpers.getScrollerPosition)(this.state, scrollerId), position, size.content, this.contentAutoSize);
+	        var loopValue = (0, _ArrayPropValue.getPropValueForScroller)(scrollerId, id, loop);
+	        var position = (0, _PositionCorrectors.pagePositionForScroller)(page, scrollerId, this.props, margin, this.contentAutoSize, !loopValue);
+	        if (loopValue) {
+	          var contentSize = (0, _ArrayPropValue.getPropValueForScroller)(scrollerId, id, size.content);
+	          position = (0, _logic.closestLoopPosition)((0, _StateHelpers.getScrollerPosition)(this.state, scrollerId), position, contentSize, this.contentAutoSize);
 	        }
-	        this.moveScroller(position, scrollerId, springValue);
+	        var currPosition = (0, _StateHelpers.getScrollerPosition)(this.state, scrollerId);
+	        if (currPosition !== position) {
+	          this.moveScroller(position, scrollerId, springValue);
+	        }
 	      }
 	    }
 	  }, {
@@ -21212,11 +21219,11 @@
 	    }
 	  }, {
 	    key: 'callOnSetToScroll',
-	    value: function callOnSetToScroll(scrollerPosition) {
+	    value: function callOnSetToScroll(scrollerPosition, scrollerId) {
 	      var onSetToScroll = this.props.onSetToScroll;
 
 	      if (onSetToScroll) {
-	        onSetToScroll(scrollerPosition);
+	        onSetToScroll(scrollerPosition, scrollerId);
 	      }
 	    }
 	  }, {
@@ -24026,15 +24033,18 @@
 	  return position - direction * distance;
 	};
 
-	var pagePositionForScroller = exports.pagePositionForScroller = function pagePositionForScroller(pageNum, scroller, _ref3, margin) {
+	var pagePositionForScroller = exports.pagePositionForScroller = function pagePositionForScroller(pageNum, scroller, _ref3, margin, contentAutoSize, needCorrection) {
 	  var id = _ref3.id;
 	  var size = _ref3.size;
+	  var center = _ref3.center;
 	  var page = _ref3.page;
 
 	  var pageSize = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, page.size);
 	  var pageMargin = margin === undefined ? (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, page.margin) : margin;
 	  var containerSize = (0, _ArrayPropValue.getPropValueForScroller)(scroller, id, size.container);
-	  return pagePosition(pageNum, pageSize, pageMargin, containerSize);
+	  var pagePos = pagePosition(pageNum, pageSize, pageMargin, containerSize);
+	  var correctedPos = needCorrection ? outOfTheBoxCorrection(pagePos, scroller, { id: id, size: size, center: center }, contentAutoSize) : pagePos;
+	  return correctedPos;
 	};
 
 	var pageNumberForPosition = exports.pageNumberForPosition = function pageNumberForPosition(position, scroller, _ref4, margin) {

@@ -82,13 +82,27 @@ export const velocityPositionCorrection = (position, scroller, velocity) => {
   return position - direction * distance;
 };
 
-export const pagePositionForScroller = (pageNum, scroller, { id, size, page }, margin) => {
+export const pagePositionForScroller = (
+  pageNum,
+  scroller,
+  { id, size, center, page },
+  margin,
+  contentAutoSize,
+  needCorrection
+) => {
   const pageSize = getPropValueForScroller(scroller, id, page.size);
   const pageMargin = margin === undefined
       ? getPropValueForScroller(scroller, id, page.margin)
       : margin;
   const containerSize = getPropValueForScroller(scroller, id, size.container);
-  return pagePosition(pageNum, pageSize, pageMargin, containerSize);
+  const pagePos = pagePosition(pageNum, pageSize, pageMargin, containerSize);
+  const correctedPos = needCorrection ? outOfTheBoxCorrection(
+    pagePos,
+    scroller,
+    { id, size, center },
+    contentAutoSize
+  ) : pagePos;
+  return correctedPos;
 };
 
 export const pageNumberForPosition = (position, scroller, { id, size, page }, margin) => {

@@ -114,8 +114,8 @@ export class Scroller extends React.Component {
         return;
       }
     });
-    if (!positionChanged && !this.getLock()) {
-      const springStyle = this.autoScrolling ? undefined : null;
+    if (!positionChanged && !this.getLock() && !this.updating) {
+      const springStyle = noAnimation ? null : undefined;
       this.correctPagination(nextProps, springStyle);
       if (!propValuesEvery(nextProps.loop)) {
         this.correctOutOfTheBox(nextProps, springStyle);
@@ -170,6 +170,7 @@ export class Scroller extends React.Component {
   }
 
   componentDidUpdate() {
+    this.updating = false;
     if (this.updateContentSize()) {
       if (!this.getLock()) {
         this.correctPagination(this.props, null);
@@ -389,7 +390,8 @@ export class Scroller extends React.Component {
   moveScroller(newPosition, id = this.props.id, springValue = Springs.Normal) {
     const state = this.state;
     if (scrollerExists(state, id)) {
-      this.callOnSetToScroll(newPosition);
+      this.updating = true;
+      this.callOnSetToScroll(newPosition, id);
       this.setState(moveScrollerNewPartialState(state, id, newPosition, springValue));
     }
   }
@@ -417,16 +419,28 @@ export class Scroller extends React.Component {
   moveScrollerToPage(page, scrollerId, margin, springValue) {
     if (scrollerExists(this.state, scrollerId)) {
       const { id, loop, size } = this.props;
-      let position = pagePositionForScroller(page, scrollerId, this.props, margin);
-      if (getPropValueForScroller(scrollerId, id, loop)) {
+      const loopValue = getPropValueForScroller(scrollerId, id, loop);
+      let position = pagePositionForScroller(
+        page,
+        scrollerId,
+        this.props,
+        margin,
+        this.contentAutoSize,
+        !loopValue
+      );
+      if (loopValue) {
+        const contentSize = getPropValueForScroller(scrollerId, id, size.content);
         position = closestLoopPosition(
           getScrollerPosition(this.state, scrollerId),
           position,
-          size.content,
+          contentSize,
           this.contentAutoSize
         );
       }
-      this.moveScroller(position, scrollerId, springValue);
+      const currPosition = getScrollerPosition(this.state, scrollerId);
+      if (currPosition !== position) {
+        this.moveScroller(position, scrollerId, springValue);
+      }
     }
   }
 
@@ -611,10 +625,10 @@ export class Scroller extends React.Component {
     }
   }
 
-  callOnSetToScroll(scrollerPosition) {
+  callOnSetToScroll(scrollerPosition, scrollerId) {
     const { onSetToScroll } = this.props;
     if (onSetToScroll) {
-      onSetToScroll(scrollerPosition);
+      onSetToScroll(scrollerPosition, scrollerId);
     }
   }
 
