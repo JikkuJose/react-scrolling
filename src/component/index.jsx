@@ -1,7 +1,6 @@
 import React from 'react';
-import autobind from 'autobind-decorator';
 import ReactGesture from 'react-gesture';
-import { eventCoordinates } from '../helpers/coordinatesFromEvent';
+import eventCoordinates from '../helpers/coordinatesFromEvent';
 import { Motion } from 'react-motion';
 import * as Config from '../config';
 import * as Orientation from '../consts/Orientation';
@@ -62,12 +61,17 @@ const defaultProps = {
 
 const windowWidth = window.innerWidth;
 
-export class Scroller extends React.Component {
+export default class Scroller extends React.Component {
 
   constructor(props) {
     super(props);
-
     this.state = getInitialState(props);
+    this.onEventBegin = this.onEventBegin.bind(this);
+    this.onEventEnd = this.onEventEnd.bind(this);
+    this.onSwipe = this.onSwipe.bind(this);
+    this.onSetContentDom = this.onSetContentDom.bind(this);
+    this.motionRest = this.motionRest.bind(this);
+    this.disableClick = this.disableClick.bind(this);
   }
 
   componentWillMount() {
@@ -123,52 +127,6 @@ export class Scroller extends React.Component {
     }
   }
 
-  shouldComponentUpdate(/* nextProps, nextState */) {
-    return true;
-    /*
-    for (let i = 0; i < nextState.scrollers.length; ++i) {
-      if (nextState.scrollers[i].position !== this.state.scrollers[i].position) {
-        return true;
-      }
-    }
-    if (nextProps.size !== this.props.size) {
-      return true;
-    }
-    if (nextProps.size.container !== this.props.size.container) {
-      return true;
-    }
-    if (nextProps.size.content !== this.props.size.content) {
-      return true;
-    }
-    if (nextProps.page !== this.props.page) {
-      return true;
-    }
-    if (nextProps.page !== undefined) {
-      if (nextProps.page.size !== this.props.page.size) {
-        return true;
-      }
-      if (nextProps.page.margin !== this.props.page.margin) {
-        return true;
-      }
-    }
-    if (nextProps.multiple !== this.props.multiple) {
-      return true;
-    }
-    if (nextProps.multiple !== undefined) {
-      if (nextProps.multiple.before !== this.props.multiple.before) {
-        return true;
-      }
-      if (nextProps.multiple.between !== this.props.multiple.between) {
-        return true;
-      }
-      if (nextProps.multiple.size !== this.props.multiple.size) {
-        return true;
-      }
-    }
-    return false;
-    */
-  }
-
   componentDidUpdate() {
     this.updating = false;
     if (this.updateContentSize()) {
@@ -181,7 +139,6 @@ export class Scroller extends React.Component {
     }
   }
 
-  @autobind
   onEventBegin(e) {
     this.stateBeforeEvents = this.state;
     const { orientation } = this.props;
@@ -198,7 +155,6 @@ export class Scroller extends React.Component {
     }
   }
 
-  @autobind
   onEventEnd(e) {
     const { orientation } = this.props;
     if (!this.getLock() || !this.getLockedSwiped()) {
@@ -252,7 +208,6 @@ export class Scroller extends React.Component {
     this.setLockerEmpty(orientation);
   }
 
-  @autobind
   onSwipe(e) {
     if (!this.isSwipeInRightDirection(e)) {
       return;
@@ -276,7 +231,6 @@ export class Scroller extends React.Component {
     }
   }
 
-  @autobind
   onSetContentDom(ref) {
     this.contentDom = ref;
   }
@@ -654,13 +608,11 @@ export class Scroller extends React.Component {
     }
   }
 
-  @autobind
   motionRest() {
     this.autoScrolling = false;
     this.callOnScrollFinished();
   }
 
-  @autobind
   disableClick(e) {
     const { clickThreshold } = this.props;
     const coordinates = eventCoordinates(e, this.props.scale, windowWidth);

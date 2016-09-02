@@ -38,9 +38,9 @@ export function closestLoopPosition(oldPosition, newPosition, contentSize, conte
   const contentSize2 = (contentAutoSize === undefined) ? contentSize : contentAutoSize;
   const newPosition2 = correctLoopPosition(newPosition, contentSize, contentAutoSize);
   const oldFrame = Math.ceil(oldPosition / contentSize2);
-  const prevFrame = (oldFrame - 1) * contentSize2 + newPosition2;
-  const currFrame = oldFrame * contentSize2 + newPosition2;
-  const nextFrame = (oldFrame + 1) * contentSize2 + newPosition2;
+  const prevFrame = ((oldFrame - 1) * contentSize2) + newPosition2;
+  const currFrame = (oldFrame * contentSize2) + newPosition2;
+  const nextFrame = ((oldFrame + 1) * contentSize2) + newPosition2;
   let min = prevFrame;
   if (Math.abs(currFrame - oldPosition) < Math.abs(min - oldPosition)) {
     min = currFrame;

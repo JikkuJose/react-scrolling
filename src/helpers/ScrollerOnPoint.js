@@ -16,3 +16,7 @@ export const scrollerOnPoint = (point, { id, multiple, orientation }) => {
   }
   return id[index];
 };
+
+export default {
+  scrollerOnPoint,
+};

@@ -7,7 +7,7 @@ export const getInitialPosition = (scrollerId, props) => {
   if (pagination === Pagination.First) {
     const pageSize = getPropValueForScroller(scrollerId, props.id, props.page.size);
     const pageMargin = getPropValueForScroller(scrollerId, props.id, props.page.margin);
-    return - (pageSize + 2 * pageMargin);
+    return -(pageSize + (2 * pageMargin));
   }
   return 0;
 };

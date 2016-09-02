@@ -6,3 +6,7 @@ export function getContainerWithOrientationStyle(orientation, size) {
     [orientationSize[orientation]]: `${size.container}px`,
   });
 }
+
+export default {
+  getContainerWithOrientationStyle,
+};
