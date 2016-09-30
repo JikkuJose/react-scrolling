@@ -7,6 +7,8 @@
 
 Smooth scrolling for the web on React.
 
+![](https://github.com/opensource-cards/react-scrolling/blob/master/demo.gif)
+
 ### Installation
 
 Using [npm](https://www.npmjs.com/):

@@ -34,9 +34,9 @@ export const getInitialState = (props) => {
 
 export const foreachScroller = (state, callback) => {
   const { scrollerIds, scrollers } = state;
-  for (let i = 0; i < scrollerIds.length; ++i) {
-    callback(scrollerIds[i], scrollers[i]);
-  }
+  scrollerIds.forEach((scrollerId, i) => {
+    callback(scrollerId, scrollers[i]);
+  });
 };
 
 export const getSpringStyle = (state) => {
