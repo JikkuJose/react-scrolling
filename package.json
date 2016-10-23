@@ -1,6 +1,6 @@
 {
   "name": "react-scrolling",
-  "version": "0.0.1-rc.30",
+  "version": "0.0.1-rc.31",
   "description": "Smooth scrolling for the web on React.",
   "keywords": [
     "react",
@@ -29,7 +29,7 @@
   ],
   "main": "lib/index.js",
   "dependencies": {
-    "react-gesture": "^0.0.2-rc.10",
+    "react-gesture": "^0.0.2-rc.11",
     "react-motion": "^0.4.5"
   },
   "peerDependencies": {
