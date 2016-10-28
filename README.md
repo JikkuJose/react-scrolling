@@ -5,7 +5,7 @@
 [![devDependency Status](https://david-dm.org/opensource-cards/react-scrolling/dev-status.svg)](https://david-dm.org/opensource-cards/react-scrolling#info=devDependencies)
 [![peerDependency Status](https://david-dm.org/opensource-cards/react-scrolling/peer-status.svg)](https://david-dm.org/opensource-cards/react-scrolling#info=peerDependencies)
 
-Smooth scrolling for the web on React.
+Smooth web scrolling for React.
 
 ![](https://github.com/opensource-cards/react-scrolling/blob/master/demo.gif)
 
