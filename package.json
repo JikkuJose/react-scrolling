@@ -1,6 +1,6 @@
 {
   "name": "react-scrolling",
-  "version": "0.0.1-rc.31",
+  "version": "0.0.1-rc.32",
   "description": "Smooth scrolling for the web on React.",
   "keywords": [
     "react",
@@ -29,7 +29,7 @@
   ],
   "main": "lib/index.js",
   "dependencies": {
-    "react-gesture": "^0.0.2-rc.11",
+    "react-gesture": "^0.0.2-rc.12",
     "react-motion": "^0.4.5"
   },
   "peerDependencies": {
@@ -49,6 +49,8 @@
     "eslint-plugin-import": "^2.0.0",
     "eslint-plugin-jsx-a11y": "^2.2.2",
     "eslint-plugin-react": "^6.3.0",
+    "react": "^15.3.2",
+    "react-dom": "^15.3.2",
     "rimraf": "^2.5.4",
     "webpack": "^1.13.2",
     "webpack-dev-server": "^1.16.1"
