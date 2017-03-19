@@ -10,6 +10,10 @@ Smooth web scrolling for React.
 
 ![](https://github.com/opensource-cards/react-scrolling/blob/master/demo.gif)
 
+### Demo
+
+See it [live][demo], served from `gh-pages` branch.
+
 ### Installation
 
 Using [npm](https://www.npmjs.com/):
@@ -21,3 +25,5 @@ npm install --save react-scrolling
 ### License
 
 MIT
+
+[demo]: https://opensource-cards.github.io/react-scrolling
